@@ -20,16 +20,12 @@ public class TeamsController {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@RequestMapping(method=RequestMethod.GET)
-	public void index() {
-	}
-
-	@RequestMapping(value="/{name}", method=RequestMethod.GET)
+	@RequestMapping(value="/{name}", method=RequestMethod.GET, produces="application/json")
 	public Team get(@PathVariable String name) {
 		return jdbcTemplate.queryForObject("select name from Team where name = ?", new TeamRowMapper(), name);
 	}
 
-	@RequestMapping(value="/create", method=RequestMethod.POST)
+	@RequestMapping(method=RequestMethod.POST)
 	public String add(TeamForm team) {
 		jdbcTemplate.update("insert into Team (name) values (?)", team.getName());
 		return "redirect:/teams/" + team.getName();

@@ -45,10 +45,6 @@ sourceSets {
     }
 }
 
-war {
-    baseName = 'pastime'
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '1.0-milestone-3'
 }
