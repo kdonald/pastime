@@ -10,7 +10,7 @@
 
 	<context-param>
     	<param-name>contextConfigLocation</param-name>
-    	<param-value>com.pastime.webapp.config</param-value>
+    	<param-value>com.pastime.config</param-value>
 	</context-param>
 		
 	<!-- Creates the Spring Container shared by all Servlets and Filters -->

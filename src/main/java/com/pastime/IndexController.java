@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * Controller for the homepage of the application.
+ * Controller for the index, or homepage, of the application.
  * @author Keith Donald
  */
 @Controller
@@ -30,7 +30,7 @@ public class IndexController {
 	 * Renders the home page as HTML in the web browser.
 	 */
 	@RequestMapping(value="/", method=RequestMethod.GET)
-	public String home() {
-		return "index";
+	public void index() {
 	}
+	
 }
