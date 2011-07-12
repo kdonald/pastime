@@ -1,25 +1,97 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Pastime</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />	
+    <meta charset="utf-8" />
     <meta name="description" content="Spend time doing what you love." />
     <meta name="keywords" content="social, sports, performance, active, activity, game, fun, cloud, SaaS" />
-</head>
-<body>
-	<div id="header">
-		<h1>Pastime</h1>
-		<div id="nav">
-	    	<ul>
-	        	<li><a href="teams">Teams</a></li>
-	    	</ul>
-		</div>	
-	</div>
-	<div id="content">
-		<h2>Welcome to Pastime!</h2>
-	</div>
-	<div id="footer">
-		<p>Pastime &copy; 2011</p>
-	</div>
-</body>
+  </head>
+  <body>
+    <header>
+      <hgroup>
+        <h1>Pastime</h1>
+        <h2>Spend time doing what you love</h2>      
+      </hgroup>
+    </header>
+    <nav>
+      <ul>
+        <li>
+          <a href="settings">Keith Donald</a>
+        </li>
+      </ul>
+    </nav>
+    <div id="main">
+      <section id="newsFeed"></section>
+      <section id="yourLeagues"></section>
+      <section id="watchedLeagues"></section>
+    </div>
+    <footer>
+      <p>Pastime &copy; 2011</p>
+    </footer>
+    <script src="jquery/1.6.2/jquery.js"></script>    
+    <script src="handlebars/1.0.0.beta3/handlebars.js"></script>
+    <script id="newsFeedTemplate" type="text/x-handlebars-template">
+      <h2>News Feed</h2>
+      <ol>
+        <li>
+          <article>
+            <header>
+              <h1>Brevard Parks and Recreation - 3:39 PM</h1>
+            </header>
+            <div>
+              <a href="leagues/florida/brevardparks/south-football/2011/summer">South Brevard Adult Flag Football</a> summer league registration is now open.
+            </div>
+          </article>
+        <li>
+          <article>
+            <header>
+              <h1>Palm Bay Pony Softball - July 9</h1>
+            </header>
+            <div>
+              <a href="leagues/florida/palm-bay/pony-softball/2011/summer/2#river-bandits-vs-pirates">River Bandits down Pirates</a> 15-2.
+            </div>
+          </article>
+        </li>
+        <li>
+          <article>
+            <header>
+              <h1>Calvary Chapel Basketball - July 7</h1>
+            </header>
+            <div
+              <a href="leagues/florida/ccm/basketball/2011/summer/3#red-vs-blue">Red defeats Blue</a> 49-37.
+            </div>
+          </article>
+        </li>
+      </ol>
+    </script>
+    <script id="yourLeaguesTemplate" type="text/x-handlebars-template">
+      <h2>Your Leagues (1)</h2>
+      <ul>
+        <li class="basketball">
+          <a href="leagues/florida/ccm/basketball/2011/summer">Calvary Chapel Basketball</a>
+        </li>
+      </ul>    
+    </script>
+    <script id="watchedLeaguesTemplate" type="text/x-handlebars-template">
+      <h2>Leagues You're Watching (1)</h2>
+      <ul>
+        <li class="softball">
+          <a href="leagues/florida/palm-bay/pony-softball/2011/summer">Palm Bay Pony Softball</a>
+         </li>
+      </ul>    
+    </script>
+    <script>
+      (function($) {
+    	  var templates = {
+          newsFeed: Handlebars.compile($("#newsFeedTemplate").html()),
+          yourLeagues: Handlebars.compile($("#yourLeaguesTemplate").html()),
+          watchedLeagues: Handlebars.compile($("#watchedLeaguesTemplate").html())          
+        };
+    	  var data = {};
+    	  $("#newsFeed").html(templates.newsFeed(data));
+        $("#yourLeagues").html(templates.yourLeagues(data));
+        $("#watchedLeagues").html(templates.watchedLeagues(data));
+      })(jQuery);
+    </script>   
+  </body>
 </html>
