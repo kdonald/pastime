@@ -1,4 +1,4 @@
-<h2>Leagues You're Watching</h2>
+<h2>Leagues You're Watching ({{leagues.length}})</h2>
 <ul>
 {{#leagues}}
   <li class="{{sport}}">

@@ -1,4 +1,4 @@
-<h2>Your Leagues (1)</h2>
+<h2>Your Leagues ({{leagues.length}})</h2>
 <ul>
 {{#leagues}}
   <li class="{{sport}}">
