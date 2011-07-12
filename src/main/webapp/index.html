@@ -30,66 +30,32 @@
     </footer>
     <script src="jquery/1.6.2/jquery.js"></script>    
     <script src="handlebars/1.0.0.beta3/handlebars.js"></script>
-    <script id="newsFeedTemplate" type="text/x-handlebars-template">
-      <h2>News Feed</h2>
-      <ol>
-        <li>
-          <article>
-            <header>
-              <h1>Brevard Parks and Recreation - 3:39 PM</h1>
-            </header>
-            <div>
-              <a href="leagues/florida/brevardparks/south-football/2011/summer">South Brevard Adult Flag Football</a> summer league registration is now open.
-            </div>
-          </article>
-        <li>
-          <article>
-            <header>
-              <h1>Palm Bay Pony Softball - July 9</h1>
-            </header>
-            <div>
-              <a href="leagues/florida/palm-bay/pony-softball/2011/summer/2#river-bandits-vs-pirates">River Bandits down Pirates</a> 15-2.
-            </div>
-          </article>
-        </li>
-        <li>
-          <article>
-            <header>
-              <h1>Calvary Chapel Basketball - July 7</h1>
-            </header>
-            <div
-              <a href="leagues/florida/ccm/basketball/2011/summer/3#red-vs-blue">Red defeats Blue</a> 49-37.
-            </div>
-          </article>
-        </li>
-      </ol>
-    </script>
-    <script id="yourLeaguesTemplate" type="text/x-handlebars-template">
-      <h2>Your Leagues (1)</h2>
-      <ul>
-        <li class="basketball">
-          <a href="leagues/florida/ccm/basketball/2011/summer">Calvary Chapel Basketball</a>
-        </li>
-      </ul>    
-    </script>
-    <script id="watchedLeaguesTemplate" type="text/x-handlebars-template">
-      <h2>Leagues You're Watching (1)</h2>
-      <ul>
-        <li class="softball">
-          <a href="leagues/florida/palm-bay/pony-softball/2011/summer">Palm Bay Pony Softball</a>
-         </li>
-      </ul>    
-    </script>
     <script>
       (function($) {
-    	  var templates = {
-          newsFeed: Handlebars.compile($("#newsFeedTemplate").html()),
-          yourLeagues: Handlebars.compile($("#yourLeaguesTemplate").html()),
-          watchedLeagues: Handlebars.compile($("#watchedLeaguesTemplate").html())          
-        };
-    	  var data = {};
-    	  $("#newsFeed").html(templates.newsFeed(data));
+        var templates = (function() {
+          function load(path) {
+            var content = $.ajax({ url: path, async: false }).responseText;
+            return Handlebars.compile(content);
+          }
+          return {
+            newsFeed: load("newsFeed.hb"),
+            yourLeagues: load("yourLeagues.hb"),
+            watchedLeagues: load("watchedLeagues.hb")          
+          };
+        })();
+        var data = { articles: [ 
+            { author: { name: "Brevard Parks and Recreation" }, time: "3:39 PM", body: "<a href=\"leagues/florida/brevardparks/south-football/2011/summer\">South Brevard Adult Flag Football</a> summer league registration is now open." },
+            { author: { name: "Palm Bay Pony Softball" }, time: "July 9", body: "<a href=\"leagues/florida/palm-bay/pony-softball/2011/summer/2#river-bandits-vs-pirates\">River Bandits down Pirates</a>" },
+            { author: { name: "Calvary Chapel Basketball" }, time: "July 7", body: " <a href=\"leagues/florida/ccm/basketball/2011/summer/3#red-vs-blue\">Red defeats Blue</a> 49-37." }
+        ]};
+        $("#newsFeed").html(templates.newsFeed(data));
+        data = { leagues: [
+            { name: "Calvary Chapel Basketball", path: "leagues/florida/ccm/basketball/2011/summer", sport: "basketball" }
+        ]};
         $("#yourLeagues").html(templates.yourLeagues(data));
+        data = { leagues: [
+            { name: "Palm Bay Pony Softball", path: "leagues/florida/palm-bay/pony-softball/2011/summer", sport: "softball" }
+        ]};
         $("#watchedLeagues").html(templates.watchedLeagues(data));
       })(jQuery);
     </script>   
