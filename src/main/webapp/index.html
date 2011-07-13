@@ -30,6 +30,7 @@
     </footer>
     <script src="jquery/1.6.2/jquery.js"></script>    
     <script src="handlebars/1.0.0.beta3/handlebars.js"></script>
+    <script src="pastime.js"></script>
     <script>
       (function($) {
         var templates = (function() {
@@ -43,20 +44,9 @@
             watchedLeagues: load("watchedLeagues.hb")          
           };
         })();
-        var data = { articles: [ 
-            { author: { name: "Brevard Parks and Recreation" }, time: "3:39 PM", body: "<a href=\"leagues/florida/brevardparks/south-football/2011/summer\">South Brevard Adult Flag Football</a> summer league registration is now open." },
-            { author: { name: "Palm Bay Pony Softball" }, time: "July 9", body: "<a href=\"leagues/florida/palm-bay/pony-softball/2011/summer/2#river-bandits-vs-pirates\">River Bandits down Pirates</a>" },
-            { author: { name: "Calvary Chapel Basketball" }, time: "July 7", body: " <a href=\"leagues/florida/ccm/basketball/2011/summer/3#red-vs-blue\">Red defeats Blue</a> 49-37." }
-        ]};
-        $("#newsFeed").html(templates.newsFeed(data));
-        data = { leagues: [
-            { name: "Calvary Chapel Basketball", path: "leagues/florida/ccm/basketball/2011/summer", sport: "basketball" }
-        ]};
-        $("#yourLeagues").html(templates.yourLeagues(data));
-        data = { leagues: [
-            { name: "Palm Bay Pony Softball", path: "leagues/florida/palm-bay/pony-softball/2011/summer", sport: "softball" }
-        ]};
-        $("#watchedLeagues").html(templates.watchedLeagues(data));
+        $("#newsFeed").html(templates.newsFeed({ articles: pastime.getNews() }));
+        $("#yourLeagues").html(templates.yourLeagues({ leagues: pastime.getLeagues() }));
+        $("#watchedLeagues").html(templates.watchedLeagues({ leagues: pastime.getWatchedLeagues() }));
       })(jQuery);
     </script>   
   </body>
