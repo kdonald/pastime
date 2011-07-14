@@ -1,6 +1,5 @@
 require([
-    "pastime",
-    "handlebars"
+    "pastime"
   ],
   function(pastime) {
     pastime.start(); 
