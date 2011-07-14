@@ -28,26 +28,6 @@
     <footer>
       <p>Pastime &copy; 2011</p>
     </footer>
-    <script src="jquery/1.6.2/jquery.js"></script>    
-    <script src="handlebars/1.0.0.beta3/handlebars.js"></script>
-    <script src="pastime.js"></script>
-    <script>
-      (function($) {
-        var templates = (function() {
-          function load(path) {
-            var content = $.ajax({ url: path, async: false }).responseText;
-            return Handlebars.compile(content);
-          }
-          return {
-            newsFeed: load("newsFeed.hb"),
-            yourLeagues: load("yourLeagues.hb"),
-            watchedLeagues: load("watchedLeagues.hb")          
-          };
-        })();
-        $("#newsFeed").html(templates.newsFeed({ articles: pastime.getNews() }));
-        $("#yourLeagues").html(templates.yourLeagues({ leagues: pastime.getLeagues() }));
-        $("#watchedLeagues").html(templates.watchedLeagues({ leagues: pastime.getWatchedLeagues() }));
-      })(jQuery);
-    </script>   
+    <script data-main="main.js" src="requirejs/0.25.0/require.js"></script>    
   </body>
 </html>
