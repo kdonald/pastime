@@ -1,15 +1,8 @@
 <h2>News Feed</h2>
 <ol>
-{{#articles}}
+{{#items}}
   <li>
-    <article class="{{type}}">
-      <header>
-        <h1>{{{author.name}}} - {{time}}</h1>
-      </header>
-      <div>
-        {{{body}}}
-      </div>
-    </article>
+    {{> item}}
   </li>
-{{/articles}}  
+{{/items}}  
 </ol>
