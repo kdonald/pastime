@@ -1,7 +1,4 @@
-require([
-    "pastime"
-  ],
-  function(pastime) {
+require(["pastime"], function(pastime) {
     pastime.start(); 
   }
 );
