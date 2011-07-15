@@ -5,9 +5,7 @@ Project Structure
 the pastime user web application
 src - all source code
 	main/java - backend java source code
-	main/webapp/assets - static sources including css, javascript, and image files
-	main/webapp/WEB-INF/views - template sources that generic dynamic views
-	test/ - test code
+	main/webapp - frontend html/css/javascript code
 	
 To build a deployable web app archive (.war):
 ---------------------------------------------
