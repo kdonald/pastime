@@ -22,7 +22,7 @@ define(["jquery"], function($) {
   
   function subscribeNews(callback) {
     function newsGenerator() {
-      callback({ id: 3, author: { name: "Brevard Parks and Recreation" }, time: "3:39 PM", body: "<a href=\"leagues/florida/brevardparks/south-football/2011/summer\">South Brevard Adult Flag Football</a> summer league registration is now open." });
+      callback({ id: 4, author: { name: "Brevard Parks and Recreation" }, time: "4:39 PM", body: "<a href=\"leagues/florida/brevardparks/south-football/2011/summer\">South Brevard Adult Flag Football</a> summer league registration is now open." });
     }
     window.setTimeout(newsGenerator, 5000);
   }

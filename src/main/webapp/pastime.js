@@ -19,7 +19,7 @@ define(["jquery", "handlebars", "sammy", "pastime-api", "templates"], function($
   
   function start() {
     var pastime = app(function() {
-      this.get("/", function() {
+      function dashboard() {
         function initNews() {
           api.getNews(function(items) {
             $("#newsFeed").html(views.newsFeed({ items: items }));
@@ -38,7 +38,8 @@ define(["jquery", "handlebars", "sammy", "pastime-api", "templates"], function($
         }
         initNews();
         initLeagues();
-      });
+      }
+      this.get("/", dashboard);
     });
     pastime.run();    
   }
