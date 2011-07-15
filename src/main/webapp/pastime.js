@@ -13,9 +13,15 @@ define(["jquery", "handlebars", "pastime-api", "text!newsFeed.hb", "text!yourLea
   })();
   
   function start() {
-    $("#newsFeed").html(views.newsFeed({ articles: api.getNews() }));
-    $("#yourLeagues").html(views.yourLeagues({ leagues: api.getLeagues() }));
-    $("#watchedLeagues").html(views.watchedLeagues({ leagues: api.getWatchedLeagues() }));          
+    api.getNews(function(news) {
+        $("#newsFeed").html(views.newsFeed({ articles: news }));
+    });
+    api.getLeagues(function(leagues) {
+        $("#yourLeagues").html(views.yourLeagues({ leagues: leagues }));
+    });
+    api.getWatchedLeagues(function(leagues) {
+        $("#watchedLeagues").html(views.watchedLeagues({ leagues: leagues }));          
+    });
   }
   
   return {
