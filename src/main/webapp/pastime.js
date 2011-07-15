@@ -1,31 +1,46 @@
-define(["jquery", "handlebars", "pastime-api", "templates"], function($, Handlebars, api, templates) {
+define(["jquery", "handlebars", "sammy", "pastime-api", "templates"], function($, templating, app, api, templates) {
   var views = (function() {
     function compile(template) {
-      return Handlebars.compile(template);
+      return templating.compile(template);
     }
-    function partial(name, template) {
-      var compiled = Handlebars.compile(template);
-      Handlebars.registerPartial(name, compiled);
-      return compiled;
-    }
+    var newsItem = compile(templates.newsItem);
     return {
-      newsFeed: compile(templates.newsFeed),
-      newsItem: partial("item", templates.newsItem),
+      newsItem: newsItem,
+      newsFeed: (function() {
+        var view = compile(templates.newsFeed);
+        return function(context) {
+          return view(context, { partials: { item: newsItem } });        
+        };
+      })(),
       yourLeagues: compile(templates.yourLeagues),
-      watchedLeagues: compile(templates.watchedLeagues)          
+      watchedLeagues: compile(templates.watchedLeagues),
     };
   })();
   
   function start() {
-    api.getNews(function(news) {
-        $("#newsFeed").html(views.newsFeed({ items: news }));
+    var pastime = app(function() {
+      this.get("/", function() {
+        function initNews() {
+          api.getNews(function(items) {
+            $("#newsFeed").html(views.newsFeed({ items: items }));
+          });
+          api.subscribeNews(function(item) {
+            $("#newsFeed li:first").before("<li>" + views.newsItem(item) + "</li>");
+          });          
+        }
+        function initLeagues() {
+          api.getLeagues(function(leagues) {
+            $("#yourLeagues").html(views.yourLeagues({ leagues: leagues }));
+          });
+          api.getWatchedLeagues(function(leagues) {
+            $("#watchedLeagues").html(views.watchedLeagues({ leagues: leagues }));          
+          });          
+        }
+        initNews();
+        initLeagues();
+      });
     });
-    api.getLeagues(function(leagues) {
-        $("#yourLeagues").html(views.yourLeagues({ leagues: leagues }));
-    });
-    api.getWatchedLeagues(function(leagues) {
-        $("#watchedLeagues").html(views.watchedLeagues({ leagues: leagues }));          
-    });
+    pastime.run();    
   }
   
   return {
