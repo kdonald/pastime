@@ -2,21 +2,23 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
     function($, handlebars, api, dashboardTemplate, newsItemTemplate) {
 
   var dashboard = undefined;
- 
+  
+  var newsItemView = handlebars.compile(newsItemTemplate);
   var dashboardView = (function() {
     var compiled = handlebars.compile(dashboardTemplate);
-    var newsItem = handlebars.compile(newsItemTemplate);
     return function(context) {
-      return compiled(context, { partials: { newsItem: newsItem } });        
+      return compiled(context, { partials: { newsItem: newsItemView } });        
     };
   })();
 
   function init() {
     api.getDashboard(function(result) {
       dashboard = result;
-    });
-    api.subscribeNews(function(newsItem) {
-      dashboard.addNewsItem(newsItem);
+      dashboard.addNewsListener({ 
+        newsItemAdded: function(newsItem) {
+          $("#newsFeed li:first").before("<li>" + newsItemView(newsItem) + "</li>");
+        } 
+      });
     });
   }
 
