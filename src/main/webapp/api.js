@@ -12,7 +12,10 @@ define(["jquery"], function($) {
       ],
       watchedLeagues: [
         { name: "Palm Bay Pony Softball", path: "leagues/florida/palm-bay/pony-softball/2011/summer", sport: "softball" }              
-      ]
+      ],
+      addNewsItem: function(newsItem) {
+        
+      }
     });
   }
     

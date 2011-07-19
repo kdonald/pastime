@@ -1,27 +1,36 @@
 define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
     function($, handlebars, api, dashboardTemplate, newsItemTemplate) {
 
-  newsItemTemplate = handlebars.compile(newsItemTemplate);
-  dashboardTemplate = (function() {
+  var dashboard = undefined;
+ 
+  var dashboardView = (function() {
     var compiled = handlebars.compile(dashboardTemplate);
+    var newsItem = handlebars.compile(newsItemTemplate);
     return function(context) {
-      return compiled(context, { partials: { newsItem: newsItemTemplate } });        
+      return compiled(context, { partials: { newsItem: newsItem } });        
     };
   })();
-  
-  function dashboard(context) {
-    function init() {
-      api.getDashboard(function(items) {
-        context.swap(dashboardTemplate(items));
-      });
-      api.subscribeNews(function(item) {
-        $("#newsFeed li:first").before("<li>" + newsItemTemplate(item) + "</li>");
-      });          
-    }
-    
-    init();
+
+  function init() {
+    console.log("Initializing dashboard");
+    api.getDashboard(function(result) {
+      dashboard = result;
+    });
+    api.subscribeNews(function(newsItem) {
+      dashboard.addNewsItem(newsItem);
+    });
   }
-  
-  return dashboard;
+
+  function render() {
+    console.log("Rendering dashboard");      
+    return dashboardView(dashboard);
+  }
+
+  return function(context) {
+    if (dashboard === undefined) {
+      init();
+    }
+    context.swap(render());    
+  };
       
 });
