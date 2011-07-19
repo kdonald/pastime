@@ -1,13 +1,16 @@
-define(["sammy", "dashboard"], function(router, dashboard) {
+define(["sammy"], function(sammy) {
   
   function start() {
-    var pastime = router("#main", function() {
-      this.get("/", dashboard);
-      this.get("/leagues", function() {
-        this.swap("Leagues!");
+    var pastime = sammy("#main", function() {
+      this.get("/", function(context) {
+        require(["dashboard"], function(dashboard) {
+          dashboard(context);
+        });
       });
-      this.get("/leagues/:state/:org/:league/:year/:season", function() {
-        this.swap(this.params["state"] + " " + this.params["org"] + " " + this.params["league"] + " " + this.params["season"] + " " + this.params["year"]);
+      this.get("/leagues/:state/:org/:league/:year/:season", function(context) {
+        require({baseUrl:"/leagues/league"}, ["season"], function(season) {
+          season(context);
+        });
       });      
     });
     pastime.run();    

@@ -12,7 +12,6 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
   })();
 
   function init() {
-    console.log("Initializing dashboard");
     api.getDashboard(function(result) {
       dashboard = result;
     });
@@ -22,7 +21,6 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
   }
 
   function render() {
-    console.log("Rendering dashboard");      
     return dashboardView(dashboard);
   }
 
