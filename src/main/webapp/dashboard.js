@@ -11,26 +11,28 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
     };
   })();
 
-  function init() {
-    api.getDashboard(function(result) {
-      dashboard = result;
+  function init(context) {
+    api.getDashboard(function(obj) {
+      dashboard = obj;
       dashboard.addNewsListener({ 
         newsItemAdded: function(newsItem) {
           $("#newsFeed li:first").before("<li>" + newsItemView(newsItem) + "</li>");
         } 
       });
+      render(context);
     });
   }
 
-  function render() {
-    return dashboardView(dashboard);
+  function render(context) {
+    return context.swap(dashboardView(dashboard));
   }
 
   return function(context) {
     if (dashboard === undefined) {
-      init();
+      init(context);
+    } else {
+      render(context);
     }
-    context.swap(render());    
   };
       
 });
