@@ -20,7 +20,7 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
         } 
       });
       render(context);
-      dashboard.subscribeNews();
+      dashboard.subscribeForUpdates();
     });
   }
 
