@@ -1,14 +1,14 @@
 <h2>{{league.name}}</h2>
 <h3>{{name}}</h3>
 <ul>
-<li>{{format}}</li>
-<li>{{games}} games plus playoffs</li>
+<li>{{format}} format</li>
+<li>each team plays {{games}} games plus playoffs</li>
 <li>
   {{#gameDays}}
-  played on {{day}} {{time}}
+  games played on {{day}} {{time}}
   {{/gameDays}}
 </li> 
-<li>starts {{startDate}} </li>
+<li>season starts {{startDate}} </li>
 </ul>
 <a href="join">Join Now</a>
 <sections id="venues">
