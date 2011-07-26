@@ -4,17 +4,25 @@ define(["jquery", "handlebars", "api"],
   var season = undefined;
 
   var seasonPreviewViewLoader = (function() {
-    var view = undefined;
-    return function(renderer) {
-      console.log(view);
-      if (view === undefined) {
+    var seasonPreview = undefined;
+    function registerHandlers(view) {
+      view.find("#joinNow").click(function() {
+        console.log("yo!");
+      });
+    }
+    function render(callback) {
+      var view = $(seasonPreview(season));
+      registerHandlers(view);
+      callback(view);
+    }
+    return function(callback) {
+      if (seasonPreview === undefined) {
         require(["text!seasonPreview.hb"], function(template) {
-          console.log(template);
-          view = handlebars.compile(template);
-          renderer(view);
+          seasonPreview = handlebars.compile(template);
+          render(callback);
         });
       } else {
-        renderer(view);
+        render(callback);
       }
     };
   })();
@@ -34,9 +42,8 @@ define(["jquery", "handlebars", "api"],
 
   function render(context) {
     if (season.preview) {
-      console.log("Rendering");
       seasonPreviewViewLoader(function(view) {
-        context.swap(view(season));
+        context.swap(view);
       });
     } else {
       context.swap("Season view");
