@@ -1,4 +1,4 @@
-define(["jquery", "handlebars", "api"],
+define(["jquery", "handlebars", "api", "jqueryui/dialog"],
     function($, handlebars, api) {
 
   var season = undefined;

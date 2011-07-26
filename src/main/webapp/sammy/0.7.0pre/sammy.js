@@ -2,9 +2,8 @@
 // version: 0.7.0pre
 
 // Sammy.js / http://sammyjs.org
-
-(function($, window) {
-
+define('sammy', ['jquery'], function($) {
+  
   var Sammy,
       PATH_REPLACER = "([^\/]+)",
       PATH_NAME_MATCHER = /:([\w\d]+)/g,
@@ -1914,6 +1913,8 @@
   });
 
   // An alias to Sammy
-  $.sammy = window.Sammy = Sammy;
+  $.sammy = Sammy;
 
-})(jQuery, window);
+  return Sammy; 
+  
+});

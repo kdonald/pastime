@@ -1,3 +1,5 @@
+define("handlebars", [], function() {
+
 // lib/handlebars/parser.js
 /* Jison generated parser */
 var handlebars = (function(){
@@ -1491,3 +1493,7 @@ Handlebars.VM = {
 };
 
 Handlebars.compile = Handlebars.VM.compile;;
+
+return Handlebars;
+
+});
