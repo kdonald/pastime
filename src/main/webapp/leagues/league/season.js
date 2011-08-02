@@ -1,71 +1,83 @@
 define(["require", "jquery", "handlebars", "api"],
     function(require, $, handlebars, api) {
 
-  var season = undefined;
-
-  var seasonPreviewViewLoader = (function() {
-    var seasonPreview = undefined;
-    var joinNow = undefined;
-    return function(callback) {
-      
-      function render(callback) {
-        var view = $(seasonPreview(season));
-        registerHandlers(view);
-        callback(view);
-      }
-
-      function registerHandlers(view) {
-        view.find("#joinNow").click(function() {
-          function open() {
-            $("<div></div>").html(joinNow(season)).dialog({ title: "Join Season" });
-          }
-          if (joinNow === undefined) { 
-            require(["text!join.hb", "jqueryui/dialog"], function(template) {
-              joinNow = handlebars.compile(template);
-              open();
-            });
-          } else {
-            open();
-          }
-        });
-      }
-     
-      if (seasonPreview === undefined) {
-        require(["text!seasonPreview.hb"], function(template) {
-          seasonPreview = handlebars.compile(template);
-          render(callback);
+  function template(file, dependencies) {
+    var compiled = undefined;
+    return function(context, callback) {
+      if (compiled === undefined) {
+        require(["text!" + file + ".hb"].concat(dependencies), function(content) {
+          compiled = handlebars.compile(content);
+          callback(compiled(context));
         });
       } else {
-        render(callback);
+        callback(compiled(context));
       }
     };
-  })();
+  }
 
+  var viewPrototype = (function() {
+    function render(callback) {
+      if (this.root == undefined) {
+        this.template(this.model, function(content) {
+          this.root = $(content);
+          if (this.eventHandlers) {
+            this.eventHandlers.bind(this)();
+          }
+          callback(this.root);         
+        }.bind(this));
+      } else {
+        callback(this.root);
+      }
+    }
+    return {
+      render : render
+    };
+  })();
+  
+  var season = undefined;
+  var view = undefined;
+
+  function createSeasonPreview() {   
+    function eventHandlers() {
+      var joinNow = createJoinNow();
+      this.root.find("#joinNow").click(function() {
+        joinNow.render(function(root) {
+          $("<div></div>").html(root).dialog({ title: "Join Season" });   
+        });
+        return false;          
+      });
+    }
+    function createJoinNow() {
+      return Object.create(viewPrototype, { 
+        model: { value: season },
+        template: { value: template("join", ["jqueryui/dialog"]) },
+      });      
+    }    
+    return Object.create(viewPrototype, { 
+      model: { value: season },
+      template: { value: template("seasonPreview") },
+      eventHandlers: { value: eventHandlers },
+    });
+  }
+  
   function init(context) {
-    api.getSeason({
-      state: context.params["state"],
-      org: context.params["org"],
-      league: context.params["league"],
-      year: context.params["year"],
-      season: context.params["season"]
-    }, function(obj) {
+    api.getSeason({ state: context.params["state"], org: context.params["org"], league: context.params["league"], year: context.params["year"], season: context.params["season"] }, function(obj) {
       season = obj;
+      if (season.preview) {
+        view = createSeasonPreview();
+      }
       render(context);
     });
   }
 
   function render(context) {
-    if (season.preview) {
-      seasonPreviewViewLoader(function(view) {
-        context.swap(view);
-      });
-    } else {
-      context.swap("Season view");
-    }
+    view.render(function(root) {
+      context.swap(root);
+    });
   }
 
   return function(context) {
-    if (season === undefined) {
+    if (view === undefined) {
       init(context);
     } else {
       render(context);
