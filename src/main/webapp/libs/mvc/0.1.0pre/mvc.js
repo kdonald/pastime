@@ -19,8 +19,8 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
       if (this.root == undefined) {
         this.template(this.model, function(content) {
           this.root = $(content);
-          if (this.eventHandlers) {
-            this.eventHandlers.bind(this)();
+          if (this.events) {
+            this.events.bind(this)();
           }
           callback(this.root);         
         }.bind(this));
