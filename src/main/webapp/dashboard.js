@@ -10,23 +10,25 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
   })();
 
   var dashboard = undefined;
-
+  var root = undefined;
+  
   function init(context) {
     api.getDashboard(function(obj) {
       dashboard = obj;
       dashboard.addNewsListener({ 
         newsItemAdded: function(newsItem) {
-          $("#newsFeed li:first").before("<li>" + newsItemTemplate(newsItem) + "</li>");
+          root.find("#newsFeed li:first").before("<li>" + newsItemTemplate(newsItem) + "</li>");
         } 
       });
+      root = $(dashboardTemplate(dashboard));
       render(context);
       dashboard.subscribeForUpdates();
     });
   }
 
   function render(context) {
-    var view = $(dashboardTemplate(dashboard));
-    return context.swap(view);
+    context.$element().children().detach();
+    context.$element().append(root);    
   }
 
   return function(context) {

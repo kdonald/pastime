@@ -1,38 +1,4 @@
-define(["require", "jquery", "handlebars", "api"],
-    function(require, $, handlebars, api) {
-
-  function template(file, dependencies) {
-    var compiled = undefined;
-    return function(context, callback) {
-      if (compiled === undefined) {
-        require(["text!" + file + ".hb"].concat(dependencies), function(content) {
-          compiled = handlebars.compile(content);
-          callback(compiled(context));
-        });
-      } else {
-        callback(compiled(context));
-      }
-    };
-  }
-
-  var viewPrototype = (function() {
-    function render(callback) {
-      if (this.root == undefined) {
-        this.template(this.model, function(content) {
-          this.root = $(content);
-          if (this.eventHandlers) {
-            this.eventHandlers.bind(this)();
-          }
-          callback(this.root);         
-        }.bind(this));
-      } else {
-        callback(this.root);
-      }
-    }
-    return {
-      render : render
-    };
-  })();
+define(["jquery", "mvc", "api"], function($, mvc, api) {
   
   var season = undefined;
   var view = undefined;
@@ -48,14 +14,14 @@ define(["require", "jquery", "handlebars", "api"],
       });
     }
     function createJoinNow() {
-      return Object.create(viewPrototype, { 
+      return Object.create(mvc.viewPrototype, { 
         model: { value: season },
-        template: { value: template("join", ["jqueryui/dialog"]) },
+        template: { value: mvc.template("join", ["jqueryui/dialog"]) },
       });      
     }    
-    return Object.create(viewPrototype, { 
+    return Object.create(mvc.viewPrototype, { 
       model: { value: season },
-      template: { value: template("seasonPreview") },
+      template: { value: mvc.template("seasonPreview") },
       eventHandlers: { value: eventHandlers },
     });
   }
@@ -72,7 +38,8 @@ define(["require", "jquery", "handlebars", "api"],
 
   function render(context) {
     view.render(function(root) {
-      context.swap(root);
+      context.$element().children().detach();
+      context.$element().append(root);
     });
   }
 

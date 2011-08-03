@@ -3,7 +3,7 @@ define(["jquery"], function($) {
   var dashboardPrototype = (function() {
     function addNewsItem(newsItem) {
       this.newsItems.unshift(newsItem);
-      Array.forEach(this.newsListeners, function(listener) {
+      this.newsListeners.forEach(function(listener) {
         listener.newsItemAdded(newsItem);
       });        
     }
