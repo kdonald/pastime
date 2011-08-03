@@ -1,9 +1,8 @@
 define(["jquery", "mvc", "api"], function($, mvc, api) {
   
-  var season = undefined;
   var view = undefined;
 
-  function seasonPreview() {   
+  function seasonPreview(season) {   
     var joinNow = Object.create(mvc.viewPrototype, { 
       model: { value: season },
       template: { value: mvc.template("join", ["jqueryui/dialog"]) },
@@ -24,10 +23,16 @@ define(["jquery", "mvc", "api"], function($, mvc, api) {
   }
 
   function init(context) {
-    api.getSeason({ state: context.params["state"], org: context.params["org"], league: context.params["league"], year: context.params["year"], season: context.params["season"] }, function(obj) {
-      season = obj;
+    api.getSeason({
+      state: context.params["state"],
+      org: context.params["org"],
+      league: context.params["league"],
+      year: context.params["year"],
+      season: context.params["season"]
+    },
+    function(season) {
       if (season.preview) {
-        view = seasonPreview();
+        view = seasonPreview(season);
       }
       render(context);
     });
