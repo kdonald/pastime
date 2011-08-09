@@ -16,7 +16,7 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
 
   var viewPrototype = (function() {
     function render(callback) {
-      if (this.root == undefined) {
+      if (this.root === undefined) {
         this.template(this.model, function(content) {
           this.root = $(content);
           if (this.events) {

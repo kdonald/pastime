@@ -1,16 +1,23 @@
 define(["jquery", "mvc", "api"], function($, mvc, api) {
   
   var view = undefined;
-
-  function seasonPreview(season) {   
-    var joinNow = Object.create(mvc.viewPrototype, { 
-      model: { value: season },
-      template: { value: mvc.template("join", ["jqueryui/dialog"]) },
-    });
+  
+  function seasonPreview(season) {
     function openJoinNowDialog() {
-      joinNow.render(function(root) {
-        $("<div></div>").html(root).dialog({ title: "Join Season" });   
-      });
+      var joinNow = function(callback) {
+        api.getEligibleFranchises(season, function(franchises) {
+          Object.create(mvc.viewPrototype, { 
+            model: { value: { season: season, franchise: franchises[0] } },
+            template: { value: mvc.template("join", ["jqueryui/dialog"]) },
+            events: { value: function() {
+              
+            }}
+          }).render(callback);
+        });
+      };
+      joinNow(function(root) {
+        $("<div></div>").html(root).dialog({ title: "Join League", modal: true, width: "auto" });   
+      });        
       return false;          
     }
     return Object.create(mvc.viewPrototype, { 

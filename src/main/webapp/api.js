@@ -85,9 +85,23 @@ define(["jquery"], function($) {
     callback(seasonPreview);
   }
     
+  function getEligibleFranchises(openSeason, callback) {
+    var franchises = [{
+      name: "Hitmen",
+      path: "/franchises/florida/brevard/hitmen",
+      activePlayers: [ 
+        { name: "Brian Fisher"},
+        { name: "Alexander Weaver"},
+        { name: "Keith Donald"}
+      ]
+    }];
+    callback(franchises);
+  }
+  
   return {
     getDashboard: getDashboard,
-    getSeason: getSeason
+    getSeason: getSeason,
+    getEligibleFranchises: getEligibleFranchises
   };
   
 });
