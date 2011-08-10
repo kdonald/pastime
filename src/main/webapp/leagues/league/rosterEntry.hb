@@ -1,0 +1,1 @@
+<li class="player">{{name}} <span class="remove">Remove</span></li>

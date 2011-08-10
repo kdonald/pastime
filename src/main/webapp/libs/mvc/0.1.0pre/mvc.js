@@ -1,17 +1,32 @@
 define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
 
-  function template(file, dependencies) {
+  function template(file, options) {
+    options = options || {};
     var compiled = undefined;
-    return function(context, callback) {
+    var renderOptions = {};
+    function render(context, callback) {
+      function initRenderOptions() {
+        var helpers = Object.create(handlebars.helpers);
+        for (helper in options.helpers) {
+          helpers[helper] = options.helpers[helper];
+        }
+        renderOptions.helpers = helpers;
+        renderOptions.partials = options.partials;
+      }
       if (compiled === undefined) {
-        require(["text!" + file + ".hb"].concat(dependencies), function(content) {
+        require(["text!" + file + ".hb"].concat(options.dependencies), function(content) {
           compiled = handlebars.compile(content);
-          callback(compiled(context));
+          initRenderOptions();
+          callback(compiled(context, renderOptions));
         });
       } else {
-        callback(compiled(context));
+        callback(compiled(context, renderOptions));
       }
     };
+    render.toString = function() {
+      return "{ file: " + file + ", options: " + options + "}"; 
+    };
+    return render;
   }
 
   var viewPrototype = (function() {
@@ -28,8 +43,16 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
         callback(this.root);
       }
     }
+    function destroy() {
+      this.root.remove();
+    }
+    function toString() {
+      return "{ template: " + this.template + "], model: " + this.model + "}";
+    }
     return {
-      render : render
+      render: render,
+      destroy: destroy,
+      toString: toString
     };
   })();
 
@@ -39,4 +62,3 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
   };
   
 });
-  
