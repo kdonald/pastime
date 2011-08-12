@@ -35,7 +35,10 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
         this.template(this.model, function(content) {
           this.root = $(content);
           if (this.events) {
-            this.events.bind(this)();
+            attachEventHandlers(this);
+          }
+          if (this.init) {
+            this.init();
           }
           callback(this.root);         
         }.bind(this));
@@ -49,16 +52,48 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
     function toString() {
       return "{ template: " + this.template + "], model: " + this.model + "}";
     }
+    function attachEventHandlers(view) {
+      for (eventDesc in view.events) {
+        var array = eventDesc.split(" ");
+        var event = array[0];
+        var source = array[1];
+        var handler = view.events[eventDesc];
+        view.root.find(source).bind(event, handler.bind(view));
+      }        
+    }
     return {
       render: render,
       destroy: destroy,
       toString: toString
     };
   })();
+  
+  function view(args) {
+    return Object.create(viewPrototype, {
+      model: { value: args.model },
+      template: { value: template(args.template) },
+      events: { value: args.events },
+      init: { value: args.init }
+    });
+  }
+  
+  function extend(view, model) {
+    return Object.create(view, { model: { value: model } });
+  }
+  
+  function guard(button, obj, constraint) {
+    constraint = constraint.bind(obj);
+    button.attr("disabled", !constraint());
+    obj.change(function() {
+      button.attr("disabled", !constraint());
+    });
+  }
 
   return {
-    template : template,
-    viewPrototype : viewPrototype
+    template: template,
+    view: view,
+    extend: extend,
+    guard: guard
   };
   
 });

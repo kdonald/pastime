@@ -90,9 +90,16 @@ define(["jquery"], function($) {
       name: "Hitmen",
       path: "/franchises/florida/brevard/hitmen",
       activePlayers: [ 
-        { name: "Brian Fisher"},
-        { name: "Alexander Weaver"},
-        { name: "Keith Donald"}
+        { name: "Brian Fisher" },
+        { name: "Alexander Weaver" },
+        { name: "Keith Donald" },
+        { name: "Marc Szczesny-Pumarada" },
+        { name: "Gabe Barfield" },
+        { name: "Joe Petrone" },
+        { name: "Jason Barry" },
+        { name: "Matthew Wade" },
+        { name: "Kelvin Zhang" },        
+        { name: "Stephen Tomko" },        
       ]
     }];
     callback(franchises);

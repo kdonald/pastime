@@ -1,139 +1,170 @@
 define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
   
   var view = undefined;
-  
+
   function seasonPreview(season) {
+    return mvc.view({ 
+      model: season,
+      template: "seasonPreview",
+      events: {
+        "click #joinNow": openJoinNowDialog
+      }
+    });
     function openJoinNowDialog() {
       var joinNow = function(callback) {
-        var roster = (function() {
-          var players = [];
-          var addListeners = [];
-          var removeListeners = [];
+        
+        var rosterPrototype = (function() {
           function addPlayer(player) {
-            players.push(player);
-            addListeners.forEach(function(listener) {
+            console.log("Adding player");
+            this.players.push(player);
+            this.addListeners.forEach(function(listener) {
               listener(player);
             });
+            invokeListeners(this.changeListeners);           
           }
           function removePlayer(player) {
-            var index = players.indexOf(player);
-            players.splice(index, 1);
-            removeListeners.forEach(function(listener) {
+            var index = this.players.indexOf(player);
+            this.players.splice(index, 1);
+            this.removeListeners.forEach(function(listener) {
               listener(player);
             });
+            invokeListeners(this.changeListeners);            
           }
-          function playerAdded(callback) {
-            addListeners.push(callback);
+          function playerCount() {
+            return this.players.length;
           }
-          function playerRemoved(callback) {
-            removeListeners.push(callback);
+          function valid() {
+            return this.playerCount() >= this.minPlayers && this.playerCount() <= this.maxPlayers;
           }          
+          function change(listener) {
+            this.changeListeners.push(listener);
+          }
+          function playerAdd(listener) {
+            this.addListeners.push(listener);
+          }
+          function playerRemove(listener) {
+            this.removeListeners.push(listener);
+          }
+          function invokeListeners(listeners) {
+            listeners.forEach(function(listener) {
+              listener();
+            });
+          }
           return {
-            addPlayer : addPlayer,
-            removePlayer : removePlayer,
-            playerAdded : playerAdded,
-            playerRemoved : playerRemoved
+            addPlayer: addPlayer,
+            removePlayer: removePlayer,
+            playerCount: playerCount,
+            valid: valid,
+            playerAdd: playerAdd,
+            playerRemove: playerRemove,
+            change: change,
           };
         })();
+        
+        var roster = Object.create(rosterPrototype, {
+          minPlayers: { value: 7 },
+          maxPlayers: { value: 16 },
+          players: { value: [] },
+          addListeners: { value: [] },
+          removeListeners: { value: [] },
+          changeListeners: { value: [] }
+        });
+        
         api.getEligibleFranchises(season, function(franchises) {
           
           var franchise = franchises.length > 0 ? franchises[0] : undefined; 
 
-          var franchisePlayerView = Object.create(mvc.viewPrototype, {
-            template: { value: mvc.template("franchisePlayer") },
-            events: { value: function() {
-              // TODO consider more declarative event expression that encapsulates require this.root query and this binding 
-              this.root.find("span.add").click(function() {
+          var franchisePlayerView = mvc.view({
+            template: "franchisePlayer",
+            events: {
+              "click span.add": function() {
                 roster.addPlayer(this.model);
-                this.destroy();
-              }.bind(this));
-            }}
-          });
-
-          var franchiseView = Object.create(mvc.viewPrototype, {
-            model: { value: { franchise: franchise } },
-            template: { value: mvc.template("franchise") },
-            events: { value: function() {
-              var playerList = this.root.find("#players");
-              function addFranchisePlayer(player) {
-                Object.create(franchisePlayerView, { model: { value: player } }).render(function(li) {
-                  li.appendTo(playerList);
-                });                
+                this.destroy();                
               }
-              function addFranchisePlayers(root) {
-                franchise.activePlayers.forEach(function(player) {
-                  addFranchisePlayer(player);
-                });
-              }
-              addFranchisePlayers(this.root);
-              roster.playerRemoved(function(player) {
-                addFranchisePlayer(player);  
-              });              
-            }}
+            }
           });
           
-          var rosterEntryView = Object.create(mvc.viewPrototype, {
-            template: { value: mvc.template("rosterEntry") },
-            events: { value: function() {
-              this.root.find("span.remove").click(function() {
+          var franchiseView = mvc.view({
+            model: franchise,
+            template: "franchise",
+            init: function() {
+              var playerList = this.root.find("#players");
+              function addFranchisePlayer(player) {
+                mvc.extend(franchisePlayerView, player).render(function(playerItem) {
+                  playerList.append(playerItem);
+                });
+              }
+              this.model.activePlayers.forEach(function(player) {
+                addFranchisePlayer(player);
+              });
+              roster.playerRemove(function(player) {
+                addFranchisePlayer(player);  
+              });              
+            }         
+          });
+          
+          var rosterEntryView = mvc.view({
+            template: "rosterEntry",
+            events: {
+              "click span.remove": function() {
                 roster.removePlayer(this.model);
                 this.destroy();
-              }.bind(this));                 
-            }}
+              }          
+            }
           });
 
-          var rosterView = Object.create(mvc.viewPrototype, {
-            template: { value: mvc.template("roster") },
-            events: { value: function() {
+          var rosterView = mvc.view({
+            model: roster,
+            template: "roster",
+            init: function() {
               var playerList = this.root.find("#players");
-              roster.playerAdded(function(player) {
-                Object.create(rosterEntryView, { model: { value: player } }).render(function(playerItem) {
-                  playerItem.appendTo(playerList);
+              roster.playerAdd(function(player) {
+                mvc.extend(rosterEntryView, player).render(function(playerItem) {
+                  playerList.append(playerItem);
                 });
               });
               var counter = this.root.find("#summary span.counter");
-              roster.playerAdded(function(player) {
+              roster.playerAdd(function(player) {
                 counter.html(parseInt(counter.html()) + 1);
               });
-              roster.playerRemoved(function(player) {
+              roster.playerRemove(function(player) {
                 counter.html(parseInt(counter.html()) - 1);
               });                
-            }}
+            }
           });
                     
-          Object.create(mvc.viewPrototype, { 
-            model: { value: { season: season } },
-            template: { value: mvc.template("join") },
-          }).render(function(root) {
+          var joinNowView = mvc.view({ 
+            model: { season: season },
+            template: "join",
+            init: function() {
+              mvc.guard(this.root.find("#next"), roster, roster.valid);
+            }
+          });
+
+          // TODO explore something like: joinNowView.render("#createRoster").append(franchiseView).append(rosterView);
+          joinNowView.render(function(root) {
             var createRoster = root.find("#createRoster");
-            // TODO explore use of deferreds to clean this up
-            franchiseView.render(function(element) {
-              element.appendTo(createRoster);
-              rosterView.render(function(element) {
-                element.appendTo(createRoster);                
-                callback(root);                
+            franchiseView.render(function(content) {
+              createRoster.append(content);
+              rosterView.render(function(content) {
+                createRoster.append(content);          
+                callback(root);  
               });
             });
           });
-          
+        
         });
       };
       joinNow(function(root) {
         require(["jqueryui/dialog"], function() {
           root.dialog({ title: "Join League", modal: true, width: "auto" });          
         });
-      });        
+      }); 
       return false;          
     }
-    return Object.create(mvc.viewPrototype, { 
-      model: { value: season },
-      template: { value: mvc.template("seasonPreview") },
-      events: { value: function() {
-        this.root.find("#joinNow").click(openJoinNowDialog);        
-      }}
-    });
+    
   }
-
+  
   function init(context) {
     api.getSeason({
       state: context.params["state"],
