@@ -30,6 +30,28 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
   }
 
   var viewPrototype = (function() {
+    function renderDeferred() {
+      var thisRendered = $.Deferred();
+      this.render(function(root) {
+        thisRendered.resolve(root);
+      });
+      function createPromise(deferred) {
+        function append(child, insertAt) {
+          var childRendered = $.Deferred();
+          $.when(thisRendered).then(function(root) {
+            child.render(function(element) {
+              root.find(insertAt).append(element);
+              childRendered.resolve(root);
+            });
+          });
+          return createPromise(childRendered);            
+        }
+        return Object.create(deferred.promise(), { 
+          append: { value: append }
+        });        
+      };
+      return createPromise(thisRendered);
+    }
     function render(callback) {
       if (this.root === undefined) {
         this.template(this.model, function(content) {
@@ -61,7 +83,9 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
         view.root.find(source).bind(event, handler.bind(view));
       }        
     }
+    
     return {
+      renderDeferred: renderDeferred,
       render: render,
       destroy: destroy,
       toString: toString

@@ -1,9 +1,9 @@
 <section id="franchise">
   <p>
-    We see that you are the owner of the <a href="{{path}}">{{name}}</a> franchise.
+    We see that you are captain of the <a href="{{path}}">{{name}}</a>.
     We assume you wish to join as {{name}}.
   </p>
-  <h4>Franchise Players</h4>
+  <h4>{{name}} Players</h4>
   <ul id="players">
     <!-- Players added dynamically -->
   </ul>
