@@ -140,40 +140,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
               mvc.guard(this.root.find("#next"), roster, roster.valid);
             }
           });
-
-          // TODO explore something like: joinNowView().append(franchiseView, "#createRoster").append(rosterView, "#createRoster").done(callback);
-
           joinNowView.renderDeferred().append(franchiseView, "#createRoster").append(rosterView, "#createRoster").done(callback);
-          
-          /*
-          var renderer = joinNowView.renderDeferred();
-          $.when(renderer.done()).then(function(root) {
-            var createRoster = root.find("#createRoster");
-            renderer = franchiseView.renderDeferred();
-            $.when(renderer.done()).then(function(element) {
-              createRoster.append(element);
-              renderer = rosterView.renderDeferred();
-              $.when(renderer.done()).then(function(element) {
-                createRoster.append(element);
-                callback(root);
-              });
-            });
-          });
-          */
-          
-          /*
-          joinNowView.render(function(root) {
-            var createRoster = root.find("#createRoster");
-            franchiseView.render(function(content) {
-              createRoster.append(content);
-              rosterView.render(function(content) {
-                createRoster.append(content);          
-                callback(root);  
-              });
-            });
-          });
-          */
-        
         });
       };
       joinNow(function(root) {
