@@ -15,7 +15,6 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
         
         var rosterPrototype = (function() {
           function addPlayer(player) {
-            console.log("Adding player");
             this.players.push(player);
             this.addListeners.forEach(function(listener) {
               listener(player);
@@ -123,13 +122,6 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
                   playerList.append(playerItem);
                 });
               });
-              var counter = this.root.find("#summary span.counter");
-              roster.playerAdd(function(player) {
-                counter.html(parseInt(counter.html()) + 1);
-              });
-              roster.playerRemove(function(player) {
-                counter.html(parseInt(counter.html()) - 1);
-              });                
             }
           });
                     

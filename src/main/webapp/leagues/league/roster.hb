@@ -4,5 +4,5 @@
     <!-- Players added dynamically -->
   </ul>
   <input id="newPlayer" type="text" placeholder="Add a new player" />
-  <div id="summary">{{minPlayers}} min {{maxPlayers}} max <span class="counter">0</span>/{{maxPlayers}}</div>
+  <div id="summary">{{minPlayers}} min {{maxPlayers}} max <span class="counter" data-bind="playerCount">0</span>/{{maxPlayers}}</div>
 </section>

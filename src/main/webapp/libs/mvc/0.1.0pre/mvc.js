@@ -59,6 +59,7 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
           if (this.events) {
             attachEventHandlers(this);
           }
+          attachDataBindings(this);
           if (this.init) {
             this.init();
           }
@@ -82,6 +83,21 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
         var handler = view.events[eventDesc];
         view.root.find(source).bind(event, handler.bind(view));
       }        
+    }
+    function attachDataBindings(view) {
+      var bindElements = view.root.find("[data-bind]");
+      bindElements.each(function(node) {
+        node = $(this);
+        var property = node.attr("data-bind");
+        var value = view.model[property];
+        if (typeof value === "function") {
+          var getter = value.bind(view.model);
+          node.html(getter());
+          view.model.change(function() {
+            node.html(getter());            
+          });
+        }
+      });
     }
     
     return {
