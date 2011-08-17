@@ -85,30 +85,68 @@ define(["jquery"], function($) {
     callback(seasonPreview);
   }
     
-  function getEligibleFranchises(openSeason, callback) {
-    var franchises = [{
+  function getEligibleTeams(openSeason, callback) {
+    var teams = [{
       name: "Hitmen",
-      path: "/franchises/florida/brevard/hitmen",
+      path: "/teams/florida/brevard/hitmen",
       activePlayers: [ 
-        { name: "Brian Fisher" },
-        { name: "Alexander Weaver" },
-        { name: "Keith Donald" },
-        { name: "Marc Szczesny-Pumarada" },
-        { name: "Gabe Barfield" },
-        { name: "Joe Petrone" },
-        { name: "Jason Barry" },
-        { name: "Matthew Wade" },
-        { name: "Kelvin Zhang" },        
-        { name: "Stephen Tomko" },        
+        { id: 1, name: "Brian Fisher", picture: "http://localhost:8080/users/1/picture" },
+        { id: 2, name: "Alexander Weaver", picture: "http://localhost:8080/users/2/picture" },
+        { id: 3, name: "Keith Donald", picture: "http://localhost:8080/users/3/picture" },
+        { id: 4, name: "Marc Szczesny-Pumarada", picture: "http://localhost:8080/users/4/picture" },
+        { id: 5, name: "Gabe Barfield", picture: "http://localhost:8080/users/5/picture" },
+        { id: 6, name: "Joe Petrone", picture: "http://localhost:8080/users/6/picture" },
+        { id: 7, name: "Jason Barry", picture: "http://localhost:8080/users/7/picture" },
+        { id: 8, name: "Matthew Wade", picture: "http://localhost:8080/users/8/picture"},
+        { id: 9, name: "Kelvin Zhang", picture: "http://localhost:8080/users/9/picture" },        
+        { id: 10, name: "Stephen Tomko", picture: "http://localhost:8080/users/10/picture" },        
       ]
     }];
-    callback(franchises);
+    callback(teams);
+  }
+  
+  function findUser(name, callback) {
+    var exactMatch = false;
+    var friendMatches = false;
+    if (exactMatch) {
+      callback({
+        exactMatch: true,
+        player: {
+          id: 11,
+          name: "David Murray",
+          picture: "http://localhost:8080/users/11/picture"
+        }
+      });      
+    } else if (friendMatches) {
+      callback({
+        exactMatch: false,
+        friendMatches: [
+          { 
+            id: 1255689239,
+            name: "Keith Donald",
+            picture: "http://graph.facebook.com/keith.donald/picture",          
+          }
+        ]
+      });
+    } else {
+      callback({
+        exactMatch: false,
+        name: "David Murray",
+        email: "dmurra05@harris.com",
+      });
+    }
+  }
+  
+  function inviteUser(user, callback) {
+    callback();
   }
   
   return {
     getDashboard: getDashboard,
     getSeason: getSeason,
-    getEligibleFranchises: getEligibleFranchises
+    getEligibleTeams: getEligibleTeams,
+    findUser: findUser,
+    inviteUser: inviteUser
   };
   
 });

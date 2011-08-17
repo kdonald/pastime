@@ -30,28 +30,6 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
   }
 
   var viewPrototype = (function() {
-    function renderDeferred() {
-      var thisRendered = $.Deferred();
-      this.render(function(root) {
-        thisRendered.resolve(root);
-      });
-      function createPromise(deferred) {
-        function append(child, insertAt) {
-          var childRendered = $.Deferred();
-          $.when(thisRendered).then(function(root) {
-            child.render(function(element) {
-              root.find(insertAt).append(element);
-              childRendered.resolve(root);
-            });
-          });
-          return createPromise(childRendered);            
-        }
-        return Object.create(deferred.promise(), { 
-          append: { value: append }
-        });        
-      };
-      return createPromise(thisRendered);
-    }
     function render(callback) {
       if (this.root === undefined) {
         this.template(this.model, function(content) {
@@ -69,8 +47,55 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
         callback(this.root);
       }
     }
-    function destroy() {
+    function renderDeferred() {
+      var thisRendered = $.Deferred();
+      this.render(function(root) {
+        thisRendered.resolve(root);
+      });
+      function createPromise(deferred) {
+        function append(child, insertAt) {
+          var childRendered = $.Deferred();
+          $.when(deferred).then(function(root) {
+            child.render(function(element) {
+              root.find(insertAt).append(element);
+              childRendered.resolve(root);
+            });
+          });
+          return createPromise(childRendered);            
+        }
+        function insertAfter(element) {
+          $.when(thisRendered).then(function(root) {
+            root.insertAfter(element);
+          });
+          return this;
+        }
+        return Object.create(deferred.promise(), { 
+          append: { value: append },
+          insertAfter: { value: insertAfter }
+        });        
+      };
+      return createPromise(thisRendered);
+    }    
+    function find(element) {
+      return this.root.find(element);
+    }
+    function detach(result) {
+      this.root.detach();
+      this.postDetachListeners.forEach(function(listener) {
+        listener(result);
+      });
+    }
+    function destroy(result) {
       this.root.remove();
+      this.postDestroyListeners.forEach(function(listener) {
+        listener(result);
+      });
+    }
+    function postDetach(listener) {
+      this.postDetachListeners.push(listener);
+    }
+    function postDestroy(listener) {
+      this.postDestroyListeners.push(listener);
     }
     function toString() {
       return "{ template: " + this.template + "], model: " + this.model + "}";
@@ -103,7 +128,11 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
     return {
       renderDeferred: renderDeferred,
       render: render,
+      $: find,
+      detach: detach,
+      postDetach: postDetach,
       destroy: destroy,
+      postDestroy: postDestroy,
       toString: toString
     };
   })();
@@ -113,7 +142,9 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
       model: { value: args.model },
       template: { value: template(args.template) },
       events: { value: args.events },
-      init: { value: args.init }
+      init: { value: args.init },
+      postDetachListeners: { value: [] },      
+      postDestroyListeners: { value: [] }
     });
   }
   
@@ -121,19 +152,49 @@ define(["require", "jquery", "handlebars"], function(require, $, handlebars) {
     return Object.create(view, { model: { value: model } });
   }
   
-  function guard(button, obj, constraint) {
-    constraint = constraint.bind(obj);
-    button.attr("disabled", !constraint());
-    obj.change(function() {
-      button.attr("disabled", !constraint());
-    });
-  }
+  var Model = (function() {
+    var modelPrototype = (function() {
+      function get() {
+        return this.value;
+      }
+      function set(value) {
+        this.value = value;
+        invokeListeners(this.changeListeners);       
+      }
+      function reset() {
+        this.value = "";
+      }
+      function change(listener) {
+        this.changeListeners.push(listener);
+      }
+      function invokeListeners(listeners) {
+        listeners.forEach(function(listener) {
+          listener();
+        });
+      }      
+      return {
+        get: get,
+        set: set,
+        reset: reset,
+        change: change
+      };
+    })();      
 
+    return { 
+      create: function() {
+        Object.create(modelPrototype, {
+          value: { value: "" }
+        });          
+      }
+    };
+    
+  })();
+  
   return {
     template: template,
     view: view,
     extend: extend,
-    guard: guard
+    model: Model.create
   };
   
 });

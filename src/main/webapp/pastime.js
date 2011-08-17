@@ -8,7 +8,16 @@ define(["sammy"], function(sammy) {
         });
       });
       this.get("/leagues/:state/:org/:league/:year/:season", function(context) {
-        require({baseUrl:"/leagues/league"}, ["season"], function(season) {
+        require({baseUrl:"/leagues/league", paths: {
+            join: "join/join",
+            team: "join/team",
+            teamPlayer: "join/teamPlayer",
+            roster: "join/roster",
+            rosterPlayer: "join/rosterPlayer",
+            addNewPlayer: "join/addNewPlayer",
+            addNewPlayerForm: "join/addNewPlayerForm"
+        }
+        }, ["season"], function(season) {
           season(context);
         });
       });      
