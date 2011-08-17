@@ -113,8 +113,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
         model: roster,
         template: "roster",
         init: function() {
-          
-          var playerList = this.$("ul");          
+          var playerList = this.$("ul");
           var rosterSummary = this.$("#rosterSummary");
           
           var addNewPlayerView = mvc.view({
@@ -171,8 +170,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
             });
           });
           
-        }
-      
+        }      
       });
                 
       var joinView = mvc.view({
