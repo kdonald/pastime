@@ -1,7 +1,8 @@
-define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
+define(["require", "mvc", "api"], function(require, MVC, api) {
 
-  var join = function(season, callback) {
-       
+  var mvc = MVC.create(require);
+  
+  var join = function(season, callback) {  
     var Roster = (function() {
       var rosterPrototype = (function() {
         function addPlayer(player) {
@@ -9,7 +10,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
           this.addListeners.forEach(function(listener) {
             listener(player);
           });
-          invokeListeners(this.changeListeners);           
+          invokeChangeListeners(this.changeListeners, this.playerCount());  
         }
         function removePlayer(player) {
           var index = this.players.indexOf(player);
@@ -17,7 +18,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
           this.removeListeners.forEach(function(listener) {
             listener(player);
           });
-          invokeListeners(this.changeListeners);            
+          invokeChangeListeners(this.changeListeners, this.playerCount());
         }
         function playerCount() {
           return this.players.length;
@@ -25,7 +26,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
         function valid() {
           return this.playerCount() >= this.minPlayers && this.playerCount() <= this.maxPlayers;
         }         
-        function change(listener) {
+        function change(property, listener) {
           this.changeListeners.push(listener);
         }
         function playerAdd(listener) {
@@ -34,27 +35,27 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
         function playerRemove(listener) {
           this.removeListeners.push(listener);
         }
-        function invokeListeners(listeners) {
+        function invokeChangeListeners(listeners, value) {
           listeners.forEach(function(listener) {
-            listener();
+            listener(value);
           });
         }
-        return {
-          addPlayer: addPlayer,
-          removePlayer: removePlayer,
-          playerCount: playerCount,
-          valid: valid,
-          playerAdd: playerAdd,
-          playerRemove: playerRemove,
-          change: change,
-        };
+        return Object.create(Object.prototype, {
+          addPlayer: { value: addPlayer },
+          removePlayer: { value: removePlayer },
+          playerCount: { value: playerCount, enumerable: true },
+          valid: { value: valid },
+          playerAdd: { value: playerAdd },
+          playerRemove: { value: playerRemove },
+          change: { value: change },
+        });
       })();
       
       return { 
         create: function(minPlayers, maxPlayers) {
           return Object.create(rosterPrototype, {
-            minPlayers: { value: minPlayers },
-            maxPlayers: { value: maxPlayers },
+            minPlayers: { value: minPlayers, enumerable: true },
+            maxPlayers: { value: maxPlayers, enumerable: true },
             players: { value: [] },
             addListeners: { value: [] },
             removeListeners: { value: [] },
@@ -69,7 +70,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
     api.getEligibleTeams(season, function(teams) {
       
       var team = teams.length > 0 ? teams[0] : undefined; 
-
+      
       var teamPlayerView = mvc.view({
         template: "teamPlayer",
         events: {
@@ -95,8 +96,29 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
           });
           roster.playerRemove(function(player) {
             addPlayer(player);  
-          });              
-        }         
+          });
+          // TODO make this reusable
+          playerList.focus(function() {
+            playerList.find("li").first().addClass("selected");            
+          });
+          playerList.keydown(function(e) {
+            var selected = playerList.find("li.selected");
+            if (e.keyCode === 40) {
+              selected.removeClass("selected");
+              selected.next().addClass("selected");
+              return false;
+            } else if (e.keyCode === 38) {
+              selected.removeClass("selected");
+              selected.prev().addClass("selected");
+              return false;              
+            } else if (e.keyCode === 13) {
+              var next = selected.next();
+              selected.find("span.add").trigger("click");
+              next.addClass("selected");              
+              return false;
+            }            
+          });
+        }
       });
       
       var rosterPlayerView = mvc.view({
@@ -123,11 +145,11 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
               this.input = this.$("input");              
             },
             events: {
-              "click button": function() {
+              "submit form": function() {
                 function handleApiResult(result) {
                   if (result.exactMatch) {
                     roster.addPlayer(result.player);
-                    this.model.reset();
+                    this.model.value = "";
                   } else {
                     this.detach(result);
                   }
@@ -142,15 +164,11 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
           var addNewPlayerFormView = mvc.view({
             template: "addNewPlayerForm",
             events: {
-              "click button.add": function() {
+              "submit form": function() {
                 api.inviteUser(this.model, function() {
                   roster.addPlayer(this.model);
                   this.destroy();
                 }.bind(this));
-                return false;
-              },
-              "click button.cancel": function() {
-                this.destroy();
                 return false;
               }
             }
@@ -161,6 +179,7 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
           });
           
           addNewPlayerFormView.postDestroy(function() {
+            addNewPlayerView.model.value = "";
             addNewPlayerView.renderDeferred().insertAfter(rosterSummary);  
           });
 

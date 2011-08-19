@@ -3,7 +3,6 @@
   <form>
     <p>
       Please complete a few more details.
-      The person will be added to the roster and receive an email inviting them to the team.
     </p>
     <label>
       Full Name <input name="name" type="text" data-bind="name" required />
@@ -11,7 +10,6 @@
     <label>
       E-mail <input name="email" type="email" data-bind="email" required />  
     </label>
-    <button class="add">Add</button>
-    <button class="cancel">Cancel</button>
+    <button type="submit">Add</button>
   </form>
 </section>

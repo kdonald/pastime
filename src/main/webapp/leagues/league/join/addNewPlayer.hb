@@ -1,3 +1,6 @@
 <div id="addNewPlayer">
-  <input type="text" placeholder="Add a new player" data-bind="value" required /> <button>Add</button>
+  <form>
+    <input type="text" placeholder="Add a new player" data-bind="value" />
+    <button type="submit">Add</button>
+  </form>
 </div>

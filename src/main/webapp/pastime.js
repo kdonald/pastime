@@ -1,4 +1,4 @@
-define(["sammy"], function(sammy) {
+define(["require", "sammy"], function(require, sammy) {
   
   function start() {
     var pastime = sammy("#main", function() {
@@ -8,16 +8,7 @@ define(["sammy"], function(sammy) {
         });
       });
       this.get("/leagues/:state/:org/:league/:year/:season", function(context) {
-        require({baseUrl:"/leagues/league", paths: {
-            join: "join/join",
-            team: "join/team",
-            teamPlayer: "join/teamPlayer",
-            roster: "join/roster",
-            rosterPlayer: "join/rosterPlayer",
-            addNewPlayer: "join/addNewPlayer",
-            addNewPlayerForm: "join/addNewPlayerForm"
-        }
-        }, ["season"], function(season) {
+        require(["leagues/league/season"], function(season) {
           season(context);
         });
       });      

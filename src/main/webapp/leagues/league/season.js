@@ -1,7 +1,7 @@
-define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
-  
-  var view = undefined;
+define(["require", "mvc", "api"], function(require, MVC, api) {
 
+  var mvc = MVC.create(require), view = undefined;
+  
   function seasonPreview(season) {
     return mvc.view({ 
       model: season,
@@ -11,12 +11,12 @@ define(["require", "jquery", "mvc", "api"], function(require, $, mvc, api) {
       }
     });
     function openJoinDialog() {
-      require(["join"], function(join) {
+      mvc.submodule("join", function(join) {
         join(season, function(root) {
           require(["jqueryui/dialog"], function() {
-            root.dialog({ title: "Join League", modal: true, width: "auto" });          
+            root.dialog({ title: "Join League", modal: true, width: "auto" });       
           });
-        });            
+        }); 
       });          
       return false;
     }    

@@ -131,8 +131,8 @@ define(["jquery"], function($) {
     } else {
       callback({
         exactMatch: false,
-        name: "David Murray",
-        email: "dmurra05@harris.com",
+        name: name,
+        email: "",
       });
     }
   }
