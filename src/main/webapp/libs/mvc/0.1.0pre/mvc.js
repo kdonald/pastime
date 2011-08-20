@@ -203,14 +203,17 @@ define(["jquery", "handlebars"], function($, handlebars) {
             }
             var bindElements = view.root.find("[data-bind]");
             bindElements.each(function(element) {
-              element = $(this);
+              var element = $(this);
               var property = element.attr("data-bind");
               var value = postProcess(view.model[property]);
               if (element.is("input")) {
                 element.val(value);
                 view.model.change(property, function(value) {
                   element.val(value);            
-                });                
+                });
+                element.change(function() {
+                  view.model[property] = element.val();
+                });
               } else {
                 element.html(value);
                 view.model.change(property, function(value) {

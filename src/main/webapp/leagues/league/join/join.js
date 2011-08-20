@@ -80,6 +80,7 @@ define(["require", "./roster", "mvc", "api"], function(require, Roster, MVC, api
             events: {
               "submit form": function() {
                 api.inviteUser(this.model, function() {
+                  console.log(this.model);
                   roster.addPlayer(this.model);
                   this.destroy();
                 }.bind(this));
