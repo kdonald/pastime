@@ -1,1 +1,1 @@
-<li class="player">{{name}} <span class="remove">Remove</span></li>
+<li class="player">{{name}} <span class="select">Remove</span></li>
