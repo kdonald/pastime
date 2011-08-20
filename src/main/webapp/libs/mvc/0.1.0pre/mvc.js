@@ -3,9 +3,11 @@ define(["jquery", "handlebars"], function($, handlebars) {
   var MVC = (function() {
 
     var mvcPrototype = (function() {
-      
-      var model = (function() {    
+
+      var model = (function() {   
+        
         var modelPrototype = (function() {
+          
           function change(property, listener) {
             if (this.changeListeners[property] === undefined) {
               this.changeListeners[property] = [];
@@ -18,53 +20,58 @@ define(["jquery", "handlebars"], function($, handlebars) {
           });
           
         })();      
+        
+        function addProperties(model, obj) {
+          for (name in obj) {
+            var value = obj[name];
+            if (typeof value === "function") {
+              addPropertyForGetterFunction(model, obj, name, value);
+            } else {
+              addProperty(model, obj, name);
+            }
+          }
+        }
 
+        function addPropertyForGetterFunction(model, obj, name, getter) {
+          Object.defineProperty(model, name, {
+            enumerable: true,
+            get: function() {
+              return getter.call(obj);
+            }
+          });
+          if (obj.change) {
+            obj.change(name, function(value) {
+              if (this.changeListeners[name]) {
+                this.changeListeners[name].forEach(function(listener) {
+                  listener(value);
+                });
+              }
+            }.bind(model));
+          }
+        }
+        
+        function addProperty(model, obj, name) {
+          Object.defineProperty(model, name, {
+            enumerable: true,
+            get: function() {
+              return obj[name];
+            },
+            set: function(value) {
+              obj[name] = value;
+              if (this.changeListeners[name]) {
+                this.changeListeners[name].forEach(function(listener) {
+                  listener(value);
+                });
+              }
+            }
+          });                
+        }
+        
         function create(obj) {
           var model = Object.create(modelPrototype, {
             changeListeners: { value: {} }
           });
-          for (name in obj) {
-            var value = obj[name];
-            if (typeof value === "function") {
-              (function() {
-                var property = name;
-                var getter = value;
-                Object.defineProperty(model, property, {
-                  enumerable: true,
-                  get: function() {
-                    return getter.call(obj);
-                  }
-                });
-                if (obj.change) {
-                  obj.change(property, function(value) {
-                    if (this.changeListeners[property]) {
-                      this.changeListeners[property].forEach(function(listener) {
-                        listener(value);
-                      });
-                    }                      
-                  }.bind(model));
-                }
-              })();
-            } else {
-              (function() {
-                var property = name;
-                Object.defineProperty(model, property, {
-                  enumerable: true,
-                  get: function() {
-                    return obj[property];
-                  },
-                  set: function(value) {
-                    obj[property] = value;
-                    if (this.changeListeners[property]) {
-                      this.changeListeners[property].forEach(function(listener) {
-                        listener(value);
-                      });
-                    }
-                  }
-                });                
-              })();                
-            }
-          }
+          addProperties(model, obj);
           return model;
         }
         
