@@ -4,7 +4,7 @@
   <form>
     <p>
       <button>Submit Roster and Continue</button>
-      <aside>Don't worry if you were unable to add everyone you want to: you'll have the opportunity to amend your roster later.</aside>
+      <aside>Don't worry if you were unable to add everyone you want to. You will have the opportunity to amend your roster later.</aside>
     </p>
   </form>
 </div>

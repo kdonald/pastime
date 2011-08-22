@@ -51,24 +51,17 @@ define(["require", "./roster", "mvc", "api", "listselect"], function(require, Ro
       var addNewPlayerView = mvc.view({
         model: { value: "" },
         template: "addNewPlayer",
-        init: function() {
-          this.input = this.$("input");          
-          var parent = this;
-          this.expand = function(result) {
-            mvc.extend(this.expandedViewPrototype, result).render(function(expanded) {
-              parent.form = parent.$("form").detach();
-              parent.root.append(expanded);
-              this.$("button[type=submit]").focus();              
-            });
-          };          
-          this.expandedViewPrototype = mvc.view({
+        init: function() {          
+          var self = this;          
+          var expandedView = mvc.view({
             template: "addNewPlayerForm",
             events: {
               "submit": function() {
-                api.inviteUser(this.model, function() {
+                var successHandler = function() {              
                   roster.addPlayer(this.model);
                   this.destroy();
-                }.bind(this));
+                }.bind(this);
+                api.inviteUser(this.model, successHandler);
                 return false;
               },
               "click button.cancel": function() {
@@ -77,21 +70,29 @@ define(["require", "./roster", "mvc", "api", "listselect"], function(require, Ro
               }
             }
           }).postDestroy(function() {
-            parent.model.value = "";
-            parent.root.append(parent.form);
+            self.model.value = "";
+            self.root.append(self.originalForm);            
           });
+          this.expand = function(result) {
+            mvc.extend(expandedView, result).render(function(expandedForm) {
+              self.originalForm = self.$("form").detach();
+              self.root.append(expandedForm);
+              this.$("button[type=submit]").focus();                
+            });
+          };
+          this.input = this.$("input");          
         },
         events: {
           "submit form": function() {
-            function handleApiResult(result) {
+            var successHandler = function(result) {
               if (result.exactMatch) {
                 roster.addPlayer(result.player);
                 this.model.value = "";
               } else {
                 this.expand(result);
               }
-            }
-            api.findUser(this.input.val(), handleApiResult.bind(this));
+            }.bind(this);
+            api.findUser(this.input.val(), successHandler);
             return false;
           } 
         }
