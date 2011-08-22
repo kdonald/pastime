@@ -1,4 +1,4 @@
-define(["require", "mvc", "api"], function(require, MVC, api) {
+define(["require", "jquery", "mvc", "api"], function(require, $, MVC, api) {
 
   var mvc = MVC.create(require), view = undefined;
   

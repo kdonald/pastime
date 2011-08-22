@@ -128,18 +128,22 @@ define(["jquery", "handlebars"], function($, handlebars) {
             }
           }
           
-          function renderDeferred() {
+          function renderDeferred(anchor) {
             var self = this;
             var thisRendered = $.Deferred();
             this.render(function(root) {
               thisRendered.resolveWith(self, [root]);
             });
             function createPromise(deferred) {
-              function append(child, insertAt) {
+              function append(child) {
                 var childRendered = $.Deferred();
                 $.when(deferred).then(function(root) {
                   child.render(function(element) {
-                    root.find(insertAt).append(element);
+                    if (anchor) {
+                      root.find(anchor).append(element);
+                    } else {
+                      root.append(element);
+                    }
                     childRendered.resolveWith(self, [root]);
                   });
                 });

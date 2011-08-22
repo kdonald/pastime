@@ -1,0 +1,17 @@
+<div id="confirm">
+  <p>
+    Congratulations! Your roster has been saved.
+    Each player on your roster has been sent an e-mail asking them to confirm their roster spot.
+  <p>
+    Your team's registration status is now [pending].
+    To [confirm] your registration, you must:
+    <ol>
+      <li>Pay the league fee</li>
+      <li>Have at least 7 players confirm their roster spot</li>
+    </ol>
+  </p>
+  <p>
+    You must confirm your registration by 9/9/2011.
+    If you do not confirm by this deadline, your team will be removed from the league and will not be able to play.
+  </p>
+</div>

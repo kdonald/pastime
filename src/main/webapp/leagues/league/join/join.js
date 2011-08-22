@@ -6,17 +6,6 @@ define(["require", "./roster", "mvc", "api", "listselect"], function(require, Ro
     
     api.getEligibleTeams(season, function(teams) {
       var team = teams.length > 0 ? teams[0] : undefined;   
-
-      var joinView = mvc.view({
-        model: { season: season },
-        template: "join",
-        events: {
-          "submit form": function() {
-            this.destroy();
-            return false;
-          }
-        }
-      });
       
       var teamView = mvc.view({
         model: team,
@@ -120,8 +109,30 @@ define(["require", "./roster", "mvc", "api", "listselect"], function(require, Ro
           }          
         }
       });
-            
-      joinView.renderDeferred().append(teamView, "#createRoster").append(addNewPlayerView, "#createRoster").append(rosterView, "#createRoster").done(callback);
+
+      var joinDiv = $('<div id="join"></div>');
+      
+      var submitRosterView = mvc.view({
+        model: { season: season },
+        template: "submitRoster",
+        events: {
+          "submit form": function() {
+            this.destroy();
+            confirmView.render(function(content) {
+              joinDiv.append(content);
+            });
+            return false;
+          }
+        }
+      });
+      
+      var confirmView = mvc.view({
+        template: "confirm"
+      });
+      
+      submitRosterView.renderDeferred("#createRoster").append(teamView).append(addNewPlayerView).append(rosterView).done(function(content) {
+        callback(joinDiv.append(content));
+      });
       
     });
   };
