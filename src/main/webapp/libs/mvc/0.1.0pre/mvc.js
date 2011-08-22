@@ -129,26 +129,26 @@ define(["jquery", "handlebars"], function($, handlebars) {
           }
           
           function renderDeferred() {
+            var self = this;
             var thisRendered = $.Deferred();
             this.render(function(root) {
-              thisRendered.resolve(root);
-            });            
+              thisRendered.resolveWith(self, [root]);
+            });
             function createPromise(deferred) {
               function append(child, insertAt) {
                 var childRendered = $.Deferred();
                 $.when(deferred).then(function(root) {
                   child.render(function(element) {
                     root.find(insertAt).append(element);
-                    childRendered.resolve(root);
+                    childRendered.resolveWith(self, [root]);
                   });
                 });
                 return createPromise(childRendered);            
               }
               function insertAfter(element) {
-                $.when(thisRendered).then(function(root) {
+                return $.when(thisRendered).then(function(root) {
                   root.insertAfter(element);
                 });
-                return this;
               }
               return Object.create(deferred.promise(), { 
                 append: { value: append },
@@ -182,10 +182,12 @@ define(["jquery", "handlebars"], function($, handlebars) {
           
           function postDetach(listener) {
             this.postDetachListeners.push(listener);
+            return this;
           }
           
           function postDestroy(listener) {
             this.postDestroyListeners.push(listener);
+            return this;
           }
           
           function toString() {
@@ -199,8 +201,12 @@ define(["jquery", "handlebars"], function($, handlebars) {
               var array = eventDesc.split(" ");
               var event = array[0];
               var source = array[1];
-              var handler = view.events[eventDesc];
-              view.root.find(source).bind(event, handler.bind(view));
+              var handler = view.events[eventDesc].bind(view);
+              if (source) {
+                view.root.find(source).bind(event, handler);
+              } else {
+                view.root.bind(event, handler);
+              }
             }        
           }
           

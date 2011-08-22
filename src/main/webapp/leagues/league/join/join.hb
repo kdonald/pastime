@@ -1,11 +1,10 @@
 <div id="joinNow">
-  <p>To join our league, the first thing you need to do is create your roster.</p>
-  <div id="createRoster">
-    <!-- Content added dynamically -->
-  </div>
+  <p>To join our league, the first thing you need to do is submit your initial roster.</p>
+  <div id="createRoster"></div>
   <form>
     <p>
-      <button id="next">Next</button>
+      <button>Submit Roster and Continue</button>
+      <aside>Don't worry if you were unable to add everyone you want to: you'll have the opportunity to amend your roster later.</aside>
     </p>
   </form>
 </div>

@@ -1,13 +1,9 @@
-<section id="team">
+<div id="team">
   <p>
     We see that you are captain of <a href="{{path}}">{{name}}</a>.
-    We assume you wish to join as {{name}}.
+    We assume you will be joining this league as {{name}}.
+    Add your existing players that will be playing this season.
   </p>
-  <section id="players">
-    <h4>Players</h4>
-    <ul tabindex="1">
-      <!-- Players added dynamically -->
-    </ul>
-  </section>
-  <small><a href="join?newteam">Join as a new team</a> instead of {{name}}</a></small>  
-</section>
+  <h4>Existing {{name}} Players</h4>
+  <ul tabindex="0"></ul>
+</div>
