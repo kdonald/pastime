@@ -1,4 +1,4 @@
-define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
+define(["jquery", "handlebars", "api", "text!./dashboard.hb", "text!./newsItem.hb"],
     function($, handlebars, api, dashboardTemplate, newsItemTemplate) {
 
   newsItemTemplate = handlebars.compile(newsItemTemplate);
@@ -31,12 +31,14 @@ define(["jquery", "handlebars", "api", "text!dashboard.hb", "text!newsItem.hb"],
     context.$element().append(root);    
   }
 
-  return function(context) {
-    if (dashboard === undefined) {
-      init(context);
-    } else {
-      render(context);
-    }
+  return function() {
+    this.get("/", function(context) {
+      if (dashboard === undefined) {
+        init(context);
+      } else {
+        render(context);
+      }      
+    });
   };
       
 });

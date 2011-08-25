@@ -2,10 +2,10 @@
   <h2>{{league.name}}</h2>
   <h3>{{name}}</h3>
   <ul>
-  <li>{{format}} format</li>
-  <li>each team gets {{games}} games plus playoffs</li>
-  <li>{{#gameDays}}games played on {{day}} {{time}}{{/gameDays}}</li> 
-  <li>season starts {{startDate}} </li>
+    <li>{{format}} format</li>
+    <li>each team gets {{games}} games plus playoffs</li>
+    <li>{{#gameDays}}games played on {{day}} {{time}}{{/gameDays}}</li> 
+    <li>season starts {{startDate}} </li>
   </ul>
   <a id="joinNow" href="join">Join Now</a>
   <section id="venues">
