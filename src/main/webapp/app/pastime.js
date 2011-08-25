@@ -1,8 +1,8 @@
-define(["require", "sammy", "dashboard/dashboard", "leagues/leagues", "teams/teams"], function(require, sammy, dashboard, leagues, teams) {
+define(["require", "sammy", "home/home", "leagues/leagues", "teams/teams"], function(require, sammy, home, leagues, teams) {
 
   function start() {    
     var pastime = sammy("#main", function() {
-      dashboard(this);
+      home(this);
       leagues(this);
       teams(this);
     });
