@@ -16,8 +16,8 @@ define(["require", "jquery", "mvc", "api"], function(require, $, MVC, api) {
     });
   }
 
-  return function() {
-    this.get("/teams", function(context) {
+  return function(routes) {
+    routes.get("/teams", function(context) {
       if (view === undefined) {
         init(context);
       } else {

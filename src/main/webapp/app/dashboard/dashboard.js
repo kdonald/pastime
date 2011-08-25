@@ -31,8 +31,8 @@ define(["jquery", "handlebars", "api", "text!./dashboard.hb", "text!./newsItem.h
     context.$element().append(root);    
   }
 
-  return function() {
-    this.get("/", function(context) {
+  return function(routes) {
+    routes.get("/", function(context) {
       if (dashboard === undefined) {
         init(context);
       } else {

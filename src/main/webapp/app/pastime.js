@@ -2,9 +2,9 @@ define(["require", "sammy", "dashboard/dashboard", "leagues/leagues", "teams/tea
 
   function start() {    
     var pastime = sammy("#main", function() {
-      dashboard.bind(this)();
-      leagues.bind(this)();
-      teams.bind(this)();
+      dashboard(this);
+      leagues(this);
+      teams(this);
     });
     pastime.run();
   }
