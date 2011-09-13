@@ -1,5 +1,20 @@
 define(["jquery", "handlebars"], function($, handlebars) {
 
+  var mapPrototype = (function() {
+
+    function get(key) {
+      if (!this.data.hasOwnProperty(key)) {
+        this.data[key] = this.newValue();
+      }
+      return this.data[key];
+    }
+    
+    return {
+      get: get
+    };
+    
+  })();
+  
   var MVC = (function() {
 
     var mvcPrototype = (function() {
@@ -109,7 +124,19 @@ define(["jquery", "handlebars"], function($, handlebars) {
           return render;
         }
         
-        var viewPrototype = (function() {      
+        var viewPrototype = (function() {
+          
+          function bind(event, listener) {
+            this.listeners.get(event).push(listener);
+          }
+          
+          function trigger(event, args) {
+            var listeners = this.listeners.get(event);
+            listeners.forEach(function(listener) {
+              listener(args);
+            });
+          }
+          
           function render(callback) {
             if (this.root === undefined) {
               this.template(this.model, function(content) {
@@ -218,29 +245,52 @@ define(["jquery", "handlebars"], function($, handlebars) {
             function postProcess(value) {
               return typeof value === "function" ? value.bind(view.model) : value;
             }
+            function bindInput(element, view, propertyName, propertyValue) {
+              element.val(propertyValue);
+              view.model.change(propertyName, function(newValue) {
+                element.val(newValue);    
+              });
+              element.change(function() {
+                view.model[propertyName] = element.val();
+              });              
+            }
+            function bindSelect(element, view, propertyName, propertyValue) {
+              var optionsSource = element.attr("data-options");
+              if (optionsSource) {
+                var optionsLoader = view.referenceData[optionsSource], deferred = $.Deferred();
+                deferred.done(function(options) {
+                  options.forEach(function(option) {
+                    var optionElement = $("<option></option>").attr("value", option.value).append(option.label);
+                    if (option.value === propertyValue) {
+                      optionElement.attr("selected", "selected");
+                    }
+                    optionElement.appendTo(element);
+                  });
+                });
+                optionsLoader(deferred);
+              }              
+            }
             var bindElements = view.root.find("[data-bind]");
             bindElements.each(function(element) {
               var element = $(this);
-              var property = element.attr("data-bind");
-              var value = postProcess(view.model[property]);
+              var propertyName = element.attr("data-bind");
+              var propertyValue = postProcess(view.model[propertyName]);
               if (element.is("input")) {
-                element.val(value);
-                view.model.change(property, function(value) {
-                  element.val(value);            
-                });
-                element.change(function() {
-                  view.model[property] = element.val();
-                });
+                bindInput(element, view, propertyName, propertyValue);
+              } else if (element.is("select")) {
+                bindSelect(element, view, propertyName, propertyValue);
               } else {
-                element.html(value);
-                view.model.change(property, function(value) {
-                  element.html(value);
+                element.html(propertyValue);
+                view.model.change(propertyName, function(newValue) {
+                  element.html(newValue);
                 });
               }
             });
           }
           
           return {
+            bind: bind,
+            trigger: trigger,
             render: render,
             renderDeferred: renderDeferred,            
             $: find,
@@ -255,11 +305,17 @@ define(["jquery", "handlebars"], function($, handlebars) {
         })();
 
         function create(args) {
+          var listeners = Object.create(mapPrototype, { 
+            data: { value: {} },
+            newValue: { value: function() { return []; } }
+          });
           return Object.create(viewPrototype, {
             model: { value: model(args.model) },
+            referenceData: { value: args.referenceData },            
             template: { value: template(this.require, args.template) },
             events: { value: args.events },
             init: { value: args.init },
+            listeners: { value: listeners },
             postDetachListeners: { value: [] },      
             postDestroyListeners: { value: [] }
           });

@@ -141,12 +141,23 @@ define(["jquery"], function($) {
     callback();
   }
   
+  function createTeam(args, callback) {
+    callback({ location: "http://localhost:8080/#/teams/hitmen", slug: "hitmen" });
+  }
+  
+  function getSports(callback) {
+    sports = [ { value: 0, label: "Flag football" }, { value: 1, label: "Softball" } ];
+    callback(sports);
+  }
+  
   return {
     getDashboard: getDashboard,
     getSeason: getSeason,
     getEligibleTeams: getEligibleTeams,
     findUser: findUser,
-    inviteUser: inviteUser
+    inviteUser: inviteUser,
+    createTeam: createTeam,
+    getSports: getSports,
   };
   
 });

@@ -3,13 +3,11 @@ package com.pastime.teams;
 import javax.inject.Inject;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Controller
 @RequestMapping("/teams")
 public class TeamsController {
 	
