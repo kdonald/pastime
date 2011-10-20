@@ -150,6 +150,24 @@ define(["jquery"], function($) {
     callback(sports);
   }
   
+  function getTeam(slug, callback) {
+    var team = {
+      name: "Hitmen",
+      logo: "http://localhost:8080/teams/hitmen/logo",
+      stories: [
+       { date: "2011/9/19 8:00 AM", title: "Hitmen to Face Long Doggers in Round 1 of Playoffs", author: "Analyst Bot", picture: "http://localhost:8080/teams/hitmen/news/2011/09/19/playoffs/thumbnail.png", summary: "Hitmen took the first meeting 23-16 and will need to do it again to advance.", article: "http://localhost:8080/teams/hitmen/news/2011/09/19/hitmen-to-face-long-doggers-in-round-1-of-playoffs" },
+       { date: "2011/9/14 11:05 PM", title: "Hitmen Edge Out Elite Stucco on Late Game Heorics", author: "Analyst Bot", picture: "http://localhost:8080/teams/hitmen/news/2011/09/14/elite-stucco/thumbnail.png", summary: "Marc P. threw for 6 touchdowns and Dale Heinz scored twice.", article: "http://localhost:8080/teams/hitmen/news/2011/09/14/hitmen-edge-out-elite-stucco-on-late-game-heroics"  },
+       { date: "2011/9/14 11:00 PM", title: "Hitmen Blow Out Prestige Worldwide", author: "Analyst Bot", picture: "http://localhost:8080/teams/hitmen/news/2011/09/14/prestiege-worldwide/thumbnail.png", summary: "Keith Donald scored the game winning TD and Dale Heinz got the game winning INT.", article: "http://localhost:8080/teams/hitmen/news/2011/09/14/hitmen-blow-out-prestiege-worldwide"  },
+      ],
+      schedule: [
+       { date: "2011/9/14 7:00 PM", opponent: { name: "Prestige Worldwide", ref: "http://localhost:8080/leagues/florida/brevardparks/south-football/2011/summer/5/1" }, result: { code: "W", score: 40, opponent: 0 } },
+       { date: "2011/9/14 8:00 PM", opponent: { name: "Elite Stucco", ref: "http://localhost:8080/leagues/florida/brevardparks/south-football/2011/summer/5/2" }, result: { code: "W", score: 18, opponent: 3 } },
+       { date: "2011/9/21 6:45 PM", opponent: { name: "Long Doggers", ref: "http://localhost:8080/leagues/florida/brevardparks/south-football/2011/summer/6/1" }, playoffs: true }
+      ],
+    };
+    callback(team);
+  }
+  
   return {
     getDashboard: getDashboard,
     getSeason: getSeason,

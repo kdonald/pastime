@@ -45,7 +45,9 @@ define(["require", "jquery", "mvc", "api"], function(require, $, MVC, api) {
       }      
     });
     routes.get("/teams/:slug", function(context) {
-      console.log(context.params["slug"]);
+      api.getTeam(context.params["slug"], function(team) {
+        
+      });
     });
   };
       
