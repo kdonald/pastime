@@ -1,4 +1,4 @@
-define('jqueryuicarousel/autoscroll', ['jquery','jqueryui/core','jqueryui/widget', 'jqueryuicarousel/carousel'], function (jQuery) {
+define('jqueryuicarousel/autoscroll', ['jquery', 'jqueryui/core', 'jqueryui/widget', 'jqueryuicarousel/carousel'], function (jQuery) {
 
 /*
  * jquery.rs.carousel-autoscroll v0.8.5

@@ -6,6 +6,48 @@
     <meta name="description" content="Spend time doing what you love." />
     <meta name="keywords" content="social, sports, performance, active, activity, game, fun, cloud, SaaS" />
     <link rel="stylesheet" href="main.css">
+  <style type="text/css">
+  
+    /* carousel */
+    .rs-carousel {
+      overflow: hidden;
+    }
+    
+    .rs-carousel .rs-carousel-mask {
+        position:relative;
+        overflow:hidden;
+    }
+    
+      .rs-carousel .rs-carousel-runner {
+        position: absolute;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .no-js .rs-carousel .rs-carousel-runner {
+        position: static;
+      }
+      
+        .rs-carousel .rs-carousel-item {
+          float: left;
+          width: 350px;
+          height: 375px;
+          margin: 0;
+        }
+    
+    /** horizontal **/
+    #spike .rs-carousel-mask {
+      height: 375px;
+      margin: 0;
+    }
+    
+      /** items per page **/
+      #spike.rs-carousel-items-1 .rs-carousel-mask {
+        width: 350px;
+      }
+  </style> 
   </head>
   <body>
     <div id="page">
@@ -26,9 +68,15 @@
             </form>
           </div>        
         </div>
-        <div id="spike">
-          <!-- Spike image page-able list -->
-        </div>
+        <div id="spike" class="rs-carousel">
+          <ul class="rs-carousel-runner">
+            <li class="rs-carousel-item"><img src="images/spike/football.png" width="350" height="375" /></li>
+            <li class="rs-carousel-item"><img src="images/spike/softball.png" width="350" height="375"/></li>
+            <li class="rs-carousel-item"><img src="images/spike/basketball.png" width="350" height="375"/></li>
+            <li class="rs-carousel-item"><img src="images/spike/volleyball.png" width="350" height="375"/></li>
+            <li class="rs-carousel-item"><img src="images/spike/hockey.png" width="350" height="375"/></li>
+          </ul>
+        </div>        
       </div>
     </div>
     <footer>

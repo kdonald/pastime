@@ -1,4 +1,4 @@
-define('jqueryuicarousel/continuous', ['jquery','jqueryui/core','jqueryui/widget', 'jqueryuicarousel/carousel'], function (jQuery) {
+define('jqueryuicarousel/continuous', ['jquery', 'jqueryui/core', 'jqueryui/widget', 'jqueryuicarousel/carousel'], function (jQuery) {
 
 /*
  * jquery.rs.carousel-continuous v0.8.5

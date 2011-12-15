@@ -135,10 +135,8 @@ header h2 {
 }
 
 #spike {
-	border: 1px dotted lightGray;
-	font-size: 36px;
-  height: 370px;
-  margin-left: 680px;
+  font-size: 36px;
+  height: 375px;
   margin-bottom: 25px;
   width: 350px;
 }
