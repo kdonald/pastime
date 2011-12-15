@@ -6,25 +6,35 @@
     <meta name="description" content="Spend time doing what you love." />
     <meta name="keywords" content="social, sports, performance, active, activity, game, fun, cloud, SaaS" />
     <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="libs/jqueryui/1.8.14/themes/base/jquery.ui.all.css">    
   </head>
   <body>
-    <header>
-      <hgroup>
-        <h1>Pastime</h1>
-        <h2>Spend time doing what you love</h2>      
-      </hgroup>
-    </header>
-    <nav>
-      <ul>
-        <li><a href="/teams">Teams</a></li>
-        <li><a href="/settings">Keith Donald</a></li>
-      </ul>
-    </nav>
-    <div id="main">
+    <div id="page">
+      <header>
+        <hgroup>
+          <h1>Pastime</h1>
+          <h2>Spend time doing what you love</h2>      
+        </hgroup>
+      </header>
+      <div id="content">
+        <div id="mission">
+          <h3>Discover leagues. Form teams. Play.</h3>
+          <div id="invite">
+            <p>Get notified when we launch!</p>
+            <form>
+              <input type="email"></input>
+               <button>Subscribe</button>
+            </form>
+          </div>        
+        </div>
+        <div id="spike">
+          <!-- Spike image page-able list -->
+        </div>
+      </div>
     </div>
     <footer>
-      <p>Pastime &copy; 2011</p>
+      <div id="copyright">
+        <p><small>Pastime &copy; 2011</small></p>
+      </div>
     </footer>
     <script data-main="main.js" src="libs/requirejs/1.0.2/require.js"></script>    
   </body>
