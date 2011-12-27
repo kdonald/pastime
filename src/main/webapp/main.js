@@ -9,7 +9,6 @@ require.config({
 require(["jquery", "jqueryuicarousel/carousel", "jqueryuicarousel/autoscroll", "jqueryuicarousel/continuous"], function($) {
   $(document).ready(function() {
     var el = $('.rs-carousel').carousel();
-    el.carousel('option', {itemsPerPage: 1, itemsPerTransition: 1, pagination: false, nextPrevActions: false, autoScroll: true, pause: 4000, continuous: true });
-    el.carousel('refresh');
+    el.carousel('option', { itemsPerPage: 1, itemsPerTransition: 1, pagination: false, nextPrevActions: false, autoScroll: true, pause: 4000, continuous: true } );
   });
 });
