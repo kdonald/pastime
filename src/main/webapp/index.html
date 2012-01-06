@@ -4,45 +4,92 @@
     <title>Pastime</title>
     <meta charset="utf-8" />
     <meta name="description" content="Spend time doing what you love." />
-    <meta name="keywords" content="social, sports, performance, active, activity, game, fun, cloud, SaaS" />
+    <meta name="keywords" content="sports, football, softball, basketball, soccer, volleyball, hockey, league, team, game, activity, performance, fun, cloud, SaaS" />
+    <meta property="fb:app_id" content="212373618850030"/>
+    <meta property="fb:admins" content="1255689239"/>
+    <meta property="og:description" content="Spend time doing what you love."/>
+    <meta property="og:image" content="http://localhost:8080/images/logo.png"/>
+    <meta property="og:site_name" content="Pastime"/>
+    <meta property="og:title" content="Pastime"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="http://localhost:8080"/>
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="libs/jqueryui/1.8.16/themes/base/jquery.ui.all.css">     
   </head>
   <body>
+    <div id="fb-root"></div>  
     <div id="page">
       <header>
         <hgroup>
           <h1>Pastime</h1>
           <h2>Spend time doing what you love</h2>      
         </hgroup>
+        <div id="banner">
+          Pastime will launch in Brevard County, Florida in Spring 2012.
+          Subscribe for updates, refer your friends, and win a free registration for your team!
+        </div>
       </header>
       <div id="content">
-        <div id="mission">
-          <h3>Discover leagues. Form teams. Play.</h3>
-          <div id="invite">
-            <p>Get notified when we launch!</p>
-            <form>
-              <input type="email"></input>
-               <button>Subscribe</button>
-            </form>
-          </div>        
+      	<div id="top">
+      		<div id="topLeft">
+      			<h1>Pastime makes it easier than ever to get out and play the sports you love.</h1>
+      			<div id="icons">
+      				<ul>
+      					<li id="football">Football</li>
+      					<li id="softball">Softball</li>
+      					<li id="basketball">Basketball</li>
+      					<li id="soccer">Soccer</li>
+      					<li id="volleyball">Volleyball</li>
+      					<li id="tennis">Tennis</li>
+      					<li id="hockey">Hockey</li>
+      				</ul>
+      			</div>
+      			<div id="learn">
+        			<section id="discoverLeagues">
+        				<h2>Discover Leagues</h2>
+        				<p>
+        				  Find the leagues you want to play in.
+        				  Just tell Spike what sports you want to play and he'll do the rest.
+        				</p>
+        			</section>
+        			<section id="formTeams">
+        				<h2>Form Teams</h2>
+       					<p>
+        				  Find and form teams in your community.
+        				  Track your team's performance over the years.
+          				Have your very own franchise!
+        				</p>
+        			</section>
+        			<section id="play">
+        				<h2>Play</h2>
+        				<p>
+          				It's never been easier to start playing.
+          				Register on-line, get game schedules &amp; reminders, and show-off your results.
+          				Bring your "A" game!
+        				</p>
+        			</section>
+        		</div>       		
+      		</div>
+      		<div id="topRight">
+        		<h1>Spike</h1>
+        	</div>
+      	</div>
+        <div id="subscribe">
+          <form method="post">
+            <p>Get notified when we launch!
+            <input type="text" name="name" placeholder="Name" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <input type="hidden" name="ref" />
+            <button>Subscribe</button>
+          </form>
         </div>
-        <div id="spike" class="rs-carousel">
-          <ul class="rs-carousel-runner">
-            <li class="rs-carousel-item"><img src="images/spike/football.png" width="350" height="375" /></li>
-            <li class="rs-carousel-item"><img src="images/spike/softball.png" width="350" height="375"/></li>
-            <li class="rs-carousel-item"><img src="images/spike/basketball.png" width="350" height="375"/></li>
-            <li class="rs-carousel-item"><img src="images/spike/soccer.png" width="350" height="375"/></li>            
-            <li class="rs-carousel-item"><img src="images/spike/volleyball.png" width="350" height="375"/></li>
-            <li class="rs-carousel-item"><img src="images/spike/hockey.png" width="350" height="375"/></li>
-          </ul>
-        </div>        
       </div>
-    </div>
-    <footer>
-      <div id="copyright">
-        <p><small>Pastime &copy; 2011</small></p>
-      </div>
-    </footer>
-    <script data-main="main.js" src="libs/requirejs/1.0.3/require.js"></script>    
+      <footer>
+        <div id="copyright">
+          <p><small>Pastime &copy; 2012</small></p>
+        </div>
+      </footer>
+    </div>    
   </body>
 </html>

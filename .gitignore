@@ -4,5 +4,6 @@ build
 .project
 .settings
 bin
+pastime.esproj
 *.DS_Store
 Thumbs.db
