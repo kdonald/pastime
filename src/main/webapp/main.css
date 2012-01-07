@@ -88,7 +88,7 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
   border: 1px solid lightGray;
   margin: auto;
   margin-top: 25px;
-  width: 1040px;
+  width: 1030px;
   -webkit-border-radius: 12px;
   -moz-border-radius: 12px;
   border-radius: 12px;
@@ -267,7 +267,6 @@ footer {
 
 #topRight {
 	float: left;
-	margin-left: 10px;
 }
 
 #topRight h1 {
