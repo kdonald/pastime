@@ -88,7 +88,7 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
   border: 1px solid lightGray;
   margin: auto;
   margin-top: 25px;
-  width: 1050px;
+  width: 1040px;
   -webkit-border-radius: 12px;
   -moz-border-radius: 12px;
   border-radius: 12px;
@@ -155,8 +155,8 @@ footer {
 }
 
 #content {
-  padding-left: 45px;
-  padding-right: 45px;
+  padding-left: 40px;
+  padding-right: 40px;
   padding-top: 20px;  
   padding-bottom: 20px;
 }
@@ -245,24 +245,24 @@ footer {
 }
 
 #discoverLeagues {
-	float: left;
-	width: 200px;
 	border-right: 1px solid #e1dfdd;
+	float: left;
 	padding-right: 20px;
+	width: 190px;
 }
 
 #formTeams {
-	float: left;
-	width: 200px;
 	border-right: 1px solid #e1dfdd;
+	float: left;
 	padding-left: 25px;
 	padding-right: 20px;
+	width: 190px;
 }
 
 #play {
 	float: left;
-	width: 200px;
 	padding-left: 25px;
+	width: 215px;
 }
 
 #topRight {
