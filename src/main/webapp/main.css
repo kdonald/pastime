@@ -267,6 +267,7 @@ footer {
 
 #topRight {
 	float: left;
+	margin-left: 10px;
 }
 
 #topRight h1 {
