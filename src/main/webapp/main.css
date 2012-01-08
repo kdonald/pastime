@@ -13,8 +13,17 @@ thead,tr,th,td,article,aside,figure,footer,header,hgroup,menu,nav,section,time,m
   vertical-align: baseline;
 }
 
+html {
+  height:100%;
+}
+
 body {
-  background-color: #ffffff;
+  background-attachment: fixed;
+  background-color: #f6f6f6;
+  background-image: -moz-linear-gradient(100% 100% 90deg, #ffffff, #f6f6f6);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f6f6f6) );
+  background-repeat: no-repeat;
+  height: 100%;
   line-height: 1;
 }
 
@@ -78,17 +87,49 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
   display: block;
 }
 
+/* general page styles */
+
+#floater {
+	float: left;
+	height: 50%;
+	margin-bottom: -309px;
+	position: relative;
+	width: 1px;
+}
+
 #page {
+  clear: left;
   background-color: #ffffff;
-  margin: auto;
+  border: 1px solid lightGray;  
+	height: 618px;
+	margin: 0 auto;
+	position: relative;  
   width: 980px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  -webkit-box-shadow: 0px 0px 4px #f4f4f4;
+  -moz-box-shadow: 0px 0px 4px #f4f4f4;
+  box-shadow: 0px 0px 4px #f4f4f4;  
 }
 
 header {
+  background-image: -moz-linear-gradient(100% 100% 90deg, #fefeda, #ffffff);
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#fefeda) );
+  border-bottom: 2px solid #f4f4f4;
   padding-left: 10px;
   padding-top: 10px;
   padding-bottom: 10px;
   overflow: auto;
+  -webkit-border-radius: 12px 12px 0px 0px;
+  -moz-border-radius: 12px 12px 0px 0px;
+  border-radius: 12px 12px 0px 0px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;  
 }
 
 header hgroup {
