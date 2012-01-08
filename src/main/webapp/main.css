@@ -14,12 +14,9 @@ thead,tr,th,td,article,aside,figure,footer,header,hgroup,menu,nav,section,time,m
 }
 
 body {
+  background-color: #ffffff;
   line-height: 1;
-  background-attachment: fixed;
-  background-color: #f6f6f6;
-  background-image: -moz-linear-gradient(100% 100% 90deg, #ffffff, #f6f6f6);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f6f6f6) );
-  background-repeat: no-repeat;
+  min-width: 1026px;
 }
 
 ol,ul {
@@ -82,83 +79,57 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
   display: block;
 }
 
-/* general page structure styles */
 #page {
-  background-color: white;
-  border: 1px solid lightGray;
   margin: auto;
-  margin-top: 25px;
-  width: 1030px;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  border-radius: 12px;
-  -moz-background-clip: padding;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  -webkit-box-shadow: 0px 0px 4px #f4f4f4;
-  -moz-box-shadow: 0px 0px 4px #f4f4f4;
-  box-shadow: 0px 0px 4px #f4f4f4;
+  width: 980px;
 }
 
 header {
-  background-color: #ffffff;
-  background-image: -moz-linear-gradient(100% 100% 90deg, #fefeda, #ffffff);
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#fefeda) );
-  border-bottom: 2px solid #f4f4f4;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  border-radius: 12px;
-  -moz-background-clip: padding;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
+  padding-top: 10px;
   overflow: auto;
-  margin-top: 8px;
 }
 
 header hgroup {
-  padding: 1em;
   float: left;
 }
 
 header h1 {
   background: url(images/logo.png);
-  width: 229px;
   height: 69px;
-  text-indent: -9999px;
   margin-bottom: 2px;
+  text-indent: -9999px;
+  width: 229px;
 }
 
 header h2 {
+  color: #8f8468;
   font-size: 18px;
   font-style: italic;
-  color: #8f8468;
   padding-left: 29px;
 }
 
 header #banner {
-	float: right;
-	width: 465px;
-	background-color: #7cc733;
-	background: url(images/brevard-seal.png) no-repeat bottom right, -moz-linear-gradient(100% 100% 90deg, #6fc41d, #acd281);
+  background-color: #7cc733;
+  background: url(images/brevard-seal.png) no-repeat bottom right, -moz-linear-gradient(100% 100% 90deg, #6fc41d, #acd281);
   background: url(images/brevard-seal.png) no-repeat bottom right, -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6fc41d), to(#acd281) );
 	color: #fff;
-	margin: 17px 22px 22px 17px;
-	padding: 30px 100px 30px 30px;
+	float: right;
 	font-size: 14px;
+	padding: 30px 100px 30px 30px;
+	width: 465px;	
+}
+
+#content {
+  padding-top: 10px;
+  padding-left: 17px;
+  padding-right: 17px;
+  padding-bottom: 10px;
 }
 
 footer {
   color: #9a9893;
   font-size: 11px;
-  padding: 1em;
   text-align: center;
-}
-
-#content {
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-top: 20px;  
-  padding-bottom: 20px;
 }
 
 /* coming soon page styles */
@@ -169,11 +140,6 @@ footer {
 #topLeft {
 	float: left;
 	padding-top: 20px;
-	width: 700px;
-}
-
-#mission {
-  padding-bottom: 40px;
 }
 
 #mission h1 {
@@ -188,6 +154,11 @@ footer {
 	font-size: 22px;
 }
 
+#icons {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
 #icons ul {
 	list-style: none;
 	overflow: hidden;
@@ -195,7 +166,7 @@ footer {
 
 #icons li {
 	float: left;
-	padding: 0 53px 0 0;
+	padding-left: 53px;
 	width: 47px;
 	height: 47px;
 	text-indent: -9999px;
@@ -233,8 +204,6 @@ footer {
   overflow: hidden;
   color: #7d786b;
   line-height: 130%;
-  padding-top: 40px;
-  padding-bottom: 40px;
 }
 
 #learn h2 {
@@ -277,10 +246,10 @@ footer {
 }
 
 #subscribe {
-  font-size: 24px;
 	background-image: -moz-linear-gradient(100% 100% 90deg, #44919e, #5cc2d5, #44919e);
   background-image: -webkit-linear-gradient(#44919e, #5cc2d5, #44919e); 
   color: #ffffff; 
+  font-size: 24px;
   margin-top: 10px;
   padding: 24px;
   text-align: center;
