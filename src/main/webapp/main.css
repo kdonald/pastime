@@ -16,7 +16,6 @@ thead,tr,th,td,article,aside,figure,footer,header,hgroup,menu,nav,section,time,m
 body {
   background-color: #ffffff;
   line-height: 1;
-  min-width: 1026px;
 }
 
 ol,ul {
@@ -80,11 +79,13 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
 }
 
 #page {
+  background-color: #ffffff;
   margin: auto;
   width: 980px;
 }
 
 header {
+  padding-left: 10px;
   padding-top: 10px;
   overflow: auto;
 }
@@ -112,10 +113,13 @@ header #banner {
   background-color: #7cc733;
   background: url(images/brevard-seal.png) no-repeat bottom right, -moz-linear-gradient(100% 100% 90deg, #6fc41d, #acd281);
   background: url(images/brevard-seal.png) no-repeat bottom right, -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6fc41d), to(#acd281) );
-	color: #fff;
+  padding-left: 30px;
+  padding-right: 100px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+	color: #ffffff;
 	float: right;
 	font-size: 14px;
-	padding: 30px 100px 30px 30px;
 	width: 465px;	
 }
 
@@ -130,6 +134,7 @@ footer {
   color: #9a9893;
   font-size: 11px;
   text-align: center;
+  padding-bottom: 10px;
 }
 
 /* coming soon page styles */
