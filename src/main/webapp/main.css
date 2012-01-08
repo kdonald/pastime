@@ -87,6 +87,7 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
 header {
   padding-left: 10px;
   padding-top: 10px;
+  padding-bottom: 10px;
   overflow: auto;
 }
 
@@ -120,13 +121,13 @@ header #banner {
 	color: #ffffff;
 	float: right;
 	font-size: 14px;
-	width: 465px;	
+	width: 475px;	
 }
 
 #content {
-  padding-top: 10px;
   padding-left: 17px;
   padding-right: 17px;
+  padding-top: 10px;
   padding-bottom: 10px;
 }
 
