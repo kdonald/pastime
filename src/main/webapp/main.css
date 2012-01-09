@@ -456,7 +456,6 @@ button {
   color: #fff;
   cursor: pointer;
   display: inline-block;
-  font-family: Arial, sans-serif;
   font-size: 1em;
   letter-spacing: 0.1em;
   padding: 6px 9px;
@@ -679,14 +678,46 @@ header #banner p {
   padding: 24px;
   text-align: center;
   text-shadow: 1px 1px 1px #418895; 
-  -webkit-border-radius: 12px 12px 12px 12px;
-  -moz-border-radius: 12px 12px 12px 12px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
 }
 
 #subscribe p {
   color: #ffffff;
   font-size: 1.4em;
   display: inline;  
+}
+
+#thanks h1 {
+  font-size: 1.3em;
+  text-align: center;
+}
+
+#thanks h2 {
+  font-size: 1.2em;
+}
+
+#thanks p strong {
+  text-transform: uppercase;
+}
+
+#thanks p {
+  font-size: 0.8em;
+}
+
+#referralLink {
+  color: #000;
+  background-color: #f4f4f4;
+  border: 1px solid lightGray; 
+  padding: 10px; 
+  text-align: center;  
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
 }
 
 footer {

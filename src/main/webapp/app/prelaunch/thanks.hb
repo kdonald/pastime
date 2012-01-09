@@ -1,14 +1,16 @@
 <div id="thanks">
-  <h2>Thanks {{name}}!</h2>
+  <h1>Thanks {{name}}!</h1>
   <p>We'll let you know as soon as Pastime is ready for you.</p>
   <section id="referalls">
-    <h3>Spread the word!</h3>
+    <h2>Spread the word!</h2>
     <p>
-      Each Brevard County resident you get to sign up earns you a chance to win a free registration in a local sports league of your choice!
-      Simply send your friends a Facebook message or email and ask them to sign up through your referral link.
+      Did you know each Brevard County resident you get to sign up earns you a chance to win a <strong>free</strong> registration in a local sports league of your choice?
     </p>
     <p>
-      Your referral link is:
+      Simply send your friends an email or Facebook message and ask them to sign up through your referral link!
+    </p>
+    <p>
+      Your own personal referral link is:
       <div id="referralLink">{{referralLink}}</div>
     </p>
     <div class="fb-send" data-href="http://kdonald.org"></div>      
