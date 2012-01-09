@@ -4,7 +4,8 @@
   <section id="referalls">
     <h2>Spread the word!</h2>
     <p>
-      Did you know each Brevard County resident you get to sign up earns you a chance to win a <strong>free</strong> registration in a local sports league of your choice?
+      Did you know each Brevard County resident you get to sign up earns you a chance to win a <strong>free</strong> registration
+      for you and your team in a local sports league of your choice?
     </p>
     <p>
       Simply send your friends an email or Facebook message and ask them to sign up through your referral link!
