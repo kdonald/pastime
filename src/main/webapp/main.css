@@ -92,12 +92,12 @@ article,aside,figure,footer,header,hgroup,menu,nav,section {
 #floater {
 	float: left;
 	height: 50%;
-	margin-bottom: -309px;
+	margin-bottom: -320px;
 	position: relative;
 	width: 1px;
 }
 
-#page {
+#card {
   clear: left;
   background-color: #ffffff;
   border: 1px solid lightGray;  
@@ -165,7 +165,7 @@ header #banner {
 	position: absolute;
 	left: 725px;
 	right: 0px;
-	bottom: 130px;
+	bottom: 135px;
 	text-indent: -9999px;
 }
 
