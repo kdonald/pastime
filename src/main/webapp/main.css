@@ -551,7 +551,7 @@ header h2 {
   font-size: 18px;
   font-style: italic;
   font-weight: normal;
-  margin: 3px 0;
+  margin: 3px 0 0;
   padding-left: 28px;
 }
 
@@ -561,7 +561,7 @@ header #banner {
   background: url(images/brevard-seal.png) no-repeat bottom right, -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6fc41d), to(#acd281) );
 	font-size: 14px;
 	float: right;
-  padding: 30px 100px 30px 30px;
+  padding: 25px 100px 25px 25px;
 	width: 485px;
 }
 
