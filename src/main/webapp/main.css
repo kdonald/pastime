@@ -120,7 +120,7 @@ header {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#fefeda) );
   border-bottom: 2px solid #f4f4f4;
   overflow: auto;
-  padding: 10px;
+  padding: 15px 10px 15px 10px;
   -webkit-border-radius: 12px 12px 0px 0px;
   -moz-border-radius: 12px 12px 0px 0px;
   border-radius: 12px 12px 0px 0px;
@@ -159,10 +159,13 @@ header #banner {
 	width: 485px;
 }
 
-#spike {
-	width: 246x;
-	height: 376px;
+#spike h1 {
 	background: url(images/spike.png) no-repeat;
+	height: 376px;
+	position: absolute;
+	left: 725px;
+	right: 0px;
+	bottom: 130px;
 	text-indent: -9999px;
 }
 
