@@ -14,6 +14,6 @@
       Your own personal referral link is:
       <div id="referralLink">{{referralLink}}</div>
     </p>
-    <div class="fb-send" data-href="http://kdonald.org"></div>      
+    <a class="fb-send-button"><i></i><span>Send</span></a>
   </section>
 </div>

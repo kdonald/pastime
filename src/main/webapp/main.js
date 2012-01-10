@@ -38,9 +38,14 @@ require(["require", "jquery", "handlebars", "text!prelaunch/thanks.hb", "jqueryu
     subscribeForm.on("submit", function(event) {
       var xhr = api.subscribe(subscribeForm);
       xhr.done(function(data) {
-        var html = thanksTemplate({ name: data.name, referralLink: data.referralLink });        
-        $(html).dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
-        FB.XFBML.parse();
+        var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink }));  
+        thanks.find("a.fb-send-button").on("click", function() {
+          FB.ui({
+            method: "send",
+            link: data.referralLink
+          });        
+        });
+        thanks.dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
       });
       return false;
     });
