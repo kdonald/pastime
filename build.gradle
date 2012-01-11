@@ -13,18 +13,22 @@ configurations {
 }
 
 cglibVersion = '2.2.2'
+codecVersion = '1.6'
 logbackVersion = '1.0.0'
 hibernateValidatorVersion = '4.2.0.Final'
 jacksonVersion = '1.9.3'
 javaxInjectVersion = '1'
 javaxValidationVersion = '1.0.0.GA'
+junitVersion = '4.10'
 postgresVersion = '9.1-901-1.jdbc4'
 servletVersion = '2.5'
 slf4jVersion = '1.6.4'
 springVersion = '3.1.0.RELEASE'
+springSecurityVersion = '3.1.0.RELEASE'
 
 dependencies {
   compile "cglib:cglib-nodep:$cglibVersion"
+  compile "commons-codec:commons-codec:$codecVersion"
   compile "ch.qos.logback:logback-classic:$logbackVersion"
   compile "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
   compile "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
@@ -32,9 +36,11 @@ dependencies {
   compile "org.springframework:spring-context:$springVersion"
   compile "org.springframework:spring-jdbc:$springVersion"
   compile "org.springframework:spring-webmvc:$springVersion"
+  compile "org.springframework.security:spring-security-crypto:$springSecurityVersion"
   compile "javax.inject:javax.inject:$javaxInjectVersion"
-  compile 'javax.validation:validation-api:$javaxValidationVersion'
+  compile "javax.validation:validation-api:$javaxValidationVersion"
   compile "postgresql:postgresql:$postgresVersion"
+  testCompile "junit:junit:$junitVersion"
   providedCompile "javax.servlet:servlet-api:$servletVersion"
 }
 

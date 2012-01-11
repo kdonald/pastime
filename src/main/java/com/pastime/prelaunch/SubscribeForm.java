@@ -41,4 +41,5 @@ public class SubscribeForm {
     public String toString() {
         return "[SubscribeForm name='" + name + "', email='" + email + "', ref='" + ref + "']";
     }
+
 }

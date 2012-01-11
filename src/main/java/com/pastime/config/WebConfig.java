@@ -15,19 +15,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHan
 public class WebConfig extends WebMvcConfigurationSupport {
 
     protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        CustomExceptionResolver resolver = new CustomExceptionResolver(new GlobalExceptionHandling());
+        GlobalExceptionHandlerCapableExceptionResolver resolver = new GlobalExceptionHandlerCapableExceptionResolver(new GlobalExceptionHandling());
         resolver.afterPropertiesSet();
         exceptionResolvers.add(resolver);
     }
 
     // temp extension for enabling Global @ExceptionHandlers until Spring MVC supports this by default (likely 3.2)
-    private class CustomExceptionResolver extends ExceptionHandlerExceptionResolver {
+    private class GlobalExceptionHandlerCapableExceptionResolver extends ExceptionHandlerExceptionResolver {
 
         private final Object handling;
 
         private final ExceptionHandlerMethodResolver methodResolver;
 
-        public CustomExceptionResolver(Object handling) {
+        public GlobalExceptionHandlerCapableExceptionResolver(Object handling) {
             this.handling = handling;
             this.methodResolver = new ExceptionHandlerMethodResolver(handling.getClass());
             setMessageConverters(WebConfig.this.getMessageConverters());
