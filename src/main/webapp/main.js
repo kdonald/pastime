@@ -14,6 +14,17 @@ require.config({
 });
 require(["require", "jquery", "handlebars", "text!prelaunch/thanks.hb", "jqueryui/dialog", "facebook"], function(require, $, handlebars, thanksTemplate) {
   thanksTemplate = handlebars.compile(thanksTemplate);
+  var api = createApi();
+  
+  $(document).ready(function() {
+    var subscribeForm = $("#subscribe form");
+    subscribeForm.on("submit", function() {
+      var xhr = api.subscribe(subscribeForm);
+      xhr.done(showSubscribedDialog);
+      return false;
+    });
+  });
+
   function createApi() {
     var local = window.location.protocol == "file:";
     if (local) {
@@ -32,22 +43,16 @@ require(["require", "jquery", "handlebars", "text!prelaunch/thanks.hb", "jqueryu
       };
     }
   }
-  var api = createApi();
-  $(document).ready(function() {
-    var subscribeForm = $("#subscribe form");
-    subscribeForm.on("submit", function(event) {
-      var xhr = api.subscribe(subscribeForm);
-      xhr.done(function(data) {
-        var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink }));  
-        thanks.find("a.fb-send-button").on("click", function() {
-          FB.ui({
-            method: "send",
-            link: data.referralLink
-          });        
-        });
-        thanks.dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
-      });
-      return false;
+  
+  function showSubscribedDialog(data) {
+    var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink }));  
+    thanks.find("a.fb-send-button").on("click", function() {
+      FB.ui({
+        method: "send",
+        link: data.referralLink
+      });        
     });
-  });
+    thanks.dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
+  }
+  
 });
