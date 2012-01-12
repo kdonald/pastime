@@ -53,7 +53,6 @@ public class PrelaunchController {
     }    
 
     private Subscription createSubscription(String email, Name name, String ref) {
-        System.out.println(name);
         Integer referredBy = singleResult(jdbcTemplate.query("SELECT id FROM prelaunch.subscriptions WHERE referral_code = ?", new SingleColumnRowMapper<Integer>(Integer.class), ref));
         String referralCode = referralCodeGenerator.generateKey();
         String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referred_by, referral_code) VALUES (?, ?, ?, ?, ?)";
