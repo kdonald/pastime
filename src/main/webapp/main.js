@@ -12,7 +12,7 @@ require.config({
     "listselect": "../libs/listselect/0.1.0pre/listselect"    
   }
 });
-require(["require", "jquery", "handlebars", "text!prelaunch/thanks.hb", "jqueryui/dialog", "facebook"], function(require, $, handlebars, thanksTemplate) {
+require(["require", "jquery", "handlebars", "text!prelaunch/thanks.html", "jqueryui/dialog", "facebook"], function(require, $, handlebars, thanksTemplate) {
   thanksTemplate = handlebars.compile(thanksTemplate);
   var api = createApi();
   

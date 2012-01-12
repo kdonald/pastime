@@ -19,6 +19,7 @@ hibernateValidatorVersion = '4.2.0.Final'
 jacksonVersion = '1.9.3'
 javaxInjectVersion = '1'
 javaxValidationVersion = '1.0.0.GA'
+jmustacheVersion = '1.5'
 junitVersion = '4.10'
 postgresVersion = '9.1-901-1.jdbc4'
 servletVersion = '2.5'
@@ -27,21 +28,22 @@ springVersion = '3.1.0.RELEASE'
 springSecurityVersion = '3.1.0.RELEASE'
 
 dependencies {
-  compile "cglib:cglib-nodep:$cglibVersion"
-  compile "commons-codec:commons-codec:$codecVersion"
-  compile "ch.qos.logback:logback-classic:$logbackVersion"
-  compile "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
-  compile "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
-  compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
-  compile "org.springframework:spring-context:$springVersion"
-  compile "org.springframework:spring-jdbc:$springVersion"
-  compile "org.springframework:spring-webmvc:$springVersion"
-  compile "org.springframework.security:spring-security-crypto:$springSecurityVersion"
-  compile "javax.inject:javax.inject:$javaxInjectVersion"
-  compile "javax.validation:validation-api:$javaxValidationVersion"
-  compile "postgresql:postgresql:$postgresVersion"
-  testCompile "junit:junit:$junitVersion"
-  providedCompile "javax.servlet:servlet-api:$servletVersion"
+  compile 'cglib:cglib-nodep:$cglibVersion'
+  compile 'commons-codec:commons-codec:$codecVersion'
+  compile 'com.samskivert:jmustache:$jmustacheVersion'
+  compile 'ch.qos.logback:logback-classic:$logbackVersion'
+  compile 'org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion'
+  compile 'org.hibernate:hibernate-validator:$hibernateValidatorVersion'
+  compile 'org.slf4j:jcl-over-slf4j:$slf4jVersion'
+  compile 'org.springframework:spring-context:$springVersion'
+  compile 'org.springframework:spring-jdbc:$springVersion'
+  compile 'org.springframework:spring-webmvc:$springVersion'
+  compile 'org.springframework.security:spring-security-crypto:$springSecurityVersion'
+  compile 'javax.inject:javax.inject:$javaxInjectVersion'
+  compile 'javax.validation:validation-api:$javaxValidationVersion'
+  compile 'postgresql:postgresql:$postgresVersion'
+  testCompile 'junit:junit:$junitVersion'
+  providedCompile 'javax.servlet:servlet-api:$servletVersion'
 }
 
 sourceSets {

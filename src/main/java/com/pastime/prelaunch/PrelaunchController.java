@@ -1,20 +1,22 @@
 package com.pastime.prelaunch;
 
+import static org.springframework.dao.support.DataAccessUtils.singleResult;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import static org.springframework.dao.support.DataAccessUtils.singleResult;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -30,8 +32,9 @@ public class PrelaunchController {
     }
 
     @RequestMapping(value="/", method=RequestMethod.GET)
-    public String comingSoon() {
-        return "index.html";
+    public String comingSoon(@RequestParam(required=false) String ref, Model model) {
+        model.addAttribute("ref", ref);
+        return "index";
     }
     
     @RequestMapping(value="/", method=RequestMethod.POST)

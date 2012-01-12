@@ -3,10 +3,14 @@ package com.pastime.config;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.servlet.mvc.view.jmustache.JMustacheViewResolver;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
@@ -15,6 +19,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHan
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
+    @Bean
+    public ViewResolver viewResolver(ResourceLoader resourceLoader) {
+        return new JMustacheViewResolver(resourceLoader);
+    }
+    
     @Override
     protected void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
