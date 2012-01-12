@@ -32,8 +32,7 @@ public class PrelaunchController {
     }
 
     @RequestMapping(value="/", method=RequestMethod.GET)
-    public String comingSoon(@RequestParam(required=false) String ref, Model model) {
-        model.addAttribute("ref", ref);
+    public String comingSoon(Model model) {
         return "index";
     }
     
