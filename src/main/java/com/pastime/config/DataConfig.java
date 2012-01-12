@@ -13,6 +13,7 @@ public class DataConfig {
 	@Bean
 	public DataSource dataSource() {
 	    DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	    dataSource.setDriverClassName("org.postgresql.Driver");
 	    dataSource.setUrl("jdbc:postgresql:pastime");
 	    dataSource.setUsername("pastime");
 	    dataSource.setPassword("hitmen");

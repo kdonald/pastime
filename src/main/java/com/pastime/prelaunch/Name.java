@@ -23,11 +23,23 @@ public class Name {
     }
     
     public static final Name parseName(String name) {
+        if (isFirstNameOnly(name)) {
+            return new Name(name, null);
+        }
         int pos = findWordStart(name, name.length() - 1);
         if (isSuffix(name.substring(pos))) {
             pos = findWordStart(name, pos);
         }
         return new Name(name.substring(0, pos).trim(), name.substring(pos).trim());
+    }
+    
+    private static boolean isFirstNameOnly(String name) {
+        for (int i = 0; i < name.length(); i++) {
+            if (Character.isWhitespace(name.charAt(i))) {
+                return false;
+            }
+        }
+        return true;        
     }
     
     private static int findWordStart(String name, int startIndex) {

@@ -2,13 +2,18 @@ CREATE SCHEMA prelaunch;
 
 CREATE TABLE prelaunch.subscriptions (id serial CONSTRAINT pk_subscriptions PRIMARY KEY,
   email varchar(320) NOT NULL UNIQUE,
-  firstName varchar(64) NOT NULL, 
-  lastName varchar(64) NOT NULL,
-  referallCode char(6) NOT NULL UNIQUE,
-  referredBy integer,
-  created timestamp NOT NULL,
-  CONSTRAINT fk_subscriptions_referredBy FOREIGN KEY (referredBy) REFERENCES prelaunch.subscriptions(id)
+  first_name varchar(64) NOT NULL, 
+  last_name varchar(64),
+  referral_code char(6) NOT NULL UNIQUE,
+  referred_by integer,
+  created timestamp NOT NULL CONSTRAINT df_subscriptions_created DEFAULT now(),
+  CONSTRAINT fk_subscriptions_referred_by FOREIGN KEY (referred_by) REFERENCES prelaunch.subscriptions(id)
 );
+
+GRANT USAGE ON SCHEMA prelaunch TO pastime;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA prelaunch TO pastime;
+GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA prelaunch TO pastime;
+
 
 CREATE TABLE prelaunch.referralCount (
   count integer;

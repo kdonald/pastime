@@ -12,7 +12,7 @@ public final class ReferralCodeGenerator implements StringKeyGenerator {
     private final BytesKeyGenerator generator = KeyGenerators.secureRandom(4);
     
     public String generateKey() {
-        return new String(base64.encode(generator.generateKey()));
+        return new String(base64.encode(generator.generateKey())).trim();
     }
     
 }
