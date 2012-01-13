@@ -1,5 +1,7 @@
 package com.pastime.prelaunch;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,16 +11,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class ReferralsController {
 
-    private ReferralAnalytics analytics;
+    private final AnalyticsRepository repository;
     
-    public ReferralsController() {
-        analytics = new ReferralAnalytics();
+    @Inject
+    public ReferralsController(AnalyticsRepository repository) {
+        this.repository = repository;
     }
 
     @RequestMapping(value="/referrals/{referralCode}", method=RequestMethod.GET)
     public String referralInsights(@PathVariable String referralCode, Model model) {
         model.addAttribute("referralCode", referralCode);
-        model.addAttribute("referralAnalytics", analytics);
+        model.addAttribute("referralAnalytics", repository.getReferralAnalytics(referralCode));
         return "referrals";
     }
 
@@ -26,12 +29,6 @@ public class ReferralsController {
     public String card(@PathVariable String referralCode, Model model) {
         model.addAttribute("referralCode", referralCode);
         return "card";
-    }
-
-    public static class ReferralAnalytics {
-        public int getTotalReferralCount() {
-            return 48;
-        }
     }
     
 }

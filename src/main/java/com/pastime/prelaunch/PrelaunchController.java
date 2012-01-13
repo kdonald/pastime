@@ -18,16 +18,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
 @Controller
 public class PrelaunchController {
 
-    private StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
+    private final StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
     
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    
+    private final AnalyticsRepository analyticsRepository;
     
     @Inject
-    public PrelaunchController(JdbcTemplate jdbcTemplate) {
+    public PrelaunchController(JdbcTemplate jdbcTemplate, AnalyticsRepository analyticsRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.analyticsRepository = analyticsRepository;
     }
 
     @RequestMapping(value="/", method=RequestMethod.GET)
@@ -58,6 +62,7 @@ public class PrelaunchController {
         String referralCode = referralCodeGenerator.generateKey();
         String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referred_by, referral_code) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referredBy, referralCode);
+        analyticsRepository.subscriberAdded(new Subscriber(email, name, referralCode, ref));
         return new Subscription(name.getFirstName(), referralLink(referralCode));
     }
 
