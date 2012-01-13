@@ -21,33 +21,61 @@ public class InsightRepository {
      * @param referralCode the referral code.
      */
     public void subscriberAdded(Subscriber subscriber) {
-        redisOperations.boundValueOps(subscriber.getReferralCode()).set("0");
+        initReferralCounts(subscriber.getReferralCode());
         if (subscriber.getReferredBy() != null) {
-            redisOperations.boundValueOps(subscriber.getReferredBy()).increment(1);        
+            incrementReferralCounts(subscriber.getReferredBy());        
         }
+    }
+
+     public ReferralInsights getReferralInsights() {
+        String total = redisOperations.opsForValue().get(REFERRALS);
+        if (total == null) {
+            return ReferralInsights.ZERO;
+        }
+        return new ReferralInsights(total);
     }
 
     public ReferralInsights getReferralInsights(String referralCode) {
-        BoundValueOperations<String, String> valueOps = redisOperations.boundValueOps(referralCode);
-        String value = valueOps.get();
-        if (value == null) {
+        BoundValueOperations<String, String> valueOps = redisOperations.boundValueOps(referralCode(referralCode));
+        String total = valueOps.get();
+        if (total == null) {
             return null;
         }
-        return new ReferralInsights(value);
+        return new ReferralInsights(total);
+    }
+
+    private void initReferralCounts(String referralCode) {
+        redisOperations.boundValueOps(referralCode(referralCode)).set("0");        
     }
     
-    public final class ReferralInsights {
-        
-        private final int totalReferralCount;
-        
-        public ReferralInsights(String totalReferralCount) {
-            this.totalReferralCount = Integer.parseInt(totalReferralCount);
-        }
-
-        public int getTotalReferralCount() {
-            return totalReferralCount;
-        }
-
+    private void incrementReferralCounts(String referralCode) {
+        redisOperations.opsForValue().increment(REFERRALS, 1);
+        redisOperations.boundValueOps(referralCode(referralCode)).increment(1);
     }
+
+    public static final class ReferralInsights {
+        
+        public static final ReferralInsights ZERO = new ReferralInsights();
+        
+        private final int total;
+        
+        public ReferralInsights(String total) {
+            this.total = Integer.parseInt(total);
+        }
+
+        public int getTotal() {
+            return total;
+        }
+        
+        private ReferralInsights() { this.total = 0; }
+    }
+
+    private static String referralCode(String referralCode) {
+        return REFERRAL_CODE + referralCode;
+    }
+    
+    private static final String REFERRALS = "referrals";
+    
+    private static final String REFERRAL_CODE = REFERRALS + "_code_";
 
 }
