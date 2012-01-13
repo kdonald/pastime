@@ -26,12 +26,12 @@ public class PrelaunchController {
     
     private final JdbcTemplate jdbcTemplate;
     
-    private final AnalyticsRepository analyticsRepository;
+    private final InsightRepository inisghtRepository;
     
     @Inject
-    public PrelaunchController(JdbcTemplate jdbcTemplate, AnalyticsRepository analyticsRepository) {
+    public PrelaunchController(JdbcTemplate jdbcTemplate, InsightRepository insightRepository) {
         this.jdbcTemplate = jdbcTemplate;
-        this.analyticsRepository = analyticsRepository;
+        this.inisghtRepository = insightRepository;
     }
 
     @RequestMapping(value="/", method=RequestMethod.GET)
@@ -62,7 +62,7 @@ public class PrelaunchController {
         String referralCode = referralCodeGenerator.generateKey();
         String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referred_by, referral_code) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referredBy, referralCode);
-        analyticsRepository.subscriberAdded(new Subscriber(email, name, referralCode, ref));
+        inisghtRepository.subscriberAdded(new Subscriber(email, name, referralCode, ref));
         return new Subscription(name.getFirstName(), referralLink(referralCode));
     }
 

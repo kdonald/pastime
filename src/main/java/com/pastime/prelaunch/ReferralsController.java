@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class ReferralsController {
 
-    private final AnalyticsRepository repository;
+    private final InsightRepository repository;
     
     @Inject
-    public ReferralsController(AnalyticsRepository repository) {
+    public ReferralsController(InsightRepository repository) {
         this.repository = repository;
     }
 
     @RequestMapping(value="/referrals/{referralCode}", method=RequestMethod.GET)
     public String referralInsights(@PathVariable String referralCode, Model model) {
         model.addAttribute("referralCode", referralCode);
-        model.addAttribute("referralAnalytics", repository.getReferralAnalytics(referralCode));
+        model.addAttribute("referralInsights", repository.getReferralInsights(referralCode));
         return "referrals";
     }
 
