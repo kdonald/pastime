@@ -28,7 +28,7 @@ public class JMustacheViewResolver extends AbstractTemplateViewResolver implemen
     public JMustacheViewResolver(ResourceLoader resourceLoader) {
         setViewClass(JMustacheView.class);
         setExposeSpringMacroHelpers(false);
-        setSuffix(".html");        
+        setSuffix(".html");
         initJMustache(resourceLoader);
     }
 

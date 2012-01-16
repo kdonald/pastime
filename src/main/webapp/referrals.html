@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Pastime | Subscriber Referral Insights</title>
+    <title>Pastime | Referral Insights</title>
     <meta charset="utf-8" />
     <meta name="description" content="How many people have referred subscribers to Pastime" />
     <meta name="keywords" content="Pastime, subscriber, referrals" />
@@ -17,11 +17,29 @@
     <link rel="stylesheet" href="standard.css" />
   </head>
   <body>
-    <div id="page">
-      <dl id="totalReferrals">
-        <dt>Total Subscribers Referred</dt>
-        <dd>{{ referralInsights.total }}</dd>
-      </dl>
+    <header>
+      <div class="content">
+        <h1>Pastime</h1>
+        <nav>
+          <ul>
+            <li><a href="../">Home</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div id="main" class="content">
+      <section id="subscriberReferrals">
+        <h2>Subscriber Referral Insights</h2>
+        <dl id="totalReferrals">
+          <dt>Total</dt>
+          <dd>{{ referralInsights.total }}</dd>
+        </dl>
+      </section>
     </div>
+    <footer>
+      <div class="content">
+        <p>&copy; 2012 Pastime Connect LLC. All rights reserved.</p>
+      </div>
+    </footer>
   </body>
 </html>

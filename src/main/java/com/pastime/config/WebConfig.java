@@ -21,7 +21,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     @Bean
     public ViewResolver viewResolver(ResourceLoader resourceLoader) {
-        return new JMustacheViewResolver(resourceLoader);
+        JMustacheViewResolver resolver = new JMustacheViewResolver(resourceLoader);
+        resolver.setCache(false);
+        return resolver;
     }
     
     @Override
