@@ -52,13 +52,22 @@ footer p {
   width: 920px;  
 }
 
+dl {
+  width: 400px;
+}
+
 dt {
+  border: 1px solid lightGray;
   color: #7d786b;
   font-weight: bold;
+  text-align: center;
+  padding: 5px;
 }
 
 dd {
+  background-color: #f4f4f4;
   color: #7d786b;
   margin: 0;
+  font-size: 10.0em;
+  text-align: center;
 }
-
