@@ -36,7 +36,7 @@ public class PrelaunchController {
 
     @RequestMapping(value="/", method=RequestMethod.GET)
     public String comingSoon(Model model) {
-        return "index";
+        return "comingsoon";
     }
     
     @RequestMapping(value="/", method=RequestMethod.POST)

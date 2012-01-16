@@ -4,12 +4,7 @@ require.config({
     "facebook": "../libs/facebook",
     "jquery": "../libs/jquery/1.7.1/jquery",
     "jqueryui": "../libs/jqueryui/1.8.16",
-    "jqueryuicarousel": "../libs/jqueryuicarousel/0.8.5",
-    "jqueryui" : "../libs/jqueryui/1.8.16",
-    "handlebars": "../libs/handlebars/1.0.0.beta6/handlebars",
-    "mvc": "../libs/mvc/0.1.0pre/mvc",
-    "sammy": "../libs/sammy/0.7.0/sammy",
-    "listselect": "../libs/listselect/0.1.0pre/listselect"    
+    "handlebars": "../libs/handlebars/1.0.0.beta6/handlebars"
   }
 });
 require(["require", "jquery", "handlebars", "text!prelaunch/thanks.html", "jqueryui/dialog", "facebook"], function(require, $, handlebars, thanksTemplate) {
