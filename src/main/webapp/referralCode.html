@@ -14,14 +14,35 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://localhost:8080" />
-    <link rel="stylesheet" href="standard.css" />    
+    <link rel="stylesheet" href="../standard.css" />    
   </head>
   <body>
-    <div id="page">
-      <dl id="totalReferrals">
-        <dt>Total Subscribers Referred</dt>
-        <dd>{{ referralInsights.total }}</dd>
-      </dl>
+    <header>
+      <div class="content">
+        <h1>Pastime</h1>
+        <nav>
+          <ul>
+            <li><a href="/">Home</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div id="main" class="content">
+      <section id="subscriberReferrals">
+        <hgroup>
+          <h2>Subscriber Referral Insights</h2>
+          <h3>{{ referralCode }}</h3>
+        </hgroup>
+        <dl id="totalReferrals">
+          <dt>Total</dt>
+          <dd>{{ referralInsights.total }}</dd>
+        </dl>
+      </section>
     </div>
+    <footer>
+      <div class="content">
+        <p>&copy; 2012 Pastime Connect LLC. All rights reserved.</p>
+      </div>
+    </footer>
   </body>
 </html>
