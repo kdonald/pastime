@@ -1,513 +1,19 @@
-/*! normalize.css 2011-11-04T15:38 UTC - http://github.com/necolas/normalize.css */
-
-/* =============================================================================
-   HTML5 display definitions
-   ========================================================================== */
-
-/*
- * Corrects block display not defined in IE6/7/8/9 & FF3
- */
-
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-nav,
-section {
-    display: block;
-}
-
-/*
- * Corrects inline-block display not defined in IE6/7/8/9 & FF3
- */
-
-audio,
-canvas,
-video {
-    display: inline-block;
-    *display: inline;
-    *zoom: 1;
-}
-
-/*
- * Prevents modern browsers from displaying 'audio' without controls
- */
-
-audio:not([controls]) {
-    display: none;
-}
-
-/*
- * Addresses styling for 'hidden' attribute not present in IE7/8/9, FF3, S4
- * Known issue: no IE6 support
- */
-
-[hidden] {
-    display: none;
-}
-
-
-/* =============================================================================
-   Base
-   ========================================================================== */
-
-/*
- * 1. Corrects text resizing oddly in IE6/7 when body font-size is set using em units
- *    http://clagnut.com/blog/348/#c790
- * 2. Keeps page centred in all browsers regardless of content height
- * 3. Prevents iOS text size adjust after orientation change, without disabling user zoom
- *    www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom/
- */
-
-html {
-    font-size: 100%; /* 1 */
-    overflow-y: scroll; /* 2 */
-    -webkit-text-size-adjust: 100%; /* 3 */
-    -ms-text-size-adjust: 100%; /* 3 */
-}
-
-/*
- * Addresses margins handled incorrectly in IE6/7
- */
-
-body {
-    margin: 0;
-}
-
-/* 
- * Addresses font-family inconsistency between 'textarea' and other form elements.
- */
-
-body,
-button,
-input,
-select,
-textarea {
-    font-family: sans-serif;
-}
-
-
-/* =============================================================================
-   Links
-   ========================================================================== */
-
-/*
- * Addresses outline displayed oddly in Chrome
- */
-
-a:focus {
-    outline: thin dotted;
-}
-
-/*
- * Improves readability when focused and also mouse hovered in all browsers
- * people.opera.com/patrickl/experiments/keyboard/test
- */
-
-a:hover,
-a:active {
-    outline: 0;
-}
-
-
-/* =============================================================================
-   Typography
-   ========================================================================== */
-
-/*
- * Neutralise smaller font-size in 'section' and 'article' in FF4+, Chrome, S5
- */
-
-h1 {
-    font-size: 2em;
-}
-
-/*
- * Addresses styling not present in IE7/8/9, S5, Chrome
- */
-
-abbr[title] {
-    border-bottom: 1px dotted;
-}
-
-/*
- * Addresses style set to 'bolder' in FF3+, S4/5, Chrome
-*/
-
-b, 
-strong { 
-    font-weight: bold; 
-}
-
-blockquote {
-    margin: 1em 40px;
-}
-
-/*
- * Addresses styling not present in S5, Chrome
- */
-
-dfn {
-    font-style: italic;
-}
-
-/*
- * Addresses styling not present in IE6/7/8/9
- */
-
-mark {
-    background: #ff0;
-    color: #000;
-}
-
-/*
- * Corrects font family set oddly in IE6, S4/5, Chrome
- * en.wikipedia.org/wiki/User:Davidgothberg/Test59
- */
-
-pre,
-code,
-kbd,
-samp {
-    font-family: monospace, serif;
-    _font-family: 'courier new', monospace;
-    font-size: 1em;
-}
-
-/*
- * Improves readability of pre-formatted text in all browsers
- */
-
-pre {
-    white-space: pre;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-/*
- * 1. Addresses CSS quotes not supported in IE6/7
- * 2. Addresses quote property not supported in S4
- */
-
-/* 1 */
-
-q {
-    quotes: none;
-}
-
-/* 2 */
-
-q:before,
-q:after {
-    content: '';
-    content: none;
-}
-
-small {
-    font-size: 75%;
-}
-
-/*
- * Prevents sub and sup affecting line-height in all browsers
- * gist.github.com/413930
- */
-
-sub,
-sup {
-    font-size: 75%;
-    line-height: 0;
-    position: relative;
-    vertical-align: baseline;
-}
-
-sup {
-    top: -0.5em;
-}
-
-sub {
-    bottom: -0.25em;
-}
-
-
-/* =============================================================================
-   Lists
-   ========================================================================== */
-
-ul,
-ol {
-    margin-left: 0;
-    padding: 0 0 0 40px;
-}
-
-dd {
-    margin: 0 0 0 40px;
-}
-
-nav ul,
-nav ol {
-    list-style: none;
-    list-style-image: none;
-}
-
-
-/* =============================================================================
-   Embedded content
-   ========================================================================== */
-
-/*
- * 1. Removes border when inside 'a' element in IE6/7/8/9, FF3
- * 2. Improves image quality when scaled in IE7
- *    code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/
- */
-
-img {
-    border: 0; /* 1 */
-    -ms-interpolation-mode: bicubic; /* 2 */
-}
-
-/*
- * Corrects overflow displayed oddly in IE9 
- */
-
-svg:not(:root) {
-    overflow: hidden;
-}
-
-
-/* =============================================================================
-   Figures
-   ========================================================================== */
-
-/*
- * Addresses margin not present in IE6/7/8/9, S5, O11
- */
-
-figure {
-    margin: 0;
-}
-
-
-/* =============================================================================
-   Forms
-   ========================================================================== */
-
-/*
- * Corrects margin displayed oddly in IE6/7
- */
-
-form {
-    margin: 0;
-}
-
-/*
- * Define consistent border, margin, and padding
- */
-
-fieldset {
-    border: 1px solid #c0c0c0;
-    margin: 0 2px;
-    padding: 0.35em 0.625em 0.75em;
-}
-
-/*
- * 1. Corrects color not being inherited in IE6/7/8/9
- * 2. Corrects alignment displayed oddly in IE6/7
- */
-
-legend {
-    border: 0; /* 1 */
-    *margin-left: -7px; /* 2 */
-}
-
-/*
- * 1. Corrects font size not being inherited in all browsers
- * 2. Addresses margins set differently in IE6/7, FF3+, S5, Chrome
- * 3. Improves appearance and consistency in all browsers
- */
-
-button,
-input,
-select,
-textarea {
-    font-size: 100%; /* 1 */
-    margin: 0; /* 2 */
-    vertical-align: baseline; /* 3 */
-    *vertical-align: middle; /* 3 */
-}
-
-/*
- * Addresses FF3/4 setting line-height on 'input' using !important in the UA stylesheet
- */
-
-button,
-input {
-    line-height: normal; /* 1 */
-}
-
-/*
- * 1. Improves usability and consistency of cursor style between image-type 'input' and others
- * 2. Corrects inability to style clickable 'input' types in iOS
- * 3. Removes inner spacing in IE7 without affecting normal text inputs
- *    Known issue: inner spacing remains in IE6
- */
-
-button,
-input[type="button"], 
-input[type="reset"], 
-input[type="submit"] {
-    cursor: pointer; /* 1 */
-    -webkit-appearance: button; /* 2 */
-    *overflow: visible;  /* 3 */
-}
-
-/*
- * 1. Addresses box sizing set to content-box in IE8/9
- * 2. Removes excess padding in IE8/9
- */
-
-input[type="checkbox"],
-input[type="radio"] {
-    box-sizing: border-box; /* 1 */
-    padding: 0; /* 2 */
-}
-
-/*
- * 1. Addresses appearance set to searchfield in S5, Chrome
- * 2. Addresses box-sizing set to border-box in S5, Chrome (include -moz to future-proof)
- */
-
-input[type="search"] {
-    -webkit-appearance: textfield; /* 1 */
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box; /* 2 */
-    box-sizing: content-box;
-}
-
-/*
- * Removes inner padding that is displayed in S5, Chrome on OS X
- */
-
-input[type="search"]::-webkit-search-decoration {
-    -webkit-appearance: none;
-}
-
-/*
- * Removes inner padding and border in FF3+
- * www.sitepen.com/blog/2008/05/14/the-devils-in-the-details-fixing-dojos-toolbar-buttons/
- */
-
-button::-moz-focus-inner,
-input::-moz-focus-inner {
-    border: 0;
-    padding: 0;
-}
-
-/*
- * 1. Removes default vertical scrollbar in IE6/7/8/9
- * 2. Improves readability and alignment in all browsers
- */
-
-textarea {
-    overflow: auto; /* 1 */
-    vertical-align: top; /* 2 */
-}
-
-
-/* =============================================================================
-   Tables
-   ========================================================================== */
-
-/* 
- * Remove most spacing between table cells
- */
-
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-
-/* base styles */
-
-html {
-  height: 100%;  
-}
-
-body {
-  height: 100%;
-}
-
-p {
-  color: #7d786b;
-  line-height: 1.5em;  
-}
-
-h1, h2, h3 { 
-  color: #9d8956;
-  line-height: 1.2em; 
-}
-
-button {
-  background-image: -moz-linear-gradient(100% 100% 90deg, #6bbe1a, #afd18c);
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#afd18c), to(#6bbe1a) );
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 1em;
-  letter-spacing: 0.1em;
-  padding: 6px 9px;
-  text-decoration: none;
-  text-transform: uppercase;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
-  text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.15);
-}
-
-form input[type="email"], form input[type="text"] {
-  border: 1px solid #b4b5ad;
-  color: #696a65;
-  font-size: 1em;
-  font-weight: normal;
-  margin-right: 6px;
-  outline: none;
-  padding: 6px;
-  position: relative;
-  top: -1px;
-  width: 200px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-box-shadow: 0px 1px 2px rgba(255, 255, 255, 0.7);
-  -moz-box-shadow: 0px 1px 2px rgba(255, 255, 255, 0.7);
-  box-shadow: 0px 1px 2px rgba(255, 255, 255, 0.7);
-}
-
-form input[type="text"] {
-  width: 140px;
-  margin-left: 18px;
-}
-
-/* general page styles */
+@IMPORT url("base.css");
 
 #floater {
-	float: left;
-	height: 50%;
-	margin-bottom: -368px;
-	position: relative;
-	width: 1px;
+  float: left;
+  height: 50%;
+  margin-bottom: -368px;
+  position: relative;
+  width: 1px;
 }
 
 #card {
   clear: left;
   background-color: #ffffff;
-  border: 1px solid lightGray;  
-	margin: 0 auto;
-	position: relative;  
+  border: 1px solid lightGray;
+  margin: 0 auto;
+  position: relative;
   width: 980px;
   -webkit-border-radius: 12px;
   -moz-border-radius: 12px;
@@ -517,7 +23,7 @@ form input[type="text"] {
   background-clip: padding-box;
   -webkit-box-shadow: 0px 0px 4px #f4f4f4;
   -moz-box-shadow: 0px 0px 4px #f4f4f4;
-  box-shadow: 0px 0px 4px #f4f4f4;  
+  box-shadow: 0px 0px 4px #f4f4f4;
 }
 
 header {
@@ -531,7 +37,7 @@ header {
   border-radius: 12px 12px 0px 0px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
-  background-clip: padding-box;  
+  background-clip: padding-box;
 }
 
 header hgroup {
@@ -559,14 +65,14 @@ header #banner {
   background-color: #7cc733;
   background: url(images/brevard-seal.png) no-repeat bottom right, -moz-linear-gradient(100% 100% 90deg, #6fc41d, #acd281);
   background: url(images/brevard-seal.png) no-repeat bottom right, -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6fc41d), to(#acd281) );
-	font-size: 14px;
-	float: right;
+  font-size: 14px;
+  float: right;
   padding: 25px 100px 25px 25px;
-	width: 485px;
+  width: 485px;
 }
 
 header #banner p {
-	color: #ffffff;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -584,62 +90,62 @@ header #banner p {
 }
 
 #icons {
-	list-style: none;
-	overflow: hidden;
-	margin-top: 30px;
-	margin-bottom: 30px;
-	padding: 0;
+  list-style: none;
+  overflow: hidden;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 0;
 }
 
 #icons li {
-	float: left;
-	width: 47px;
-	height: 47px;
-	text-indent: -9999px;
+  float: left;
+  width: 47px;
+  height: 47px;
+  text-indent: -9999px;
 }
 
 #football {
-	background: url(images/icon-football.png) no-repeat;	
-	padding-left: 50px;
+  background: url(images/icon-football.png) no-repeat;
+  padding-left: 50px;
 }
 
 #softball {
-	background: url(images/icon-softball.png) no-repeat;	
-	padding-left: 50px;	
+  background: url(images/icon-softball.png) no-repeat;
+  padding-left: 50px;
 }
 
 #basketball {
-	background: url(images/icon-basketball.png) no-repeat;	
-	padding-left: 50px;	
+  background: url(images/icon-basketball.png) no-repeat;
+  padding-left: 50px;
 }
 
 #soccer {
-	background: url(images/icon-soccer.png) no-repeat;	
-	padding-left: 50px;	
+  background: url(images/icon-soccer.png) no-repeat;
+  padding-left: 50px;
 }
 
 #volleyball {
-	background: url(images/icon-volleyball.png) no-repeat;	
-	padding-left: 50px;	
+  background: url(images/icon-volleyball.png) no-repeat;
+  padding-left: 50px;
 }
 
 #tennis {
-	background: url(images/icon-tennis.png) no-repeat;
-	padding-left: 50px;	
+  background: url(images/icon-tennis.png) no-repeat;
+  padding-left: 50px;
 }
 
 #hockey {
-	background: url(images/icon-hockey.png) no-repeat;	
+  background: url(images/icon-hockey.png) no-repeat;
 }
 
 #spike h1 {
-	background: url(images/spike.png) no-repeat;
-	height: 376px;
-	position: absolute;
-	left: 732px;
-	right: 0px;
-	bottom: 145px;
-	text-indent: -9999px;
+  background: url(images/spike.png) no-repeat;
+  height: 376px;
+  position: absolute;
+  left: 732px;
+  right: 0px;
+  bottom: 145px;
+  text-indent: -9999px;
 }
 
 #learn {
@@ -651,33 +157,33 @@ header #banner p {
 }
 
 #discoverLeagues {
-	border-right: 1px solid #e1dfdd;
-	float: left;
-	padding-right: 20px;
-	width: 190px;
+  border-right: 1px solid #e1dfdd;
+  float: left;
+  padding-right: 20px;
+  width: 190px;
 }
 
 #formTeams {
-	border-right: 1px solid #e1dfdd;
-	float: left;
-	padding-left: 25px;
-	padding-right: 20px;
-	width: 190px;
+  border-right: 1px solid #e1dfdd;
+  float: left;
+  padding-left: 25px;
+  padding-right: 20px;
+  width: 190px;
 }
 
 #play {
-	float: left;
-	padding-left: 25px;
-	width: 215px;
+  float: left;
+  padding-left: 25px;
+  width: 215px;
 }
 
 #subscribe {
-	background-image: -moz-linear-gradient(100% 100% 90deg, #44919e, #5cc2d5, #44919e);
-  background-image: -webkit-linear-gradient(#44919e, #5cc2d5, #44919e); 
+  background-image: -moz-linear-gradient(100% 100% 90deg, #44919e, #5cc2d5, #44919e);
+  background-image: -webkit-linear-gradient(#44919e, #5cc2d5, #44919e);
   margin-top: 40px;
   padding: 24px;
   text-align: center;
-  text-shadow: 1px 1px 1px #418895; 
+  text-shadow: 1px 1px 1px #418895;
   -webkit-border-radius: 12px;
   -moz-border-radius: 12px;
   border-radius: 12px;
@@ -686,7 +192,7 @@ header #banner p {
 #subscribe p {
   color: #ffffff;
   font-size: 1.4em;
-  display: inline;  
+  display: inline;
 }
 
 #thanks h1 {
@@ -713,9 +219,9 @@ header #banner p {
 #referralLink {
   color: #7d786b;
   background-color: #f4f4f4;
-  border: 1px solid lightGray; 
-  padding: 10px; 
-  text-align: center;  
+  border: 1px solid lightGray;
+  padding: 10px;
+  text-align: center;
   -webkit-border-radius: 12px;
   -moz-border-radius: 12px;
   border-radius: 12px;
@@ -729,50 +235,4 @@ footer {
   font-size: 11px;
   text-align: center;
   padding: 10px;
-}
-
-/* facebook */
-
-.fb-send-button {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -o-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  border-radius: 3px;
-  cursor: pointer;
-  color: #3b5998;
-  -moz-outline-style: none;
-  text-decoration: none;
-  background: #eceef5;
-  border: 1px solid #cad4e7;
-  display: inline-block;
-  padding: 4px 5px;
-  white-space: nowrap;
-  padding: 2px 5px;
-  font-family: 'trebuchet ms', sans-serif;
-  font-size: 11px;
-}
-
-.fb-send-button:hover {
-  border-color: #9dacce;
-  text-decoration: none;
-  color: #3b5998;
-}
-
-.fb-send-button span {
-  line-height: 14px;
-  line-height: 13px;
-}
-
-.fb-send-button i, .fb-send-button img {
-  float: left;
-  height: 14px;
-  margin-right: 3px;
-  width: 14px;
-}
-
-.fb-send-button i {
-  background-image: url(http://static.ak.fbcdn.net/rsrc.php/v1/z7/r/ql9vukDCc4R.png);
-  background-position: -1px -47px;
 }
