@@ -4,13 +4,14 @@ header {
   background-color: #224E98;
   background-image: -moz-linear-gradient(100% 100% 90deg, #224E98, #4178C5);
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#224E98), to(#4178C5) );
-  height: 38px;
+  height: 49px;
 }
 
 header h1 {
   float: left;
   color: #fff;
   margin: 0;
+  line-height: 1.55em;
 }
 
 nav {
@@ -28,7 +29,7 @@ nav ul {
 
 nav ul li {
   float: left;
-  line-height: 2.3em;
+  line-height: 3.1em;
 }
 
 #main {
