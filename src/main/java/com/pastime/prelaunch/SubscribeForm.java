@@ -6,22 +6,33 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class SubscribeForm {
     
     @NotEmpty
-    private String name;
+    private String firstName;
+
+    @NotEmpty
+    private String lastName;
 
     @NotEmpty
     @Email
     private String email;
 
     private String ref;
-    
-    public String getName() {
-        return name;
+
+    public String getFirstName() {
+        return firstName;
     }
-    
-    public void setName(String name) {
-        this.name = name;
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
-    
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -36,10 +47,6 @@ public class SubscribeForm {
     
     public void setRef(String ref) {
         this.ref = ref;
-    }
-    
-    public String toString() {
-        return "[SubscribeForm name='" + name + "', email='" + email + "', ref='" + ref + "']";
     }
 
 }

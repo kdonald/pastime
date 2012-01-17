@@ -50,7 +50,7 @@ public class PrelaunchController {
         if (subscription != null) {
             return subscription;
         }
-        return createSubscription(form.getEmail(), Name.parseName(form.getName()), form.getRef());
+        return createSubscription(form.getEmail(), new Name(form.getFirstName(), form.getLastName()), form.getRef());
     }
 
     private Subscription findSubscription(String email) {
