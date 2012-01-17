@@ -69,5 +69,10 @@ dd {
   color: #7d786b;
   margin: 0;
   font-size: 10.0em;
+  overflow: auto;
   text-align: center;
+}
+
+h1 a {
+  color: #fff;
 }
