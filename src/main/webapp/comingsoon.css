@@ -198,30 +198,57 @@ header h2 {
 
 #subscribe p {
   color: #15c5e4;
-  font-size: 1.1em;
-  display: inline;
+  font-size: 1.2em;
+  margin: 0 0 8px 0;
 }
 
-#subscribe form input[type="email"], form input[type="text"] {
+#firstName {
   color: #a7a7a7;
   border-radius: 0px;
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
   box-shadow: none;
-  margin: 5px auto 0 auto;
-  width: 178px;
+  width: 100px;
+}
+
+#lastName {
+  color: #a7a7a7;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  box-shadow: none;
+  width: 130px;
+}
+
+#email {
+  color: #a7a7a7;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  box-shadow: none;
+  margin-top: 8px;
+  width: 240px;
 }
 
 #subscribe button {
-  background-image: #6bbe1a;
+  background-image: -moz-linear-gradient(100% 100% 90deg, #6bbe1a, #afd18c);
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#afd18c), to(#6bbe1a) );
   border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  box-shadow: none;
-  color: #ffffff;
-  margin-top: 5px;
-  width: 193px;
-  text-shadow: none;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1em;
+  letter-spacing: 0.1em; 
+  margin-top: 8px;
+  padding: 6px 9px;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 248px;
 }
 
 #thanks h1 {
