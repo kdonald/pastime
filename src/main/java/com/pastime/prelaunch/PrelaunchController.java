@@ -39,6 +39,11 @@ public class PrelaunchController {
         return "comingsoon";
     }
     
+    @RequestMapping(value="/privacy", method=RequestMethod.GET)
+    public String privacy(Model model) {
+        return "privacy";
+    }
+    
     @RequestMapping(value="/", method=RequestMethod.POST)
     public @ResponseBody Subscription subscribe(@Valid SubscribeForm form) {
         Subscription subscription = findSubscription(form.getEmail());
