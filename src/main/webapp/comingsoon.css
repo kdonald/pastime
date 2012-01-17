@@ -203,31 +203,20 @@ header h2 {
 }
 
 #firstName {
-  color: #a7a7a7;
-  border-radius: 0px;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  box-shadow: none;
-  width: 100px;
+  width: 90px;
 }
 
 #lastName {
-  color: #a7a7a7;
-  border-radius: 0px;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  box-shadow: none;
-  width: 130px;
+  width: 140px;
 }
 
 #email {
-  color: #a7a7a7;
-  border-radius: 0px;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  box-shadow: none;
   margin-top: 8px;
-  width: 240px;
+  width: 241px;
+}
+
+input {
+  min-height: 20px;
 }
 
 #subscribe button {
