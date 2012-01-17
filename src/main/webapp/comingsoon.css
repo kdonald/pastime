@@ -11,7 +11,7 @@
 #card {
   clear: left;
   background-color: #ffffff;
-  border: 1px solid lightGray;
+  border: none;
   margin: 0 auto;
   position: relative;
   width: 980px;
@@ -24,14 +24,15 @@
   -webkit-box-shadow: 0px 0px 4px #f4f4f4;
   -moz-box-shadow: 0px 0px 4px #f4f4f4;
   box-shadow: 0px 0px 4px #f4f4f4;
+  font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif;
 }
 
 header {
-  background-image: -moz-linear-gradient(100% 100% 90deg, #fefeda, #ffffff);
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#fefeda) );
-  border-bottom: 2px solid #f4f4f4;
+  //background-image: -moz-linear-gradient(100% 100% 90deg, #fefeda, #ffffff);
+  //background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#fefeda) );
+  //border-bottom: 2px solid #f4f4f4;
   overflow: auto;
-  padding: 20px;
+  padding: 0 0 35px 0;
   -webkit-border-radius: 12px 12px 0px 0px;
   -moz-border-radius: 12px 12px 0px 0px;
   border-radius: 12px 12px 0px 0px;
@@ -45,17 +46,17 @@ header hgroup {
 }
 
 header h1 {
-  background: url(images/logo.png);
+  background: url(images/logo-text.png);
   height: 69px;
   margin: 0;
+  margin-top:5px;
   text-indent: -9999px;
   width: 229px;
 }
 
 header h2 {
-  color: #8f8468;
-  font-size: 18px;
-  font-style: italic;
+  color: #80c608;
+  font-size: 22px;
   font-weight: normal;
   margin: 3px 0 0;
   padding-left: 28px;
@@ -67,40 +68,68 @@ header #banner {
   background: url(images/brevard-seal.png) no-repeat bottom right, -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6fc41d), to(#acd281) );
   font-size: 14px;
   float: right;
-  padding: 25px 100px 25px 25px;
-  width: 485px;
+  padding: 25px 95px 25px 25px;
+  width: 200px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  border:1px solid #fff;
+  position:absolute;
+  top:160px;
+  right:22px;
+  z-index:3;
+  font-size:16px;
+
 }
 
 header #banner p {
   color: #ffffff;
   margin: 0;
+  line-height:105%;  
 }
 
 #content {
-  padding: 45px;
+  padding: 30px;
+  background-color: #02519c;
+  background: -moz-linear-gradient(100% 100% 90deg, #2a7cc6, #02519c);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#02519c), to(#2a7cc6) );  
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  margin-bottom:40px;
+  position:relative;
+  z-index:1;
+}
+
+#content p {
+  color: #ffffff;
 }
 
 #mission h1 {
   margin: 0;
+  color:#ffffff;
+  font-weight: normal;
+  font-size:29px;
 }
 
 #mission p {
-  font-size: 1.3em;
+  font-size: 20px;
   margin: 0;
+  color:#f1c354;
 }
 
 #icons {
   list-style: none;
   overflow: hidden;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  padding: 0;
+  padding: 8px 0 8px 30px;
+  background-color: #00acc0;
+  margin: 20px -30px 28px -30px;
 }
 
 #icons li {
   float: left;
-  width: 47px;
-  height: 47px;
+  width: 27px;
+  height: 27px;
   text-indent: -9999px;
 }
 
@@ -139,61 +168,99 @@ header #banner p {
 }
 
 #spike h1 {
-  background: url(images/spike.png) no-repeat;
-  height: 376px;
+  background: url(images/spike-header.png) no-repeat;
+  height: 219px;
+  width: 177px;
   position: absolute;
   left: 732px;
   right: 0px;
-  bottom: 145px;
+  bottom: 320px;
   text-indent: -9999px;
+  z-index:0;
 }
 
 #learn {
   overflow: hidden;
+  font-size:15px;
 }
 
 #learn h2 {
   font-size: 1.3em;
+  color: #f1c354;
+  font-weight:normal;
+  margin:0;
+  padding:0;
 }
 
 #discoverLeagues {
-  border-right: 1px solid #e1dfdd;
+  border-right: 1px solid #5582ab;
   float: left;
-  padding-right: 20px;
-  width: 190px;
+  padding-right: 15px;
+  width: 165px;
 }
 
 #formTeams {
-  border-right: 1px solid #e1dfdd;
+  border-right: 1px solid #5582ab;
   float: left;
-  padding-left: 25px;
-  padding-right: 20px;
-  width: 190px;
+  padding-left: 20px;
+  padding-right: 15px;
+  width: 165px;
 }
 
 #play {
   float: left;
-  padding-left: 25px;
-  width: 215px;
+  padding-left: 20px;
+  width: 165px;
 }
 
 #subscribe {
-  background-image: -moz-linear-gradient(100% 100% 90deg, #44919e, #5cc2d5, #44919e);
-  background-image: -webkit-linear-gradient(#44919e, #5cc2d5, #44919e);
-  margin-top: 40px;
-  padding: 24px;
+  background:#fff;
+  position:absolute;
+  width: 190px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  border:1px solid #fff;
+  position:absolute;
+  top:175px;
+  right:22px;
+  z-index:3;
+  padding: 14px 65px;
   text-align: center;
-  text-shadow: 1px 1px 1px #418895;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  border-radius: 12px;
 }
 
 #subscribe p {
-  color: #ffffff;
-  font-size: 1.4em;
+  color: #15c5e4;
+  font-size: 24px;
   display: inline;
+  line-height: 90%;
 }
+
+#subscribe form input[type="email"], form input[type="text"] {
+  color: #a7a7a7;
+  font-size: 14px;
+  width: 178px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  box-shadow: none;
+  margin: 5px auto 0 auto;
+  
+}
+
+#subscribe button {
+  background-image: #6bbe1a;
+  color: #ffffff;
+  font-size: 14px;
+  width: 190px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  box-shadow: none;
+  text-shadow: none;
+  margin-top: 4px;
+}
+
 
 #thanks h1 {
   font-size: 1.3em;
