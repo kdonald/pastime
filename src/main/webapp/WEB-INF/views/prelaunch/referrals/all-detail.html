@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Referral Insights | {{ referralCode }}</title>
+    <title>Pastime Referral Insights</title>
     <meta charset="utf-8" />
-    <meta name="description" content="How many people used referral code '{{ referralCode }}' to subscribe to Pastime" />
-    <meta name="keywords" content="Pastime, referrals, referral, referral code, {{ referralCode }}" />
+    <meta name="description" content="A list of the subscribers referred by other subscribers" />
+    <meta name="keywords" content="Pastime, subscriber, referrals" />
     <meta property="fb:app_id" content="212373618850030" />
     <meta property="fb:admins" content="1255689239" />
-    <meta property="og:description" content="How many people used referral code '{{ referralCode }}' to subscribe to Pastime" />
+    <meta property="og:description" content="A list of the subscribers referred by other subscribers" />
     <meta property="og:image" content="http://pastimebrevard.com/images/p-icon.png" />
     <meta property="og:site_name" content="Pastime" />
     <meta property="og:title" content="Pastime" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="http://pastimebrevard.com/referrals/{{ referralCode }}" />
-    <link rel="stylesheet" href="../ref.css" />    
+    <meta property="og:url" content="http://pastimebrevard.com/referrals/detail" />
+    <link rel="stylesheet" href="/static/prelaunch/referrals/referrals.css" />
   </head>
   <body>
     <header>
@@ -30,19 +30,33 @@
     <div id="main" class="pagecontent">
       <hgroup>
         <h1>Referral Insights</h1>
-        <h2>{{ referralCode }}</h2>
+        <h2>All</h2>
       </hgroup>
       <nav>
         <ul>
-          <li><strong>Summary</strong></li>
-          <li><a href="referrals/detail">Detail</a></li>
+          <li><a href="../referrals">Summary</a></li>
+          <li><strong>Detail</strong></li>
         </ul>
       </nav>
       <div id="content">
-        <dl>
-          <dt>Total Referrals</dt>
-          <dd>{{ referralInsights.total }}</dd>
-        </dl>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Referred By</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#referrals}}
+              <tr>
+                <td>{{date}}</td>
+                <td>{{name}}</td>
+                <td>{{referredBy}}</td>
+              </tr>
+            {{/referrals}}
+          </tbody>
+        </table>
       </div>
     </div>
     <footer>

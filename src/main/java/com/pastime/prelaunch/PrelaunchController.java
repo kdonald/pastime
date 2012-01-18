@@ -22,17 +22,17 @@ public class PrelaunchController {
     
     private final JdbcTemplate jdbcTemplate;
     
-    private final InsightRepository inisghtRepository;
+    private final SubscriberListener subscriberListener;
     
     @Inject
-    public PrelaunchController(JdbcTemplate jdbcTemplate, InsightRepository insightRepository) {
+    public PrelaunchController(JdbcTemplate jdbcTemplate, SubscriberListener subscriberListener) {
         this.jdbcTemplate = jdbcTemplate;
-        this.inisghtRepository = insightRepository;
+        this.subscriberListener = subscriberListener;
     }
 
     @RequestMapping(value="/", method=RequestMethod.GET)
-    public String comingSoon(Model model) {
-        return "comingsoon";
+    public String index(Model model) {
+        return "prelaunch/index";
     }
 
     @RequestMapping(value="/", method=RequestMethod.POST)
@@ -41,17 +41,17 @@ public class PrelaunchController {
         if (subscription != null) {
             return subscription;
         }
-        return createSubscription(form.getEmail(), new Name(form.getFirstName(), form.getLastName()), form.getRef());
+        return createSubscription(form.getEmail(), new Name(form.getFirstName(), form.getLastName()), form.getR());
     }
     
     @RequestMapping(value="/privacy", method=RequestMethod.GET)
     public String privacy(Model model) {
-        return "privacy";
+        return "prelaunch/privacy";
     }
 
     @RequestMapping(value="/unsubscribe", method=RequestMethod.GET)
     public String unsubscribeForm(Model model) {
-        return "unsubscribe";
+        return "prelaunch/unsubscribe";
     }
 
     @RequestMapping(value="/unsubscribe", method=RequestMethod.POST)
@@ -75,17 +75,17 @@ public class PrelaunchController {
         return new Subscription(rs.getString("first_name"), referralLink(rs.getString("referral_code")));
     }    
 
-    private Subscription createSubscription(String email, Name name, String ref) {
-        Integer referredBy = singleResult(jdbcTemplate.query("SELECT id FROM prelaunch.subscriptions WHERE referral_code = ?", new SingleColumnRowMapper<Integer>(Integer.class), ref));
+    private Subscription createSubscription(String email, Name name, String r) {
+        Integer referredBy = singleResult(jdbcTemplate.query("SELECT id FROM prelaunch.subscriptions WHERE referral_code = ?", new SingleColumnRowMapper<Integer>(Integer.class), r));
         String referralCode = referralCodeGenerator.generateKey();
         String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referred_by, referral_code) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referredBy, referralCode);
-        inisghtRepository.subscriberAdded(new Subscriber(email, name, referralCode, ref));
+        subscriberListener.subscriberAdded(new Subscriber(email, name, referralCode, r));
         return new Subscription(name.getFirstName(), referralLink(referralCode));
     }
 
     private String referralLink(String referralCode) {
-        return "http://pastimebrevard.com?ref=" +  referralCode;
+        return "http://pastimebrevard.com?r=" +  referralCode;
     }
     
 }

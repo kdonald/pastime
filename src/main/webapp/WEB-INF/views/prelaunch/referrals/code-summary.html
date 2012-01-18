@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Pastime Referral Insights</title>
+    <title>Referral Insights | {{ referralCode }}</title>
     <meta charset="utf-8" />
-    <meta name="description" content="How many people have referred subscribers to Pastime" />
-    <meta name="keywords" content="Pastime, subscriber, referrals" />
+    <meta name="description" content="How many people used referral code '{{referralCode}}' to subscribe to Pastime" />
+    <meta name="keywords" content="Pastime, referrals, referral, referral code, {{referralCode}}" />
     <meta property="fb:app_id" content="212373618850030" />
     <meta property="fb:admins" content="1255689239" />
-    <meta property="og:description" content="How many people have referred subscribers to Pastime" />
+    <meta property="og:description" content="How many people used referral code '{{ referralCode }}' to subscribe to Pastime" />
     <meta property="og:image" content="http://pastimebrevard.com/images/p-icon.png" />
     <meta property="og:site_name" content="Pastime" />
     <meta property="og:title" content="Pastime" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="http://pastimebrevard.com/referrals" />
-    <link rel="stylesheet" href="ref.css" />
+    <meta property="og:url" content="http://pastimebrevard.com/referrals/{{referralCode}}" />
+    <link rel="stylesheet" href="/static/prelaunch/referrals/referrals.css" />    
   </head>
   <body>
     <header>
@@ -30,18 +30,18 @@
     <div id="main" class="pagecontent">
       <hgroup>
         <h1>Referral Insights</h1>
-        <h2>All</h2>
+        <h2>{{referralCode}}</h2>
       </hgroup>
       <nav>
         <ul>
           <li><strong>Summary</strong></li>
-          <li><a href="referrals/detail">Detail</a></li>
+          <li><a href="../referrals/{{referralCode}}/detail">Detail</a></li>
         </ul>
       </nav>
       <div id="content">
         <dl>
           <dt>Total Referrals</dt>
-          <dd>{{ referralInsights.total }}</dd>
+          <dd>{{totalReferrals}}</dd>
         </dl>
       </div>
     </div>

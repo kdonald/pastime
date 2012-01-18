@@ -1,4 +1,4 @@
-package com.pastime.prelaunch;
+package com.pastime.prelaunch.referrals;
 
 import javax.inject.Inject;
 
@@ -6,8 +6,12 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.stereotype.Repository;
 
+import com.pastime.prelaunch.Subscriber;
+import com.pastime.prelaunch.SubscriberListener;
+
+
 @Repository
-public class InsightRepository {
+public class InsightRepository implements SubscriberListener {
     
     private final RedisOperations<String, String> redisOperations;
     
@@ -16,10 +20,7 @@ public class InsightRepository {
         this.redisOperations = redisOperations;
     }
 
-    /**
-     * On a new referred subscriber, update analytics.
-     * @param referralCode the referral code.
-     */
+    @Override
     public void subscriberAdded(Subscriber subscriber) {
         initReferralCounts(subscriber.getReferralCode());
         if (subscriber.getReferredBy() != null) {

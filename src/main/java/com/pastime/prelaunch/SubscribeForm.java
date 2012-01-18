@@ -15,7 +15,7 @@ public class SubscribeForm {
     @Email
     private String email;
 
-    private String ref;
+    private String r;
 
     public String getFirstName() {
         return firstName;
@@ -40,13 +40,13 @@ public class SubscribeForm {
     public void setEmail(String email) {
         this.email = email;
     }
-    
-    public String getRef() {
-        return ref;
+
+    public String getR() {
+        return r;
     }
-    
-    public void setRef(String ref) {
-        this.ref = ref;
-    }
+
+    public void setR(String r) {
+        this.r = r;
+    }    
 
 }

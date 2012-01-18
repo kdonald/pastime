@@ -2,9 +2,9 @@ package com.pastime.prelaunch;
 
 public class Subscription {
     
-    private String firstName;
+    private final String firstName;
     
-    private String referralLink;
+    private final String referralLink;
 
     public Subscription(String firstName, String referralLink) {
         this.firstName = firstName;

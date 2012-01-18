@@ -2,13 +2,13 @@ package com.pastime.prelaunch;
 
 public class Subscriber {
     
-    private String email;
+    private final String email;
     
-    private Name name;
+    private final Name name;
     
-    private String referredBy;
+    private final String referredBy;
     
-    private String referralCode;
+    private final String referralCode;
 
     public Subscriber(String email, Name name, String referralCode, String referredBy) {
         this.email = email;

@@ -1,4 +1,4 @@
-package com.pastime.prelaunch;
+package com.pastime.prelaunch.referrals;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.pastime.prelaunch.InsightRepository.ReferralInsights;
+import com.pastime.prelaunch.referrals.InsightRepository.ReferralInsights;
 
 @Controller
 public class ReferralsController {
@@ -23,13 +23,17 @@ public class ReferralsController {
         this.repository = repository;
     }
 
-
     @RequestMapping(value="/referrals", method=RequestMethod.GET)
-    public String referrals(Model model) {
-        model.addAttribute("referralInsights", repository.getReferralInsights());
-        return "referrals";
+    public String referralsSummary(Model model) {
+        model.addAttribute("totalReferrals", repository.getReferralInsights().getTotal());
+        return "prelaunch/referrals/all-summary";
     }
-    
+
+    @RequestMapping(value="/referrals/detail", method=RequestMethod.GET)
+    public String referralsDetail(Model model) {
+        return "prelaunch/referrals/all-detail";
+    }
+
     @RequestMapping(value="/referrals/{referralCode}", method=RequestMethod.GET)
     public String referralCode(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
         ReferralInsights insights = repository.getReferralInsights(referralCode);
@@ -38,14 +42,8 @@ public class ReferralsController {
             return null;
         }
         model.addAttribute("referralCode", referralCode);
-        model.addAttribute("referralInsights", insights);     
-        return "referralCode";
+        model.addAttribute("totalReferrals", insights.getTotal());     
+        return "prelaunch/referrals/code-summary";
     }
 
-    @RequestMapping(value="/cards/{referralCode}", method=RequestMethod.GET)
-    public String card(@PathVariable String referralCode, Model model) {
-        model.addAttribute("referralCode", referralCode);
-        return "card";
-    }
-    
 }
