@@ -1,5 +1,10 @@
 @IMPORT url("base.css");
 
+.pagecontent {
+  margin: auto;
+  width: 920px;  
+}
+
 header {  
   background-color: #224E98;
   background-image: -moz-linear-gradient(100% 100% 90deg, #224E98, #4178C5);
@@ -14,65 +19,25 @@ header h1 {
   line-height: 1.55em;
 }
 
-nav {
-  float: right;
-}
-
-nav a {
+header a {
   color: #fff  
 }
 
-nav ul {
-  margin: 0;
-  padding: 0;
+header nav {
+  float: right;
 }
 
-nav ul li {
+header nav ul li {
   float: left;
   line-height: 3.1em;
 }
 
-#main {
-  padding: 10px;
-}
-
-footer {  
+footer {
+  clear: both;
   width: 100%;
+  padding-top: 20px;
 }
 
 footer p {
-  margin: 0;
   font-size: 0.8em;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-
-.content {
-  margin: auto;
-  width: 920px;  
-}
-
-dl {
-  width: 400px;
-}
-
-dt {
-  border: 1px solid lightGray;
-  color: #7d786b;
-  font-weight: bold;
-  text-align: center;
-  padding: 5px;
-}
-
-dd {
-  background-color: #f4f4f4;
-  color: #7d786b;
-  margin: 0;
-  font-size: 10.0em;
-  overflow: auto;
-  text-align: center;
-}
-
-h1 a {
-  color: #fff;
 }

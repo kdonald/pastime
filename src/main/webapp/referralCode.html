@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Referral Insights for '{{ referralCode }}'</title>
+    <title>Referral Insights | {{ referralCode }}</title>
     <meta charset="utf-8" />
     <meta name="description" content="How many people used referral code '{{ referralCode }}' to subscribe to Pastime" />
     <meta name="keywords" content="Pastime, referrals, referral, referral code, {{ referralCode }}" />
@@ -14,11 +14,11 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://pastimebrevard.com/referrals/{{ referralCode }}" />
-    <link rel="stylesheet" href="../standard.css" />    
+    <link rel="stylesheet" href="../ref.css" />    
   </head>
   <body>
     <header>
-      <div class="content">
+      <div class="pagecontent">
         <h1><a href="/">Pastime</a></h1>
         <nav>
           <ul>
@@ -27,21 +27,27 @@
         </nav>
       </div>
     </header>
-    <div id="main" class="content">
-      <section id="subscriberReferrals">
-        <hgroup>
-          <h2>Subscriber Referral Insights</h2>
-          <h3>{{ referralCode }}</h3>
-        </hgroup>
-        <dl id="totalReferrals">
-          <dt>Total</dt>
+    <div id="main" class="pagecontent">
+      <hgroup>
+        <h1>Referral Insights</h1>
+        <h2>{{ referralCode }}</h2>
+      </hgroup>
+      <nav>
+        <ul>
+          <li><strong>Summary</strong></li>
+          <li><a href="referrals/detail">Detail</a></li>
+        </ul>
+      </nav>
+      <div id="content">
+        <dl>
+          <dt>Total Referrals</dt>
           <dd>{{ referralInsights.total }}</dd>
         </dl>
-      </section>
+      </div>
     </div>
     <footer>
-      <div class="content">
-        <p>&copy; 2012 Pastime Connect LLC. All rights reserved.</p>
+      <div class="pagecontent">
+        <p>&copy; 2012 Pastime Connect LLC. All rights reserved. <a href="/privacy">Privacy Policy</a>.</p>
       </div>
     </footer>
   </body>

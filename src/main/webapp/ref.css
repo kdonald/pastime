@@ -1,0 +1,50 @@
+@IMPORT url("standard.css");
+
+#main { 
+  margin-top: 40px;
+}
+
+#main h1 {
+  margin: 0;
+}
+
+#main h2 {
+  font-size: 1.3em;
+}
+
+#main nav {
+  float: left;
+  padding-right: 10px;
+}
+
+#main nav ul li {
+  margin: 10px;
+}
+
+#content {
+  border-left: 1px solid #ccc;
+  float: left;
+  padding-left: 25px;
+}
+
+dl {
+  margin-top: 10px;
+  width: 400px;
+}
+
+dt {
+  border: 1px solid lightGray;
+  color: #7d786b;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px;
+}
+
+dd {
+  background-color: #f4f4f4;
+  color: #7d786b;
+  margin: 0;
+  font-size: 10.0em;
+  overflow: auto;
+  text-align: center;
+}
