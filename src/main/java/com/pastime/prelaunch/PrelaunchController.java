@@ -2,24 +2,18 @@ package com.pastime.prelaunch;
 
 import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import org.hibernate.validator.constraints.Email;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 
 @Controller
 public class PrelaunchController {
@@ -69,12 +63,16 @@ public class PrelaunchController {
     // internal helpers
     
     private Subscription findSubscription(String email) {
-        String sql = "SELECT first_name, referral_code FROM prelaunch.subscriptions WHERE email = ?";
-        return singleResult(jdbcTemplate.query(sql, new RowMapper<Subscription>() {
-            public Subscription mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return new Subscription(rs.getString("first_name"), referralLink(rs.getString("referral_code")));
-            }
-        }, email));
+        String sql = "SELECT id, first_name, referral_code, unsubscribed FROM prelaunch.subscriptions WHERE email = ?";
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, email);
+        if (!rs.first()) {
+            return null;
+        }
+        boolean unsubscribed = rs.getBoolean("unsubscribed");
+        if (unsubscribed) {
+            jdbcTemplate.update("UPDATE prelaunch.subscriptions SET unsubscribed = false WHERE id  = ?", rs.getInt("id"));        
+        }
+        return new Subscription(rs.getString("first_name"), referralLink(rs.getString("referral_code")));
     }    
 
     private Subscription createSubscription(String email, Name name, String ref) {
