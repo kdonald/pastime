@@ -33,9 +33,9 @@ public class ReferralsController {
     @RequestMapping(value="/referrals/detail", method=RequestMethod.GET)
     public String referralsDetail(Model model) {
         LinkedList<Referral> referrals = new LinkedList<Referral>();
-        referrals.add(new Referral("January 18th", "Corgan D.", "Alexander W."));
-        referrals.add(new Referral("January 18th", "Keri D.", "Annabelle D."));
-        referrals.add(new Referral("January 18th", "Keri D.", "Corgan D."));
+        referrals.add(new Referral("January 18th", "Alexander W.", "Corgan D."));
+        referrals.add(new Referral("January 18th", "Annabelle D.", "Keri D."));
+        referrals.add(new Referral("January 18th", "Corgan D.", "Keri. D."));
         referrals.add(new Referral("January 17th", "Scot D.", "Keith D."));
         referrals.add(new Referral("January 17th", "Keri D.", "Keith D."));
         model.addAttribute("referrals", referrals);
