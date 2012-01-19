@@ -48,6 +48,31 @@ header h2 {
   z-index: 1;
 }
 
+#spike-text {
+	background: url(images/bubble-stem.png) no-repeat right;
+	height:30px;
+	width:350px;
+	position:absolute;
+	right:210px;
+	top:54px;
+}
+	
+
+#spike-text h2 {
+	background-color:#ddd;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	padding:25px 40px;
+	position:absolute;
+	right:30px;
+	top:-20px;
+	margin:0;
+	color:#9a9a9a;
+	font-size:1.8em;
+	font-weight:500;
+}
+
 #content {
   background-color: #02519c;
   background: -moz-linear-gradient(100% 100% 90deg, #2a7cc6, #02519c);
