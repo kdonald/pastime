@@ -29,15 +29,7 @@ public class InsightRepository implements SubscriberListener {
         this.redisOperations = redisOperations;
     }
 
-    @Override
-    public void subscriberAdded(Subscriber subscriber) {
-        initReferralCounts(subscriber.getReferralCode());
-        if (subscriber.getReferredBy() != null) {
-            captureReferralInsights(subscriber);        
-        }
-    }
-
-    public Integer getTotalReferrals() {
+      public Integer getTotalReferrals() {
         String total = redisOperations.opsForValue().get(TOTAL_REFERRALS);
         return total != null ? Integer.parseInt(total) : 0;        
     }
@@ -47,21 +39,38 @@ public class InsightRepository implements SubscriberListener {
         return total != null ? Integer.parseInt(total) : null;
     }
 
-    public List<Referral> getReferrals() {
+    public List<Referral> getAllReferrals() {
         Set<TypedTuple<String>> results = redisOperations.opsForZSet().reverseRangeWithScores(REFERRALS_BY_DATE, 0, Integer.MAX_VALUE);
-        if (results.size() == 0) {
-            return Collections.emptyList();
-        }
         List<Referral> referrals = new ArrayList<Referral>(results.size());
         SimpleDateFormat format = new SimpleDateFormat("MMMM d");
         for (TypedTuple<String> result : results) {
             Date date = new Date(result.getScore().longValue());
             Map<Object, Object> row = redisOperations.opsForHash().entries(referral(result.getValue()));
-            referrals.add(new Referral(format.format(date), (String) row.get("name"), (String) row.get("referredBy")));
+            referrals.add(new Referral(format.format(date), (String) row.get("name"), (String) row.get("referred_by"), (String) row.get("referral_code")));
         }
         return referrals;
     }
     
+    public List<Referred> getReferred(String referralCode) {
+        Set<TypedTuple<String>> results = redisOperations.opsForZSet().reverseRangeWithScores(referralsByDate(referralCode), 0, Integer.MAX_VALUE);
+        List<Referred> referred = new ArrayList<Referred>(results.size());
+        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
+        for (TypedTuple<String> result : results) {
+            Date date = new Date(result.getScore().longValue());
+            referred.add(new Referred(format.format(date), result.getValue()));
+        }
+        return referred;
+    }
+
+    // implementing SubscriberListener
+    
+    public void subscriberAdded(Subscriber subscriber) {
+        initReferralCounts(subscriber.getReferralCode());
+        if (subscriber.getReferredBy() != null) {
+            captureReferralInsights(subscriber);        
+        }
+    }
+
     // internal helpers
     
     private void initReferralCounts(String referralCode) {
@@ -74,11 +83,15 @@ public class InsightRepository implements SubscriberListener {
         redisOperations.opsForValue().increment(totalReferralsForCode(referredBy.getReferralCode()), 1);
 
         Map<String, String> m  = new HashMap<String, String>();
-        m.put("name", subscriber.getName().getPublicDisplayName());
-        m.put("referredBy", referredBy.getName().getPublicDisplayName());
+        String name = subscriber.getName().getPublicDisplayName();
+        m.put("name", name);
+        m.put("referred_by", referredBy.getName().getPublicDisplayName());
+        m.put("referral_code", referredBy.getReferralCode());
         redisOperations.opsForHash().putAll(referral(referralId), m);
         
-        redisOperations.boundZSetOps(REFERRALS_BY_DATE).add(referralId.toString(), new Date().getTime());
+        Long time = new Date().getTime();
+        redisOperations.opsForZSet().add(REFERRALS_BY_DATE, referralId.toString(), time);
+        redisOperations.opsForZSet().add(referralsByDate(referredBy.getReferralCode()), name, time);
     }
 
     private static String totalReferralsForCode(String referralCode) {
@@ -89,11 +102,15 @@ public class InsightRepository implements SubscriberListener {
         return REFERRALS + ":" + referralId;
     }
     
+    private String referralsByDate(String referralCode) {
+        return REFERRALS_BY_DATE_FOR_CODE + referralCode;
+    }
+    
     private static final String REFERRALS = "referrals";
     
     private static final String REFERRALS_BY_DATE = REFERRALS + "_by_date";
     
-    // private static final String REFERRALS_BY_DATE_FOR_CODE = REFERRALS_BY_DATE + "_for_code:";
+    private static final String REFERRALS_BY_DATE_FOR_CODE = REFERRALS_BY_DATE + "_for_code:";
     
     private static final String TOTAL_REFERRALS = REFERRALS + "_counts_total";
     

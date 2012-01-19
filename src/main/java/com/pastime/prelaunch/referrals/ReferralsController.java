@@ -29,7 +29,7 @@ public class ReferralsController {
 
     @RequestMapping(value="/referrals/detail", method=RequestMethod.GET)
     public String referralsDetail(Model model) {
-        model.addAttribute("referrals", repository.getReferrals());
+        model.addAttribute("referrals", repository.getAllReferrals());
         return "prelaunch/referrals/all-detail";
     }
 
@@ -43,6 +43,12 @@ public class ReferralsController {
         model.addAttribute("referralCode", referralCode);
         model.addAttribute("totalReferrals", total);     
         return "prelaunch/referrals/code-summary";
+    }
+
+    @RequestMapping(value="/referrals/{referralCode}/detail", method=RequestMethod.GET)
+    public String referralCodeDetail(@PathVariable String referralCode, Model model) {
+        model.addAttribute("referrals", repository.getReferred(referralCode));        
+        return "prelaunch/referrals/code-detail";
     }
 
 }

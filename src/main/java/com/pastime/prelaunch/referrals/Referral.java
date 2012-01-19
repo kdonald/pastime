@@ -8,10 +8,13 @@ public class Referral {
     
     private final String referredBy;
 
-    public Referral(String date, String name, String referredBy) {
+    private final String referralCode;
+    
+    public Referral(String date, String name, String referredBy, String referralCode) {
         this.date = date;
         this.name = name;
         this.referredBy = referredBy;
+        this.referralCode = referralCode;
     }
 
     public String getDate() {
@@ -24,6 +27,10 @@ public class Referral {
 
     public String getReferredBy() {
         return referredBy;
-    }    
+    }
+
+    public String getReferralCode() {
+        return referralCode;
+    }
     
 }

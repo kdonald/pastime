@@ -26,7 +26,7 @@ public class Name {
         StringBuilder builder = new StringBuilder();
         builder.append(getFirstName());
         if (getLastName() != null && getLastName().length() > 0) {
-            builder.append(' ').append(getLastName().charAt(0));
+            builder.append(' ').append(getLastName().charAt(0)).append(".");
         }
         return builder.toString();
     }
