@@ -17,7 +17,7 @@ header {
 }
 
 #logo a {
-  background: url(images/logo-text.png);
+  background: url(../images/logo-text.png);
   display: block;
   height: 69px;
   margin-top: 5px;
