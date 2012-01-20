@@ -17,9 +17,9 @@
     <link rel="stylesheet" href="/static/prelaunch/referrals/referrals.css" />
   </head>
   <body>
-    <header>
+    <header id="topbar">
       <div class="pagecontent">
-        <h1><a href="/">Pastime</a></h1>
+        <a id="topbarLogo" href="/" title="Pastime">Pastime</a>
         <nav>
           <ul>
             <li><a href="/">Home</a></li>
@@ -52,7 +52,7 @@
               <tr>
                 <td>{{date}}</td>
                 <td>{{name}}</td>
-                <td><a href="http://localhost:8080/referrals/{{referralCode}}">{{referredBy}}</a></td>
+                <td><a href="{{referralCode}}">{{referredBy}}</a></td>
               </tr>
             {{/referrals}}
           </tbody>

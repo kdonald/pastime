@@ -14,12 +14,12 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://pastimebrevard.com/privacy" />
-    <link rel="stylesheet" href="standard.css" />
+    <link rel="stylesheet" href="/static/standard.css" />
   </head>
   <body>
-    <header>
+    <header id="topbar">
       <div class="pagecontent">
-        <h1><a href="/">Pastime</a></h1>
+        <a id="topbarLogo" href="/" title="Pastime">Pastime</a>
         <nav>
           <ul>
             <li><a href="/">Home</a></li>
@@ -28,7 +28,7 @@
       </div>
     </header>
     <div id="main" class="pagecontent">
-      <h1>Unsubscribe from Pastime</h1>
+      <h1>Unsubscribe</h1>
       <form method="POST">
         <input id="email" type="email" name="email" size="30" placeholder="Email" required/>
         <button>Unsubscribe</button>

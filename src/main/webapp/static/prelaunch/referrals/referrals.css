@@ -76,8 +76,6 @@ tr:nth-child(2n+1) {
   background: #fff;
 }
 
-
-
 td+td {
   border-left: 1px solid #CCC;
   }
