@@ -471,6 +471,26 @@ nav ul {
   padding: 0;
 }
 
+input {
+  min-height: 26px;
+}
+
+button {
+  background-image: -moz-linear-gradient(100% 100% 90deg, #6bbe1a, #afd18c);
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#afd18c), to(#6bbe1a) );
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40);
+  color: #fff;
+  font-size: 1em;
+  letter-spacing: 0.1em; 
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
 /* facebook */
 
 .fb-send-button {
