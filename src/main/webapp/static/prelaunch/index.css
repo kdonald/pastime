@@ -43,7 +43,7 @@ header {
   width: 177px;
   position: absolute;
   top: -53px;
-  right: 120px;
+  right: 80px;
   text-indent: -9999px;
   z-index: 1;
 }
@@ -60,7 +60,7 @@ header {
   margin: 0;
   position: absolute;
   top: 20px;
-  right: 180px;
+  right: 140px;
 }
 
 #content {
@@ -70,7 +70,6 @@ header {
   border-radius: 8px;
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
-  margin-bottom: 40px;
   padding: 30px;
   position: relative;
   z-index: 0;
@@ -271,10 +270,23 @@ header {
   background-clip: padding-box;
 }
 
+footer {
+  color: #9a9893;
+  font-size: 0.8em;
+  margin: auto;
+  padding: 10px;
+  width: 980px;
+}
+
+footer p {
+  float: left;
+}
+
 #sharing {
-  position: absolute;
-  top: 68px;
-  right: 6px;
+  margin: auto;
+  width: 111px;
+  float: right;
+  margin-right: 18px;
 }
 
 #facebook {
@@ -286,11 +298,4 @@ header {
   float: left;
   margin-left: 10px;
   width: 56px;
-}
-
-footer {
-  color: #9a9893;
-  font-size: 0.8em;
-  text-align: center;
-  padding: 10px;
 }
