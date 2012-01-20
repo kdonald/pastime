@@ -7,8 +7,8 @@
 
 #topbar {  
   background-color: #224E98;
-  background-image: -moz-linear-gradient(100% 100% 90deg, #224E98, #4178C5);
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#224E98), to(#4178C5) );
+  background-image: -moz-linear-gradient(100% 100% 90deg, #2a7cc6, #02519c);
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#02519c), to(#2a7cc6) );
   height: 49px;  
 }
 
