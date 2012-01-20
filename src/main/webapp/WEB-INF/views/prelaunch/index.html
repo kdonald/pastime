@@ -83,13 +83,20 @@
             <button>Subscribe</button>
           </form>
         </div>          
-      </div>    
+      </div>
+      <div id="sharing">
+        <div id="facebook">
+          <div class="fb-like" data-href="http://pastimebrevard.com" data-send="false" data-layout="box_count" data-width="450" data-show-faces="true" data-font="arial"></div>
+        </div>
+        <div id="twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://pastimebrevard.com" data-via="pastimebrevard" data-lang="en" data-related="Pastime" data-count="vertical">Tweet</a>        
+        </div>
+      </div>  
     </div>
     <footer>
-      <div class="content">
-        <p>&copy; 2012 Pastime Connect LLC. All rights reserved. <a href="/privacy">Privacy Policy</a>.</p>
-      </div>
+      <p>&copy; 2012 Pastime Connect LLC. All rights reserved. <a href="/privacy">Privacy Policy</a>.</p>
     </footer>    
-    <script data-main="/static/prelaunch/index.js" src="libs/requirejs/1.0.3/require.js"></script>     
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    <script data-main="/static/prelaunch/index.js" src="libs/requirejs/1.0.3/require.js"></script>
   </body>
 </html>

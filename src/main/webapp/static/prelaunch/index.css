@@ -43,7 +43,7 @@ header {
   width: 177px;
   position: absolute;
   top: -53px;
-  right: 80px;
+  right: 120px;
   text-indent: -9999px;
   z-index: 1;
 }
@@ -60,7 +60,7 @@ header {
   margin: 0;
   position: absolute;
   top: 20px;
-  right: 140px;
+  right: 180px;
 }
 
 #content {
@@ -269,6 +269,23 @@ header {
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
+}
+
+#sharing {
+  position: absolute;
+  top: 68px;
+  right: 4px;
+}
+
+#facebook {
+  float: left;
+  width: 45px;
+}
+
+#twitter {
+  float: left;
+  margin-left: 10px;
+  width: 56px;
 }
 
 footer {
