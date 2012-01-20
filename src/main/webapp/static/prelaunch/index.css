@@ -272,8 +272,7 @@ header {
 footer {
   color: #9a9893;
   font-size: 0.8em;
-  margin: 4px auto;
-  padding: 10px;
+  margin: 15px auto;
   width: 980px;
 }
 
@@ -287,7 +286,7 @@ footer p {
   margin: auto;
   width: 111px;
   float: right;
-  margin-right: 18px;
+  margin-right: 20px;
 }
 
 #facebook {
