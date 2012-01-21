@@ -272,30 +272,41 @@ header {
 footer {
   color: #9a9893;
   font-size: 0.8em;
-  margin: 15px auto;
+  margin: 5px auto;
   width: 980px;
 }
 
 footer p {
   float: left;
-  margin-top: 0;
-  margin-left: 20px;
+  margin: 5px 0 0 20px;
 }
 
-#sharing {
+#social {
   margin: auto;
-  width: 111px;
   float: right;
   margin-right: 20px;
 }
 
-#facebook {
-  float: left;
-  width: 45px;
+a.facebook {
+  background: url(../images/social-icons.png) no-repeat -24px; 0;
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  text-indent: -9999px;
 }
 
-#twitter {
-  float: left;
-  margin-left: 10px;
-  width: 56px;
+a.twitter {
+  background: url(../images/social-icons.png) no-repeat 0 0;  
+  display: inline-block;
+  height: 24px;
+  width: 25px;
+  text-indent: -9999px;
+}
+
+a.mail {
+  background: url(../images/social-icons.png) no-repeat -49px; 0;
+  display: inline-block;
+  height: 24px;
+  width: 25px;
+  text-indent: -9999px;
 }
