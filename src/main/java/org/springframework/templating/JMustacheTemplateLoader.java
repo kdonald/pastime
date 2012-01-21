@@ -14,7 +14,7 @@ public class JMustacheTemplateLoader implements TemplateLoader {
 
     public JMustacheTemplateLoader(ResourceLoader resourceLoader) {
         templateLoader = new ResourceTemplateLoader(resourceLoader);
-        compiler = com.samskivert.mustache.Mustache.compiler().nullValue("").withLoader(templateLoader);
+        compiler = com.samskivert.mustache.Mustache.compiler().nullValue("").escapeHTML(false).withLoader(templateLoader);
     }
 
     public Template getTemplate(String location) {

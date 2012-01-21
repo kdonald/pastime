@@ -92,11 +92,11 @@ public class InsightRepository implements SubscriberListener {
                welcome.setFrom("keith@pastimebrevard.com");
                welcome.setTo(subscriber.getEmail());
                welcome.setSubject("Welcome to Pastime");
-               Map<String, Object> model = new HashMap<String, Object>();
+               Map<String, Object> model = new HashMap<String, Object>();               
                model.put("referralLink", "http://pastimebrevard.com?r=" + subscriber.getReferralCode());
+               model.put("referralInsightsLink", "http://pastimebrevard.com/referrals/" + subscriber.getReferralCode());
                String body = bodyTemplate.render(model);
                model = new HashMap<String, Object>();
-               model.put("preheader", "Your Pastime welcome letter from our founder, Keith Donald.");
                model.put("firstName", subscriber.getName().getFirstName());
                model.put("body", body);
                welcome.setText(founderLetterTemplate.render(model), true);
