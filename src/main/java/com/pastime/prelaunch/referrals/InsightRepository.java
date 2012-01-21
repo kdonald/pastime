@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.templating.Template;
 import org.springframework.templating.TemplateLoader;
@@ -78,6 +79,7 @@ public class InsightRepository implements SubscriberListener {
 
     // implementing SubscriberListener
     
+    @Async
     public void subscriberAdded(final Subscriber subscriber) {
         initReferralCounts(subscriber.getReferralCode());
         if (subscriber.getReferredBy() != null) {
