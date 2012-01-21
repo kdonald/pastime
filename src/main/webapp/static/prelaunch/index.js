@@ -21,22 +21,11 @@ require(["require", "jquery", "handlebars", "text!thanks.html", "jqueryui/dialog
   });
 
   function createApi() {
-    var local = window.location.protocol == "file:";
-    if (local) {
-      return {
-        subscribe: function(form) {
-           var deferred = $.Deferred();
-           deferred.resolve({ name: form.serializeArray()[0].value, referralLink: "http://pastimebrevard.com?ref=12345"});
-           return deferred;
-        }
-      };
-    } else {
-      return {
-        subscribe: function(form) {
-          return $.ajax({type: "POST", data: form.serialize() });
-        }
-      };
-    }
+    return {
+      subscribe: function(form) {
+        return $.ajax({type: "POST", data: form.serialize() });
+      }
+    };
   }
   
   function showSubscribedDialog(data) {
