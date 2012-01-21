@@ -9,10 +9,17 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
 
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Repository;
+import org.springframework.templating.Template;
+import org.springframework.templating.TemplateLoader;
+import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.pastime.prelaunch.Subscriber;
 import com.pastime.prelaunch.Subscriber.ReferredBy;
@@ -22,13 +29,22 @@ import com.pastime.prelaunch.SubscriberListener;
 public class InsightRepository implements SubscriberListener {
     
     private final RedisOperations<String, String> redisOperations;
+
+    private final JavaMailSender mailSender;
+
+    private final Template founderLetterTemplate;
+    
+    private final Template bodyTemplate;
     
     @Inject
-    public InsightRepository(RedisOperations<String, String> redisOperations) {
+    public InsightRepository(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, TemplateLoader templateLoader) {
         this.redisOperations = redisOperations;
+        this.mailSender = mailSender;
+        this.founderLetterTemplate = templateLoader.getTemplate("mail/founder-letter");
+        this.bodyTemplate = templateLoader.getTemplate("mail/welcome-body");
     }
 
-      public Integer getTotalReferrals() {
+    public Integer getTotalReferrals() {
         String total = redisOperations.opsForValue().get(TOTAL_REFERRALS);
         return total != null ? Integer.parseInt(total) : 0;        
     }
@@ -63,11 +79,29 @@ public class InsightRepository implements SubscriberListener {
 
     // implementing SubscriberListener
     
-    public void subscriberAdded(Subscriber subscriber) {
+    public void subscriberAdded(final Subscriber subscriber) {
         initReferralCounts(subscriber.getReferralCode());
         if (subscriber.getReferredBy() != null) {
             captureReferralInsights(subscriber);        
         }
+        System.out.println("Sending welcome '" + subscriber.getEmail() + "'");
+        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+            public void prepare(MimeMessage message) throws Exception {
+               MimeMessageHelper welcome = new MimeMessageHelper(message);
+               welcome.setFrom("keith@pastimebrevard.com");
+               welcome.setTo(subscriber.getEmail());
+               welcome.setSubject("Welcome to Pastime");
+               Map<String, Object> model = new HashMap<String, Object>();
+               model.put("referralLink", "http://pastimebrevard.com?r=" + subscriber.getReferralCode());
+               String body = bodyTemplate.render(model);
+               model = new HashMap<String, Object>();
+               model.put("preheader", "Your Pastime welcome letter from our founder, Keith Donald.");
+               model.put("firstName", subscriber.getName().getFirstName());
+               model.put("body", body);
+               welcome.setText(founderLetterTemplate.render(model), true);
+            }
+         };        
+        mailSender.send(preparator);
     }
 
     // internal helpers

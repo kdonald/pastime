@@ -21,16 +21,17 @@ import com.samskivert.mustache.Template;
 
 public class JMustacheViewResolver extends AbstractTemplateViewResolver implements ViewResolver {
 
-    private TemplateLoader templateLoader;
+    private final TemplateLoader templateLoader;
     
-    private Compiler compiler;
+    private final Compiler compiler;
     
     public JMustacheViewResolver(ResourceLoader resourceLoader) {
         setViewClass(JMustacheView.class);
         setExposeSpringMacroHelpers(false);
         setPrefix("/WEB-INF/views/");
         setSuffix(".html");
-        initJMustache(resourceLoader);
+        templateLoader = new ResourceTemplateLoader(resourceLoader);
+        compiler = Mustache.compiler().nullValue("").withLoader(templateLoader);        
     }
 
     @Override
@@ -46,11 +47,6 @@ public class JMustacheViewResolver extends AbstractTemplateViewResolver implemen
         return view;
     }
 
-    private void initJMustache(ResourceLoader resourceLoader) {
-        templateLoader = new ResourceTemplateLoader(resourceLoader);
-        compiler = Mustache.compiler().nullValue("").withLoader(templateLoader);
-    }
-    
     private static class ResourceTemplateLoader implements TemplateLoader {
 
         private static final String DEFAULT_ENCODING = "UTF-8";
