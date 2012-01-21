@@ -1,13 +1,13 @@
 require.config({
-  baseUrl: "app",
   paths: {
     "facebook": "../libs/facebook",
     "jquery": "../libs/jquery/1.7.1/jquery",
     "jqueryui": "../libs/jqueryui/1.8.16",
-    "handlebars": "../libs/handlebars/1.0.0.beta6/handlebars"
+    "handlebars": "../libs/handlebars/1.0.0.beta6/handlebars",
+    "text": "../libs/requirejs-text/1.0.2/text"
   }
 });
-require(["require", "jquery", "handlebars", "text!prelaunch/thanks.html", "jqueryui/dialog", "facebook"], function(require, $, handlebars, thanksTemplate) {
+require(["require", "jquery", "handlebars", "text!thanks.html", "jqueryui/dialog", "facebook"], function(require, $, handlebars, thanksTemplate) {
   thanksTemplate = handlebars.compile(thanksTemplate);
   var api = createApi();
   
