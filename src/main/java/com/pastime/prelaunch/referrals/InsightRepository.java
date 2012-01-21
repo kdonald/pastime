@@ -19,7 +19,6 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Repository;
 import org.springframework.templating.Template;
 import org.springframework.templating.TemplateLoader;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.pastime.prelaunch.Subscriber;
 import com.pastime.prelaunch.Subscriber.ReferredBy;
