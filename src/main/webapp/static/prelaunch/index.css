@@ -259,6 +259,9 @@ header {
   color: #7d786b;
   background-color: #f4f4f4;
   border: 1px solid lightGray;
+  display: block;
+  font-size: 1.2em;
+  margin-top: 4px;
   padding: 10px;
   text-align: center;
   -webkit-border-radius: 12px;

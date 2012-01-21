@@ -40,7 +40,7 @@ require(["require", "jquery", "handlebars", "text!prelaunch/thanks.html", "jquer
   }
   
   function showSubscribedDialog(data) {
-    var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink }));  
+    var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink })); 
     thanks.find("a.fb-send-button").on("click", function() {
       FB.ui({
         method: "send",
