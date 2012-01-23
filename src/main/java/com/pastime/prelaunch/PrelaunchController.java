@@ -51,9 +51,9 @@ public class PrelaunchController {
         return createSubscription(form.getEmail(), new Name(form.getFirstName(), form.getLastName()), form.getR());
     }
 
-    @RequestMapping(value = "/privacy", method = RequestMethod.GET)
+    @RequestMapping(value = "/about", method = RequestMethod.GET)
     public String privacy(Model model) {
-        return "prelaunch/privacy";
+        return "prelaunch/about";
     }
 
     @RequestMapping(value = "/unsubscribe", method = RequestMethod.GET)
