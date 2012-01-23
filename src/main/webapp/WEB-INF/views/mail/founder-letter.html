@@ -60,13 +60,9 @@
 			* @theme page
 			*/
     body,#backgroundTable { /*@editable*/
-      background-color: #FAFAFA;
+      background-color: #E6FDC4;
     }
 
-    #backgroundTable {
-      padding: 30px 15px 0;
-    }
-    
     /**
 			* @tab Page
 			* @section email border
@@ -83,10 +79,10 @@
 			* @style heading 1
 			*/
     h1,.h1 { /*@editable*/
-      color: #202020;
+      color: #f3c254;
       display: block;
       /*@editable*/
-      font-family: Arial;
+      font-family: Helvetica, Arial, sans-serif;
       /*@editable*/
       font-size: 34px;
       /*@editable*/
@@ -108,10 +104,10 @@
 			* @style heading 2
 			*/
     h2,.h2 { /*@editable*/
-      color: #202020;
+      color: #908a7f;
       display: block;
       /*@editable*/
-      font-family: Arial;
+      font-family: Helvetica, Arial, sans-serif;
       /*@editable*/
       font-size: 30px;
       /*@editable*/
@@ -133,10 +129,10 @@
 			* @style heading 3
 			*/
     h3,.h3 { /*@editable*/
-      color: #202020;
+      color: #908a7f;
       display: block;
       /*@editable*/
-      font-family: Arial;
+      font-family: Helvetica, Arial, sans-serif;
       /*@editable*/
       font-size: 26px;
       /*@editable*/
@@ -173,7 +169,7 @@
     .headerContent { /*@editable*/
       color: #202020;
       /*@editable*/
-      font-family: Arial;
+      font-family: Helvetica, Arial, sans-serif;
       /*@editable*/
       font-size: 34px;
       /*@editable*/
@@ -195,7 +191,7 @@
 			*/
     .headerContent a:link,.headerContent a:visited, /* Yahoo! Mail Override */ .headerContent a .yshortcuts
       /* Yahoo! Mail Override */ { /*@editable*/
-      color: #336699;
+      color: #7cc500;
       /*@editable*/
       font-weight: normal;
       /*@editable*/
@@ -225,9 +221,9 @@
 			* @theme main
 			*/
     .bodyContent div { /*@editable*/
-      color: #505050;
+      color: #7d786b;
       /*@editable*/
-      font-family: Arial;
+      font-family: Helvetica, Arial, sans-serif;
       /*@editable*/
       font-size: 14px;
       /*@editable*/
@@ -243,11 +239,11 @@
 			*/
     .bodyContent div a:link,.bodyContent div a:visited, /* Yahoo! Mail Override */ .bodyContent div a .yshortcuts
       /* Yahoo! Mail Override */ { /*@editable*/
-      color: #336699;
+      color: #7cc500;
       /*@editable*/
       font-weight: normal;
       /*@editable*/
-      text-decoration: underline;
+      text-decoration: none;
     }
 
     .bodyContent img {
@@ -259,6 +255,9 @@
 <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
 	<center>
 		<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="backgroundTable">
+		  <tr>
+		    <td height="15"></td>
+		  </tr>
 			<tr>
 				<td align="center" valign="top">
 					<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateContainer">
@@ -269,7 +268,7 @@
 									<tr>
 										<td class="headerContent">
 											<!-- // Begin Module: Standard Header Image \\ -->
-											<img src="http://localhost:8080/static/images/logo-text.png" style="max-width: 600px;" id="headerImage campaign-icon" />
+											<img src="http://localhost:8080/static/images/logo-text.png" style="margin-top: 10px; max-width: 600px;" id="headerImage campaign-icon" />
 											<!-- // End Module: Standard Header Image \\ -->
 										</td>
 									</tr>
@@ -295,7 +294,7 @@
 															Sincerely,<br />
 															<br/>
 															Keith Donald<br />
-															Founder, Pastime<br/>
+															Founder, <a href="http://pastimebrevard.com">Pastime</a><br/>
 															<br />
 															<img src="http://localhost:8080/static/images/founder.png" style="max-width: 600px;" id="founder" />
 														</div>
@@ -312,6 +311,9 @@
 					</table>
 				</td>
 			</tr>
+      <tr>
+        <td height="15"></td>
+      </tr>			
 		</table>
 	</center>
 </body>
