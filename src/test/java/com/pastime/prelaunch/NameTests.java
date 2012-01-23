@@ -4,16 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
-public class SubscribeTests {
-
-    @Test
-    public void referralCodeGenerator() {
-        StringKeyGenerator generator = new ReferralCodeGenerator();
-        String code = generator.generateKey();
-        assertEquals(6, code.length());
-    }
+public class NameTests {
     
     @Test
     public void names() {

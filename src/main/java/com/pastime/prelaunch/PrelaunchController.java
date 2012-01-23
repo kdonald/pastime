@@ -24,15 +24,16 @@ import com.pastime.prelaunch.Subscriber.ReferredBy;
 @Controller
 public class PrelaunchController {
 
-    private final StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
+    private final StringKeyGenerator referralCodeGenerator;
 
     private final JdbcTemplate jdbcTemplate;
 
     private final SubscriberListener subscriberListener;
 
     @Inject
-    public PrelaunchController(JdbcTemplate jdbcTemplate, SubscriberListener subscriberListener) {
+    public PrelaunchController(JdbcTemplate jdbcTemplate, StringKeyGenerator referralCodeGenerator, SubscriberListener subscriberListener) {
         this.jdbcTemplate = jdbcTemplate;
+        this.referralCodeGenerator = referralCodeGenerator;
         this.subscriberListener = subscriberListener;
     }
 
@@ -77,8 +78,7 @@ public class PrelaunchController {
         }
         boolean unsubscribed = rs.getBoolean("unsubscribed");
         if (unsubscribed) {
-            jdbcTemplate.update("UPDATE prelaunch.subscriptions SET unsubscribed = false WHERE id  = ?",
-                    rs.getInt("id"));
+            jdbcTemplate.update("UPDATE prelaunch.subscriptions SET unsubscribed = false WHERE id  = ?", rs.getInt("id"));
         }
         return new Subscription(rs.getString("first_name"), referralLink(rs.getString("referral_code")));
     }

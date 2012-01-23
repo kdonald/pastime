@@ -11,12 +11,16 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.keygen.BytesKeyGenerator;
+import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Repository;
 import org.springframework.templating.Template;
 import org.springframework.templating.TemplateLoader;
@@ -26,7 +30,11 @@ import com.pastime.prelaunch.Subscriber.ReferredBy;
 import com.pastime.prelaunch.SubscriberListener;
 
 @Repository
-public class InsightRepository implements SubscriberListener {
+public class ReferralProgram implements StringKeyGenerator, SubscriberListener {
+    
+    private final Base64 base64 = new Base64(true);
+    
+    private final BytesKeyGenerator generator = KeyGenerators.secureRandom(4);
     
     private final RedisOperations<String, String> redisOperations;
 
@@ -37,13 +45,13 @@ public class InsightRepository implements SubscriberListener {
     private final Template bodyTemplate;
     
     @Inject
-    public InsightRepository(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, TemplateLoader templateLoader) {
+    public ReferralProgram(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, TemplateLoader templateLoader) {
         this.redisOperations = redisOperations;
         this.mailSender = mailSender;
         this.founderLetterTemplate = templateLoader.getTemplate("mail/founder-letter");
         this.bodyTemplate = templateLoader.getTemplate("mail/welcome-body");
     }
-
+    
     public Integer getTotalReferrals() {
         String total = redisOperations.opsForValue().get(TOTAL_REFERRALS);
         return total != null ? Integer.parseInt(total) : 0;        
@@ -77,6 +85,12 @@ public class InsightRepository implements SubscriberListener {
         return referred;
     }
 
+    // implementing StringKeyGenerator
+
+    public String generateKey() {
+        return new String(base64.encode(generator.generateKey())).trim();
+    }
+    
     // implementing SubscriberListener
     
     @Async
