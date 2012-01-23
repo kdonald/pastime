@@ -36,13 +36,13 @@ public class ReferralProgram implements StringKeyGenerator, SubscriberListener {
     
     private final BytesKeyGenerator generator = KeyGenerators.secureRandom(4);
     
-    private final RedisOperations<String, String> redisOperations;
+    private RedisOperations<String, String> redisOperations;
 
-    private final JavaMailSender mailSender;
+    private JavaMailSender mailSender;
 
-    private final Template founderLetterTemplate;
+    private Template founderLetterTemplate;
     
-    private final Template bodyTemplate;
+    private Template bodyTemplate;
     
     @Inject
     public ReferralProgram(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, TemplateLoader templateLoader) {
@@ -154,6 +154,9 @@ public class ReferralProgram implements StringKeyGenerator, SubscriberListener {
     private String referralsByDate(String referralCode) {
         return REFERRALS_BY_DATE_FOR_CODE + referralCode;
     }
+    
+    //cglib ceremony
+    public ReferralProgram() {};
     
     private static final String REFERRALS = "referrals";
     
