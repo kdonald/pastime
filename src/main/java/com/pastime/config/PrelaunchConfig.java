@@ -8,15 +8,19 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.templating.StringTemplateLoader;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.pastime.prelaunch.PrelaunchController;
 import com.pastime.prelaunch.SubscriberListeners;
 import com.pastime.prelaunch.WelcomeMailer;
+import com.pastime.prelaunch.admin.AdminInterceptor;
 import com.pastime.prelaunch.referrals.ReferralProgram;
 import com.pastime.prelaunch.referrals.ReferralsController;
 
 @Configuration
-public class PrelaunchConfig {
+public class PrelaunchConfig extends WebMvcConfigurerAdapter {
 
     @Inject
     private JdbcTemplate jdbcTemplate;
@@ -54,5 +58,15 @@ public class PrelaunchConfig {
     public ReferralProgram referralProgram()  {
         return new ReferralProgram(redisOperations);
     }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AdminInterceptor()).addPathPatterns("/admin/**");
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/admin").setViewName("prelaunch/admin/authenticate");
+    }    
     
 }

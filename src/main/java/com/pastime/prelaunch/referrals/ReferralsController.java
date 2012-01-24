@@ -19,13 +19,13 @@ public class ReferralsController {
         this.referralProgram = referralProgram;
     }
 
-    @RequestMapping(value="/referrals", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/referrals", method=RequestMethod.GET)
     public String referralsSummary(Model model) {
         model.addAttribute("totalReferrals", referralProgram.getTotalReferrals());
         return "prelaunch/referrals/all-summary";
     }
 
-    @RequestMapping(value="/referrals/detail", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/referrals/detail", method=RequestMethod.GET)
     public String referralsDetail(Model model) {
         model.addAttribute("referrals", referralProgram.getAllReferrals());
         return "prelaunch/referrals/all-detail";

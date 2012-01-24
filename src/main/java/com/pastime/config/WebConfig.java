@@ -11,13 +11,13 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.BaseWebConfig;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
 
 @Configuration
-public class WebConfig extends WebMvcConfigurationSupport {
+public class WebConfig extends BaseWebConfig {
 
     @Bean
     public ViewResolver viewResolver(ResourceLoader resourceLoader) {
@@ -31,12 +31,13 @@ public class WebConfig extends WebMvcConfigurationSupport {
         configurer.enable();
     }
 
+    @Override
     protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         GlobalExceptionHandlerCapableExceptionResolver resolver = new GlobalExceptionHandlerCapableExceptionResolver(new GlobalExceptionHandling());
         resolver.afterPropertiesSet();
         exceptionResolvers.add(resolver);
     }
-
+    
     // temp extension for enabling Global @ExceptionHandlers until Spring MVC supports this by default (likely 3.2)
     private class GlobalExceptionHandlerCapableExceptionResolver extends ExceptionHandlerExceptionResolver {
 
