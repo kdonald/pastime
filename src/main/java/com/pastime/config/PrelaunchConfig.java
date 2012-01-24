@@ -10,6 +10,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.templating.StringTemplateLoader;
 
 import com.pastime.prelaunch.PrelaunchController;
+import com.pastime.prelaunch.SubscriberListeners;
+import com.pastime.prelaunch.WelcomeMailer;
 import com.pastime.prelaunch.referrals.ReferralProgram;
 import com.pastime.prelaunch.referrals.ReferralsController;
 
@@ -31,18 +33,26 @@ public class PrelaunchConfig {
     @Bean
     public PrelaunchController prelaunchController() {
         PrelaunchController controller = new PrelaunchController(jdbcTemplate);
-        controller.setSubscriberListener(referralProgram());
+        SubscriberListeners listeners = new SubscriberListeners();
+        listeners.add(welcomeMailer());
+        listeners.add(referralProgram());
+        controller.setSubscriberListener(listeners);
         return controller;
     }
     
     @Bean
+    public WelcomeMailer welcomeMailer() {
+        return new WelcomeMailer(mailSender, templateLoader);
+    }
+
+    @Bean
     public ReferralsController referralsController() {
         return new ReferralsController(referralProgram());
     }
-    
+
     @Bean
     public ReferralProgram referralProgram()  {
-        return new ReferralProgram(redisOperations, mailSender, templateLoader);
+        return new ReferralProgram(redisOperations);
     }
     
 }

@@ -9,16 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.mail.internet.MimeMessage;
 
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
-import org.springframework.templating.StringTemplateLoader;
 
 import com.pastime.prelaunch.Subscriber;
 import com.pastime.prelaunch.Subscriber.ReferredBy;
@@ -28,16 +23,10 @@ import com.pastime.prelaunch.SubscriberListener;
 public class ReferralProgram implements SubscriberListener {
     
     private RedisOperations<String, String> redisOperations;
-
-    private JavaMailSender mailSender;
-
-    private StringTemplateLoader templateLoader;
     
     @Inject
-    public ReferralProgram(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, StringTemplateLoader templateLoader) {
+    public ReferralProgram(RedisOperations<String, String> redisOperations) {
         this.redisOperations = redisOperations;
-        this.mailSender = mailSender;
-        this.templateLoader = templateLoader;
     }
     
     public Integer getTotalReferrals() {
@@ -81,23 +70,6 @@ public class ReferralProgram implements SubscriberListener {
         if (subscriber.getReferredBy() != null) {
             captureReferralInsights(subscriber);        
         }
-        MimeMessagePreparator preparator = new MimeMessagePreparator() {
-            public void prepare(MimeMessage message) throws Exception {
-               MimeMessageHelper welcome = new MimeMessageHelper(message);
-               welcome.setFrom("Keith Donald <keith@pastimebrevard.com>");
-               welcome.setTo(subscriber.getEmail());
-               welcome.setSubject("Welcome to Pastime");
-               Map<String, Object> model = new HashMap<String, Object>(); 
-               model.put("referralLink", "http://pastimebrevard.com?r=" + subscriber.getReferralCode());
-               model.put("referralInsightsLink", "http://pastimebrevard.com/referrals/" + subscriber.getReferralCode());
-               String body = templateLoader.getTemplate("mail/welcome-body").render(model);
-               model = new HashMap<String, Object>();
-               model.put("firstName", subscriber.getName().getFirstName());
-               model.put("body", body);
-               welcome.setText(templateLoader.getTemplate("mail/founder-letter").render(model), true);
-            }
-         };        
-        mailSender.send(preparator);
     }
 
     // internal helpers
@@ -118,9 +90,9 @@ public class ReferralProgram implements SubscriberListener {
         m.put("referral_code", referredBy.getReferralCode());
         redisOperations.opsForHash().putAll(referral(referralId), m);
         
-        Long time = new Date().getTime();
-        redisOperations.opsForZSet().add(REFERRALS_BY_DATE, referralId.toString(), time);
-        redisOperations.opsForZSet().add(referralsByDate(referredBy.getReferralCode()), name, time);
+        Long createdTime = subscriber.getCreated().getTime();
+        redisOperations.opsForZSet().add(REFERRALS_BY_DATE, referralId.toString(), createdTime);
+        redisOperations.opsForZSet().add(referralsByDate(referredBy.getReferralCode()), name, createdTime);
     }
 
     private static String totalReferralsForCode(String referralCode) {

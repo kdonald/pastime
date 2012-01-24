@@ -4,6 +4,7 @@ import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 import javax.validation.Valid;
 
@@ -99,10 +100,11 @@ public class PrelaunchController {
     private Subscription createSubscription(String email, Name name, String r) {
         ReferredBy referredBy = findReferredBy(r);
         String referralCode = generateUniqueReferralCode();
-        String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referral_code, referred_by) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referralCode, referredBy != null ? referredBy.getId() : null);
+        Date created = new Date();
+        String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referralCode, referredBy != null ? referredBy.getId() : null, new Date());
         if (subscriberListener != null) {
-            subscriberListener.subscriberAdded(new Subscriber(email, name, referralCode, referredBy));
+            subscriberListener.subscriberAdded(new Subscriber(email, name, referralCode, referredBy, created));
         }
         return new Subscription(name.getFirstName(), referralLink(referralCode));
     }

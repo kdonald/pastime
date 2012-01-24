@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -21,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-@ContextConfiguration(classes=SubscribeTestsConfig.class)
+@ContextConfiguration(classes=SubscriptionTestsConfig.class)
 @Transactional
 @RunWith(value=SpringJUnit4ClassRunner.class)
 public class SubscriptionTests {
@@ -44,7 +45,6 @@ public class SubscriptionTests {
     }
     
     @Test
-    @Transactional
     public void subscribe() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         SubscribeForm form = new SubscribeForm();
@@ -52,7 +52,7 @@ public class SubscriptionTests {
         form.setLastName("Donald");
         form.setEmail("keith.donald@gmail.com");
         Subscription subscription = controller.subscribe(form);        
-        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null));
+        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");
         assertNotNull(subscription.getReferralLink());
         assertEquals("http://pastimebrevard.com?r=123456", subscription.getReferralLink());        
@@ -68,7 +68,6 @@ public class SubscriptionTests {
     }
 
     @Test
-    @Transactional
     public void subscribeAgain() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         SubscribeForm form = new SubscribeForm();
@@ -76,7 +75,7 @@ public class SubscriptionTests {
         form.setLastName("Donald");
         form.setEmail("keith.donald@gmail.com");
         Subscription subscription = controller.subscribe(form);        
-        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null));
+        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
         assertEquals("http://pastimebrevard.com?r=123456", subscription.getReferralLink());        
@@ -90,7 +89,6 @@ public class SubscriptionTests {
     }
 
     @Test
-    @Transactional
     public void subscribeReferredBy() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         SubscribeForm form = new SubscribeForm();
@@ -127,7 +125,6 @@ public class SubscriptionTests {
     }
 
     @Test
-    @Transactional
     public void subscribeWhitespace() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         SubscribeForm form = new SubscribeForm();
@@ -135,7 +132,7 @@ public class SubscriptionTests {
         form.setLastName("Donald            ");
         form.setEmail("keith.donald@gmail.com      ");
         Subscription subscription = controller.subscribe(form);        
-        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null));
+        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
         assertEquals("http://pastimebrevard.com?r=123456", subscription.getReferralLink());        
@@ -143,7 +140,6 @@ public class SubscriptionTests {
     }
     
     @Test(expected=DataIntegrityViolationException.class)
-    @Transactional
     public void subscribeMissingEmail() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         SubscribeForm form = new SubscribeForm();
@@ -154,7 +150,6 @@ public class SubscriptionTests {
     }
     
     @Test
-    @Transactional
     public void subscribeDuplicateReferralCode() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastimebrevard.com')", Boolean.class));        
@@ -163,12 +158,12 @@ public class SubscriptionTests {
         form.setLastName("Donald");
         form.setEmail("keith.donald@gmail.com");
         Subscription subscription = controller.subscribe(form);
-        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null));
+        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals("http://pastimebrevard.com?r=123456", subscription.getReferralLink());
         form.setEmail("keith@pastimebrevard.com");
         controller.setReferralCodeGenerator(new DuplicateReturningReferralCodeGenerator());
         subscription = controller.subscribe(form);
-        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith@pastimebrevard.com", new Name("Keith", "Donald"), "234567", null));        
+        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith@pastimebrevard.com", new Name("Keith", "Donald"), "234567", null, new Date()));        
         assertNotNull(subscription.getReferralLink());
         assertEquals("http://pastimebrevard.com?r=234567", subscription.getReferralLink());
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastimebrevard.com')", Boolean.class));

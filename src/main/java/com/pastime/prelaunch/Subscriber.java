@@ -1,5 +1,8 @@
 package com.pastime.prelaunch;
 
+import java.util.Date;
+
+
 public class Subscriber {
     
     private final String email;
@@ -10,11 +13,14 @@ public class Subscriber {
 
     private final ReferredBy referredBy;
     
-    public Subscriber(String email, Name name, String referralCode, ReferredBy referredBy) {
+    private final Date created;
+    
+    public Subscriber(String email, Name name, String referralCode, ReferredBy referredBy, Date created) {
         this.email = email;
         this.name = name;
         this.referralCode = referralCode;
-        this.referredBy = referredBy;        
+        this.referredBy = referredBy;
+        this.created = created;
     }
 
     public String getEmail() {
@@ -31,6 +37,10 @@ public class Subscriber {
 
     public ReferredBy getReferredBy() {
         return referredBy;
+    }
+    
+    public Date getCreated() {
+        return created;
     }
     
     public int hashCode() {
@@ -83,5 +93,5 @@ public class Subscriber {
         }
         
     }
-    
+
 }

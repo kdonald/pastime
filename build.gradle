@@ -33,6 +33,7 @@ dependencies {
   compile 'postgresql:postgresql:9.1-901-1.jdbc4'
   compile 'redis.clients:jedis:$jedisVersion'
   testCompile 'junit:junit:4.10'
+  testCompile 'org.jvnet.mock-javamail:mock-javamail:1.9'
   testCompile 'org.mockito:mockito-all:1.9.0'
   testCompile "org.springframework:spring-test:$springVersion"
   providedCompile 'javax.servlet:servlet-api:2.5'

@@ -12,15 +12,27 @@ public class JMustacheStringTemplateLoader implements StringTemplateLoader {
 
     private final com.samskivert.mustache.Mustache.Compiler compiler;
 
+    private String prefix = "/WEB-INF/views/";
+    
+    private String suffix = ".html";
+    
     public JMustacheStringTemplateLoader(ResourceLoader resourceLoader) {
         templateLoader = new ResourceTemplateLoader(resourceLoader);
         compiler = com.samskivert.mustache.Mustache.compiler().nullValue("").escapeHTML(false).withLoader(templateLoader);
     }
 
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+    
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+    
     public StringTemplate getTemplate(String location) {
         Reader source = null;
         try {
-           source = templateLoader.getTemplate("/WEB-INF/views/" + location + ".html");
+           source = templateLoader.getTemplate(prefix + location + suffix);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
