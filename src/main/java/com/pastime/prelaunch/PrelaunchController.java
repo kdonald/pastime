@@ -5,7 +5,6 @@ import static org.springframework.dao.support.DataAccessUtils.singleResult;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,15 +24,29 @@ import com.pastime.prelaunch.Subscriber.ReferredBy;
 @Controller
 public class PrelaunchController {
 
-    private final StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
+    private StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
 
-    private final JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
-    private final SubscriberListener subscriberListener;
-
-    @Inject
-    public PrelaunchController(JdbcTemplate jdbcTemplate, SubscriberListener subscriberListener) {
+    private SubscriberListener subscriberListener;
+    
+    private String applicationUrl = "http://pastimebrevard.com";
+    
+    public PrelaunchController(JdbcTemplate jdbcTemplate) {
+        if (jdbcTemplate == null) {
+            throw new IllegalArgumentException("jdbcTemplate cannot be null");
+        }
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public void setReferralCodeGenerator(StringKeyGenerator referralCodeGenerator) {
+        if (referralCodeGenerator == null) {
+            throw new IllegalArgumentException("cannot be null");
+        }
+        this.referralCodeGenerator = referralCodeGenerator;
+    }
+    
+    public void setSubscriberListener(SubscriberListener subscriberListener) {
         this.subscriberListener = subscriberListener;
     }
 
@@ -88,7 +101,9 @@ public class PrelaunchController {
         String referralCode = generateUniqueReferralCode();
         String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referral_code, referred_by) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referralCode, referredBy != null ? referredBy.getId() : null);
-        subscriberListener.subscriberAdded(new Subscriber(email, name, referralCode, referredBy));
+        if (subscriberListener != null) {
+            subscriberListener.subscriberAdded(new Subscriber(email, name, referralCode, referredBy));
+        }
         return new Subscription(name.getFirstName(), referralLink(referralCode));
     }
 
@@ -115,7 +130,10 @@ public class PrelaunchController {
     }
     
     private String referralLink(String referralCode) {
-        return "http://pastimebrevard.com?r=" + referralCode;
+        return applicationUrl + "?r=" + referralCode;
     }
 
+    // cglib ceremony
+    public PrelaunchController() {}
+    
 }

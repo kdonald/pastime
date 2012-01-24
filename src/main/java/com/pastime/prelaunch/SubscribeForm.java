@@ -22,7 +22,7 @@ public class SubscribeForm {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.firstName = firstName.trim();
     }
 
     public String getLastName() {
@@ -30,7 +30,7 @@ public class SubscribeForm {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.lastName = lastName.trim();
     }
 
     public String getEmail() {
@@ -38,7 +38,7 @@ public class SubscribeForm {
     }
     
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.trim();
     }
 
     public String getR() {

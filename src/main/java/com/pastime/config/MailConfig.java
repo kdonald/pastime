@@ -7,15 +7,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.templating.JMustacheTemplateLoader;
-import org.springframework.templating.TemplateLoader;
+import org.springframework.templating.JMustacheStringTemplateLoader;
+import org.springframework.templating.StringTemplateLoader;
 
 @Configuration
 public class MailConfig {
     
     @Bean
-    public TemplateLoader templateLoader(ResourceLoader resourceLoader) {
-        return new JMustacheTemplateLoader(resourceLoader);
+    public StringTemplateLoader templateLoader(ResourceLoader resourceLoader) {
+        return new JMustacheStringTemplateLoader(resourceLoader);
     }
 
     @Bean

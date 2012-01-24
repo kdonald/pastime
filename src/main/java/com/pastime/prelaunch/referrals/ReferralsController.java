@@ -2,7 +2,6 @@ package com.pastime.prelaunch.referrals;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
@@ -16,7 +15,6 @@ public class ReferralsController {
 
     private final ReferralProgram referralProgram;
     
-    @Inject
     public ReferralsController(ReferralProgram referralProgram) {
         this.referralProgram = referralProgram;
     }

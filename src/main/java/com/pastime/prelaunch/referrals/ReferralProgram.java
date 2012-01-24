@@ -18,8 +18,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
-import org.springframework.templating.Template;
-import org.springframework.templating.TemplateLoader;
+import org.springframework.templating.StringTemplateLoader;
 
 import com.pastime.prelaunch.Subscriber;
 import com.pastime.prelaunch.Subscriber.ReferredBy;
@@ -32,16 +31,13 @@ public class ReferralProgram implements SubscriberListener {
 
     private JavaMailSender mailSender;
 
-    private Template founderLetterTemplate;
-    
-    private Template bodyTemplate;
+    private StringTemplateLoader templateLoader;
     
     @Inject
-    public ReferralProgram(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, TemplateLoader templateLoader) {
+    public ReferralProgram(RedisOperations<String, String> redisOperations, JavaMailSender mailSender, StringTemplateLoader templateLoader) {
         this.redisOperations = redisOperations;
         this.mailSender = mailSender;
-        this.founderLetterTemplate = templateLoader.getTemplate("mail/founder-letter");
-        this.bodyTemplate = templateLoader.getTemplate("mail/welcome-body");
+        this.templateLoader = templateLoader;
     }
     
     public Integer getTotalReferrals() {
@@ -92,14 +88,13 @@ public class ReferralProgram implements SubscriberListener {
                welcome.setTo(subscriber.getEmail());
                welcome.setSubject("Welcome to Pastime");
                Map<String, Object> model = new HashMap<String, Object>(); 
-               model.put("firstName", subscriber.getName().getFirstName());
                model.put("referralLink", "http://pastimebrevard.com?r=" + subscriber.getReferralCode());
                model.put("referralInsightsLink", "http://pastimebrevard.com/referrals/" + subscriber.getReferralCode());
-               String body = bodyTemplate.render(model);
+               String body = templateLoader.getTemplate("mail/welcome-body").render(model);
                model = new HashMap<String, Object>();
                model.put("firstName", subscriber.getName().getFirstName());
                model.put("body", body);
-               welcome.setText(founderLetterTemplate.render(model), true);
+               welcome.setText(templateLoader.getTemplate("mail/founder-letter").render(model), true);
             }
          };        
         mailSender.send(preparator);

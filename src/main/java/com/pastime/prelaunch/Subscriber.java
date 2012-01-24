@@ -33,6 +33,22 @@ public class Subscriber {
         return referredBy;
     }
     
+    public int hashCode() {
+        return email.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof Subscriber)) {
+            return false;
+        }
+        Subscriber s = (Subscriber) o;
+        return this.email.equalsIgnoreCase(s.email);
+    }
+    
+    public String toString() {
+        return "[Subscriber email = '" + email + "']";
+    }
+    
     public static final class ReferredBy {
 
         private final Integer id;

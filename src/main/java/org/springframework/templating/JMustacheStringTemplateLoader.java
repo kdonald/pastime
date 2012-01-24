@@ -6,18 +6,18 @@ import java.util.Map;
 
 import org.springframework.core.io.ResourceLoader;
 
-public class JMustacheTemplateLoader implements TemplateLoader {
+public class JMustacheStringTemplateLoader implements StringTemplateLoader {
 
     private final com.samskivert.mustache.Mustache.TemplateLoader templateLoader;
 
     private final com.samskivert.mustache.Mustache.Compiler compiler;
 
-    public JMustacheTemplateLoader(ResourceLoader resourceLoader) {
+    public JMustacheStringTemplateLoader(ResourceLoader resourceLoader) {
         templateLoader = new ResourceTemplateLoader(resourceLoader);
         compiler = com.samskivert.mustache.Mustache.compiler().nullValue("").escapeHTML(false).withLoader(templateLoader);
     }
 
-    public Template getTemplate(String location) {
+    public StringTemplate getTemplate(String location) {
         Reader source = null;
         try {
            source = templateLoader.getTemplate("/WEB-INF/views/" + location + ".html");
@@ -47,7 +47,7 @@ public class JMustacheTemplateLoader implements TemplateLoader {
 
     }
     
-    private static class JMustacheStringTemplate implements Template {
+    private static class JMustacheStringTemplate implements StringTemplate {
 
         private com.samskivert.mustache.Template template;
         
