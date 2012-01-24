@@ -16,6 +16,7 @@ import com.pastime.prelaunch.PrelaunchController;
 import com.pastime.prelaunch.SubscriberListeners;
 import com.pastime.prelaunch.WelcomeMailer;
 import com.pastime.prelaunch.admin.AdminInterceptor;
+import com.pastime.prelaunch.admin.ReferralsAdminController;
 import com.pastime.prelaunch.referrals.ReferralProgram;
 import com.pastime.prelaunch.referrals.ReferralsController;
 
@@ -49,6 +50,8 @@ public class PrelaunchConfig extends WebMvcConfigurerAdapter {
         return new WelcomeMailer(mailSender, templateLoader);
     }
 
+    // referrals sub-module
+    
     @Bean
     public ReferralsController referralsController() {
         return new ReferralsController(referralProgram());
@@ -59,6 +62,8 @@ public class PrelaunchConfig extends WebMvcConfigurerAdapter {
         return new ReferralProgram(redisOperations);
     }
 
+    // admin sub-module
+    
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AdminInterceptor()).addPathPatterns("/admin/**");
@@ -68,5 +73,10 @@ public class PrelaunchConfig extends WebMvcConfigurerAdapter {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/admin").setViewName("prelaunch/admin/authenticate");
     }    
+
+    @Bean
+    public ReferralsAdminController referralsAdminController() {
+        return new ReferralsAdminController(referralProgram());
+    }
     
 }
