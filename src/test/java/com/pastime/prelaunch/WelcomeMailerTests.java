@@ -6,14 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 
 import javax.mail.Message;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Transport;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.jvnet.mock_javamail.Mailbox;
-import org.jvnet.mock_javamail.MockTransport;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.templating.JMustacheStringTemplateLoader;
@@ -24,7 +20,7 @@ public class WelcomeMailerTests {
 
     @Before
     public void setUp() {
-        MockJavaMailSender mailSender = new MockJavaMailSender();
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         JMustacheStringTemplateLoader templateLoader = new JMustacheStringTemplateLoader(new FileSystemResourceLoader());
         templateLoader.setPrefix("src/main/webapp/WEB-INF/views/");
         welcomeMailer = new WelcomeMailer(mailSender, templateLoader);
@@ -39,17 +35,6 @@ public class WelcomeMailerTests {
         assertEquals("Welcome to Pastime", message.getSubject());
         assertTrue(((String) message.getContent()).contains("Keith"));        
         assertTrue(((String) message.getContent()).contains("123456"));
-    }
-    
-    private static class MockJavaMailSender extends JavaMailSenderImpl {
-
-        private MockTransport transport;
-
-        @Override
-        protected Transport getTransport(Session session) throws NoSuchProviderException {
-            this.transport = new MockTransport(session, null);
-            return transport;
-        }
     }
 
 }
