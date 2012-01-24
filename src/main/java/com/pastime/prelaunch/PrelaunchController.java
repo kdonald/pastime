@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +25,15 @@ import com.pastime.prelaunch.Subscriber.ReferredBy;
 @Controller
 public class PrelaunchController {
 
-    private final StringKeyGenerator referralCodeGenerator;
+    private final StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
 
     private final JdbcTemplate jdbcTemplate;
 
     private final SubscriberListener subscriberListener;
 
     @Inject
-    public PrelaunchController(JdbcTemplate jdbcTemplate, StringKeyGenerator referralCodeGenerator, SubscriberListener subscriberListener) {
+    public PrelaunchController(JdbcTemplate jdbcTemplate, SubscriberListener subscriberListener) {
         this.jdbcTemplate = jdbcTemplate;
-        this.referralCodeGenerator = referralCodeGenerator;
         this.subscriberListener = subscriberListener;
     }
 
@@ -43,8 +43,8 @@ public class PrelaunchController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public @ResponseBody
-    Subscription subscribe(@Valid SubscribeForm form) {
+    @Transactional
+    public @ResponseBody Subscription subscribe(@Valid SubscribeForm form) {
         Subscription subscription = findSubscription(form.getEmail());
         if (subscription != null) {
             return subscription;
@@ -85,7 +85,7 @@ public class PrelaunchController {
 
     private Subscription createSubscription(String email, Name name, String r) {
         ReferredBy referredBy = findReferredBy(r);
-        String referralCode = referralCodeGenerator.generateKey();
+        String referralCode = generateUniqueReferralCode();
         String sql = "INSERT INTO prelaunch.subscriptions (email, first_name, last_name, referral_code, referred_by) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, email, name.getFirstName(), name.getLastName(), referralCode, referredBy != null ? referredBy.getId() : null);
         subscriberListener.subscriberAdded(new Subscriber(email, name, referralCode, referredBy));
@@ -105,6 +105,15 @@ public class PrelaunchController {
                 }, r));
     }
 
+    private String generateUniqueReferralCode() {
+        do {
+            String referralCode = referralCodeGenerator.generateKey();
+            if (!jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM prelaunch.subscriptions WHERE referral_code = ?)", Boolean.class, referralCode)) {
+                return referralCode;
+            }
+        } while (true);
+    }
+    
     private String referralLink(String referralCode) {
         return "http://pastimebrevard.com?r=" + referralCode;
     }

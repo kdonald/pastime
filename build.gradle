@@ -1,6 +1,5 @@
 apply plugin: 'war'
 apply plugin: 'jetty'
-// apply plugin: 'aspectj'
 
 repositories {
   mavenRepo url: 'http://maven.springframework.org/release'
@@ -29,7 +28,6 @@ dependencies {
   compile "org.springframework:spring-context:$springVersion"
   compile "org.springframework:spring-jdbc:$springVersion"
   compile "org.springframework:spring-webmvc:$springVersion"
-  compile "org.springframework:spring-aspects:$springVersion"
   compile 'org.springframework.data:spring-data-redis:1.0.0.RELEASE'
   compile 'org.springframework.security:spring-security-crypto:3.1.0.RELEASE'
   compile 'postgresql:postgresql:9.1-901-1.jdbc4'
