@@ -13,6 +13,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.BaseWebConfig;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
 
@@ -38,6 +39,14 @@ public class WebConfig extends BaseWebConfig {
         exceptionResolvers.add(resolver);
     }
     
+    @Override
+    protected void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/errors/bad-request");
+        registry.addViewController("/errors/resource-not-found");
+        registry.addViewController("/errors/internal-error");        
+        super.addViewControllers(registry);
+    }
+
     // temp extension for enabling Global @ExceptionHandlers until Spring MVC supports this by default (likely 3.2)
     private class GlobalExceptionHandlerCapableExceptionResolver extends ExceptionHandlerExceptionResolver {
 
