@@ -1,5 +1,9 @@
 package com.pastime.config;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +20,12 @@ class GlobalExceptionHandling {
         ErrorBody body = new ErrorBody(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         return new ResponseEntity<ErrorBody>(body, headers, HttpStatus.BAD_REQUEST);
     }
-
+    
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public void handle(IllegalArgumentException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
+    
     public static class ErrorBody {
 
         private final String errorMessage;

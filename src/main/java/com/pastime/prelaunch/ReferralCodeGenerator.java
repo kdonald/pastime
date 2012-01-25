@@ -10,5 +10,18 @@ public class ReferralCodeGenerator implements StringKeyGenerator {
     public String generateKey() {
         return generator.generateKey();
     }
+ 
+    public boolean meetsSyntax(String string) {
+        if (string.length() != 6) {
+            return false;
+        }
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (!(Character.getType(c) == Character.LOWERCASE_LETTER || Character.isDigit(c))) {
+                return false;
+            }
+        }
+        return true;
+    }
     
 }
