@@ -46,7 +46,7 @@ public class SubscribeForm {
     }
 
     public void setR(String r) {
-        this.r = r;
+        this.r = r.trim().toLowerCase();
     }    
 
 }
