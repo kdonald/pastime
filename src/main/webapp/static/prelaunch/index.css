@@ -1,18 +1,12 @@
 @IMPORT url("../base.css");
 
 #card {
-  clear: left;
   background-color: #ffffff;
   border: none;
   margin: 80px auto 0 auto;
   position: relative;
   width: 980px;
   font-family: Helvetica, Arial, sans-serif;
-}
-
-header {
-  overflow: auto;
-  padding: 0 0 35px 0;
 }
 
 #logo a {
@@ -41,7 +35,7 @@ header {
   height: 219px;
   width: 177px;
   position: absolute;
-  top: -53px;
+  top: -57px;
   right: 80px;
   text-indent: -9999px;
   z-index: 1;
@@ -58,17 +52,22 @@ header {
   padding: 25px 40px 25px 34px;
   margin: 0;
   position: absolute;
-  top: 20px;
+  top: 15px;
   right: 140px;
 }
 
 #content {
   background-color: #02519c;
-  background: -moz-linear-gradient(100% 100% 90deg, #2a7cc6, #02519c);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#02519c), to(#2a7cc6) );  
+  background-image: linear-gradient(top, #02519c, #2a7cc6); /* the standard */
+  background-image: -moz-linear-gradient(top, #02519c, #2a7cc6); /* FF 3.6+ */
+  background-image: -ms-linear-gradient(top, #02519c, #2a7cc6); /* IE10 */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #02519c), color-stop(100%, #2a7cc6)); /* Safari 4+, Chrome 2+ */
+  background-image: -webkit-linear-gradient(top, #02519c, #2a7cc6); /* Safari 5.1+, Chrome 10+ */
+  background-image: -o-linear-gradient(top, #02519c, #2a7cc6); /* Opera 11.10 */
   border-radius: 8px;
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
+  margin-top: 35px;
   padding: 30px;
   position: relative;
   z-index: 0;
@@ -175,15 +174,21 @@ header {
 
 #comingSoon {
   position: absolute;
-  top: 166px;
+  top: 162px;
   right: 20px;
   z-index: 2;
 }
 
 #banner {
-  background-color: #7cc733;
-  background: url(images/brevard-seal.png) no-repeat bottom right, -moz-linear-gradient(100% 100% 90deg, #6fc41d, #acd281);
-  background: url(images/brevard-seal.png) no-repeat bottom right, -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6fc41d), to(#acd281) );
+  background-color: #6fc41d;
+  background-image: url(images/brevard-seal.png), linear-gradient(top, #6fc41d, #acd281); /* the standard */
+  background-image: url(images/brevard-seal.png), -moz-linear-gradient(top, #6fc41d, #acd281); /* FF 3.6+ */
+  background-image: url(images/brevard-seal.png), -ms-linear-gradient(top, #6fc41d, #acd281); /* IE10 */
+  background-image: url(images/brevard-seal.png), -webkit-gradient(linear, left top, left bottom, color-stop(0%, #6fc41d), color-stop(100%, #acd281)); /* Safari 4+, Chrome 2+ */
+  background-image: url(images/brevard-seal.png), -webkit-linear-gradient(top, #6fc41d, #acd281); /* Safari 5.1+, Chrome 10+ */
+  background-image: url(images/brevard-seal.png), -o-linear-gradient(top, #6fc41d, #acd281); /* Opera 11.10 */
+  background-repeat: no-repeat;
+  background-position: right bottom;  
   border: 1px solid #fff;
   border-radius: 6px;
   -webkit-border-radius: 6px;
@@ -264,12 +269,12 @@ header {
   margin-top: 4px;
   padding: 10px;
   text-align: center;
+  border-radius: 12px;
   -webkit-border-radius: 12px;
   -moz-border-radius: 12px;
-  border-radius: 12px;
+  background-clip: padding-box;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
-  background-clip: padding-box;
 }
 
 footer {

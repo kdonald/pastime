@@ -476,8 +476,13 @@ input {
 }
 
 button {
-  background-image: -moz-linear-gradient(100% 100% 90deg, #6bbe1a, #afd18c);
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#afd18c), to(#6bbe1a) );
+  background-color: #6fc41d;
+  background-image: linear-gradient(top, #afd18c, #6fc41d); /* the standard */
+  background-image: -moz-linear-gradient(top, #afd18c, #6fc41d); /* FF 3.6+ */
+  background-image: -ms-linear-gradient(top, #afd18c, #6fc41d); /* IE10 */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #afd18c), color-stop(100%, #6fc41d)); /* Safari 4+, Chrome 2+ */
+  background-image: -webkit-linear-gradient(top, #afd18c, #6fc41d); /* Safari 5.1+, Chrome 10+ */
+  background-image: -o-linear-gradient(top, #afd18c, #6fc41d); /* Opera 11.10 */
   border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;

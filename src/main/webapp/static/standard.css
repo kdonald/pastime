@@ -6,9 +6,13 @@
 }
 
 #topbar {  
-  background-color: #224E98;
-  background-image: -moz-linear-gradient(100% 100% 90deg, #2a7cc6, #02519c);
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#02519c), to(#2a7cc6) );
+  background-color: #02519c;
+  background-image: linear-gradient(top, #02519c, #2a7cc6); /* the standard */
+  background-image: -moz-linear-gradient(top, #02519c, #2a7cc6); /* FF 3.6+ */
+  background-image: -ms-linear-gradient(top, #02519c, #2a7cc6); /* IE10 */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #02519c), color-stop(100%, #2a7cc6)); /* Safari 4+, Chrome 2+ */
+  background-image: -webkit-linear-gradient(top, #02519c, #2a7cc6); /* Safari 5.1+, Chrome 10+ */
+  background-image: -o-linear-gradient(top, #02519c, #2a7cc6); /* Opera 11.10 */
   height: 49px;  
 }
 
