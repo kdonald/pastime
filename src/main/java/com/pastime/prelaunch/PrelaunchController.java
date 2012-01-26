@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,12 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.FlashMap;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.pastime.prelaunch.Subscriber.ReferredBy;
 
@@ -57,9 +53,6 @@ public class PrelaunchController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model) {
-        if (model.containsAttribute("subscribed")) {
-            return "prelaunch/subscribed";
-        }
         return "prelaunch/index";
     }
 
@@ -73,20 +66,6 @@ public class PrelaunchController {
         return createSubscription(form.getEmail(), new Name(form.getFirstName(), form.getLastName()), form.getR());
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST, produces = "text/html")
-    @Transactional
-    public String subscribe(@Valid SubscribeForm form, BindingResult errors, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-        if (errors.hasErrors()) {
-            return "prelaunch/index";
-        }
-        subscribe(form);
-        redirectAttributes.addFlashAttribute("subscribed", true);        
-        request.getSession(true); // work around
-        return "redirect:/";
-    }
-
-    
-    
     @RequestMapping(value = "/about", method = RequestMethod.GET)
     public String privacy(Model model) {
         return "prelaunch/about";

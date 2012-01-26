@@ -2,7 +2,6 @@ package com.pastime.prelaunch;
 
 import java.util.Date;
 
-
 public class Subscriber {
     
     private final String email;
