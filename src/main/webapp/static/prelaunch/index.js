@@ -8,7 +8,7 @@ require.config({
     "webshims": "../libs/webshims/1.8.7/webshims"
   }
 });
-require(["jquery", "webshims", "handlebars", "text!thanks.html", "jqueryui/dialog", "facebook", ], function($, webshims, handlebars, thanksTemplate) {
+require(["jquery", "webshims", "handlebars", "text!./thanks.html", "jqueryui/dialog", "facebook", ], function($, webshims, handlebars, thanksTemplate) {
 
   webshims.setOptions({
     waitReady: false,

@@ -42,7 +42,7 @@
 }
 	
 #spikeDialog {
-	background: url(images/text-bubble.png) no-repeat;
+  background: url(images/text-bubble.png) no-repeat;
   color: #9a9a9a;
   font-size: 1.8em;
   font-weight: 500;
