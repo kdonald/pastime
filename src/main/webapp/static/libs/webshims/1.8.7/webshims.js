@@ -1229,12 +1229,6 @@ define(["jquery"], function($) {
 				webshims.polyfill(asyncWebshims.polyfill);
 			}
 		}
-		
-	  webshims.setOptions({
-	    waitReady: false,
-	    basePath: "/static/libs/webshims/1.8.7/shims/"
-	  });
-	  webshims.polyfill("forms");
 	  
 		return webshims;
 		

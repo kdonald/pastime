@@ -22,7 +22,9 @@ public class WebConfig extends BaseWebConfig {
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("/static/").setCachePeriod(0);
+        registry.addResourceHandler("/static/app/0.1.0/**").addResourceLocations("/static/app/").setCachePeriod(31556926);
+        registry.addResourceHandler("/static/libs/**").addResourceLocations("/static/libs/").setCachePeriod(31556926); // dev only
+        registry.addResourceHandler("/static/*").addResourceLocations("/static/").setCachePeriod(31556926);
     }
 
     @Bean
