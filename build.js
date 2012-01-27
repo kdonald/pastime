@@ -1,6 +1,6 @@
 ({
     baseUrl: "src/main/webapp/static",
-    dir: "build/js",
+    dir: "build/static",
     paths: {
       "facebook": "libs/facebook",
       "handlebars": "libs/handlebars/1.0.0.beta6/handlebars",    
@@ -11,7 +11,11 @@
     },   
     modules: [
         {
-            name: "prelaunch/index"
+            name: "common"
+        },
+        {
+            name: "prelaunch/index",
+            exclude: ["common"]            
         }
     ]
 })
