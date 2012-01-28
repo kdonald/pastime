@@ -139,7 +139,7 @@
 
 #learn {
   overflow: hidden;
-  margin-bottom: 19px;
+  margin-bottom: 24px;
 }
 
 #learn h2 {
@@ -209,33 +209,34 @@
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   margin-top: 20px;
-  padding: 15px;
-  text-align: center;
-  width: 270px;
+  padding: 20px;
+  width: 260px;
 }
 
 #subscribe p {
   color: #15c5e4;
   font-size: 1.2em;
   margin: 0 0 8px 0;
+  text-align: center;
 }
 
 #firstName {
-  width: 90px;
+  width: 100px;
 }
 
 #lastName {
-  width: 140px;
+  margin-left: 4px;
+  width: 148px;
 }
 
 #email {
   margin-top: 8px;
-  width: 241px;
+  width: 256px;
 }
 
 #subscribe button {
   margin-top: 8px;
-  width: 248px;
+  width: 260px;
 }
 
 #thanks h1 {
