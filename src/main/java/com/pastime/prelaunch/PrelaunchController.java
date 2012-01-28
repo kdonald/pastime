@@ -11,13 +11,13 @@ import javax.validation.Valid;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pastime.prelaunch.Subscriber.ReferredBy;
@@ -25,7 +25,7 @@ import com.pastime.prelaunch.Subscriber.ReferredBy;
 @Controller
 public class PrelaunchController {
 
-    private StringKeyGenerator referralCodeGenerator = new ReferralCodeGenerator();
+    private ReferralCodeGenerator referralCodeGenerator = new ReferralCodeGenerator();
 
     private JdbcTemplate jdbcTemplate;
 
@@ -40,7 +40,7 @@ public class PrelaunchController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void setReferralCodeGenerator(StringKeyGenerator referralCodeGenerator) {
+    public void setReferralCodeGenerator(ReferralCodeGenerator referralCodeGenerator) {
         if (referralCodeGenerator == null) {
             throw new IllegalArgumentException("cannot be null");
         }
@@ -52,7 +52,11 @@ public class PrelaunchController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String index(Model model) {
+    public String index(@RequestParam(required=false) String r, Model model) {
+        if (r != null && referralCodeGenerator.meetsSyntax(r)) {
+            model.addAttribute("referred", true);
+            model.addAttribute("referralCode", r);
+        }
         return "prelaunch/index";
     }
 
@@ -132,7 +136,7 @@ public class PrelaunchController {
     }
     
     private String referralLink(String referralCode) {
-        return applicationUrl + "?r=" + referralCode;
+        return applicationUrl + "/?r=" + referralCode;
     }
 
     // cglib ceremony
