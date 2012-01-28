@@ -25,7 +25,7 @@ import com.pastime.prelaunch.Subscriber.ReferredBy;
 @Controller
 public class PrelaunchController {
 
-    private ReferralCodeGenerator referralCodeGenerator = new ReferralCodeGenerator();
+    private ReferralCodeGenerator referralCodeGenerator = new DefaultReferralCodeGenerator();
 
     private JdbcTemplate jdbcTemplate;
 

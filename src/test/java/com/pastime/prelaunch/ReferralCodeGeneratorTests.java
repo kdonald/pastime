@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class ReferralCodeGeneratorTests {
     
-    private ReferralCodeGenerator generator = new ReferralCodeGenerator();
+    private DefaultReferralCodeGenerator generator = new DefaultReferralCodeGenerator();
     
     @Test
     public void generate() {

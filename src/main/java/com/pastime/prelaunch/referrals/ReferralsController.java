@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.pastime.prelaunch.DefaultReferralCodeGenerator;
 import com.pastime.prelaunch.ReferralCodeGenerator;
 
 @Controller
@@ -18,7 +19,7 @@ public class ReferralsController {
 
     private final ReferralProgram referralProgram;
     
-    private final ReferralCodeGenerator codeGenerator = new ReferralCodeGenerator();
+    private final ReferralCodeGenerator codeGenerator = new DefaultReferralCodeGenerator();
     
     public ReferralsController(ReferralProgram referralProgram) {
         this.referralProgram = referralProgram;
