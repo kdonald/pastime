@@ -1,3 +1,6 @@
+CREATE DATABASE pastime; -- \connect pastime
+CREATE USER pastime; -- \password hitmen
+
 CREATE SCHEMA prelaunch;
 GRANT USAGE ON SCHEMA prelaunch TO pastime;
 
