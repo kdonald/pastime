@@ -221,17 +221,17 @@
 }
 
 #firstName {
-  width: 100px;
+  width: 97px;
 }
 
 #lastName {
-  margin-left: 4px;
-  width: 148px;
+  margin-left: 6px;
+  width: 157px;
 }
 
 #email {
   margin-top: 8px;
-  width: 256px;
+  width: 260px;
 }
 
 #subscribe button {
