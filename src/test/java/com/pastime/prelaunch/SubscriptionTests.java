@@ -30,7 +30,7 @@ public class SubscriptionTests {
     private JdbcTemplate jdbcTemplate;
     
     @Inject
-    private PrelaunchController controller;
+    private SubscriptionRepository controller;
 
     private ReferralCodeGenerator referralCodeGenerator = Mockito.mock(ReferralCodeGenerator.class);
     
@@ -308,8 +308,7 @@ public class SubscriptionTests {
         // unsubscribe
         UnsubscribeForm unsubscribeForm = new UnsubscribeForm();
         unsubscribeForm.setEmail("keith.donald@gmail.com  ");
-        String redirect = controller.unsubscribe(unsubscribeForm);
-        assertEquals("redirect:/", redirect);        
+        controller.unsubscribe(unsubscribeForm.getEmail());
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));        
         row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keith.donald@gmail.com'");
         assertNotNull(row.get("id"));
@@ -337,8 +336,7 @@ public class SubscriptionTests {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));        
         UnsubscribeForm unsubscribeForm = new UnsubscribeForm();
         unsubscribeForm.setEmail("keith.donald@gmail.com");
-        String redirect = controller.unsubscribe(unsubscribeForm);
-        assertEquals("redirect:/", redirect);
+        controller.unsubscribe(unsubscribeForm.getEmail());
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));        
     }
     

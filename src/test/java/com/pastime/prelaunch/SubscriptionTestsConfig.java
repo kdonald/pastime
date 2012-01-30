@@ -33,8 +33,8 @@ public class SubscriptionTestsConfig {
     }
 
     @Bean
-    public PrelaunchController prelaunchController() {
-        return new PrelaunchController(jdbcTemplate());
+    public SubscriptionRepository subscriptionRepository() {
+        return new SubscriptionRepository(jdbcTemplate());
     }
     
 }

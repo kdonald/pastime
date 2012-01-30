@@ -3,15 +3,15 @@
   <head>
     <title>Referral Summary | {{ referralCode }}</title>
     <meta charset="utf-8" />
-    <meta name="description" content="How many people used referral code '{{referralCode}}' to subscribe to Pastime." />
-    <meta name="keywords" content="Pastime, referrals, referral, referral code, {{referralCode}}" />
+    <meta name="description" content="How many people have used referral code '{{referralCode}}' to subscribe to Pastime." />
+    <meta name="keywords" content="Pastime, referrals, referral, referral code, {{name}}, {{referralCode}}" />
     <meta name="viewport" content="width=device-width">    
     <meta property="fb:app_id" content="212373618850030" />
     <meta property="fb:admins" content="1255689239" />
-    <meta property="og:description" content="How many people used referral code '{{ referralCode }}' to subscribe to Pastime." />
+    <meta property="og:title" content="{{name}}'s Pastime referral campaign." />
+    <meta property="og:description" content="How awesome {{name}} is at getting people to subscribe to Pastime." />
     <meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.0/images/p-icon.png" />
     <meta property="og:site_name" content="Pastime" />
-    <meta property="og:title" content="Pastime" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://pastimebrevard.com/referrals/{{referralCode}}" />
@@ -40,10 +40,7 @@
       </div>
     </header>
     <div id="main" class="pagecontent">
-      <hgroup>
-        <h1>Referral Insights</h1>
-        <h2>{{referralCode}}</h2>
-      </hgroup>
+      <h1>{{name}}'s Referrals</h1>
       <nav>
         <ul>
           <li><strong>Summary</strong></li>

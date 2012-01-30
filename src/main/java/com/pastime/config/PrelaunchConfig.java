@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.pastime.prelaunch.PrelaunchController;
-import com.pastime.prelaunch.SubscriberListeners;
+import com.pastime.prelaunch.SubscriptionRepository;
 import com.pastime.prelaunch.WelcomeMailer;
 import com.pastime.prelaunch.admin.AdminInterceptor;
 import com.pastime.prelaunch.admin.ReferralsAdminController;
@@ -37,12 +37,12 @@ public class PrelaunchConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     public PrelaunchController prelaunchController() {
-        PrelaunchController controller = new PrelaunchController(jdbcTemplate);
-        SubscriberListeners listeners = new SubscriberListeners();
-        listeners.add(welcomeMailer());
-        listeners.add(referralProgram());
-        controller.setSubscriberListener(listeners);
-        return controller;
+        return new PrelaunchController(subscriptionRepository());
+    }
+
+    @Bean
+    public SubscriptionRepository subscriptionRepository() {
+        return new SubscriptionRepository(jdbcTemplate);
     }
     
     @Bean
@@ -54,7 +54,7 @@ public class PrelaunchConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     public ReferralsController referralsController() {
-        return new ReferralsController(referralProgram());
+        return new ReferralsController(referralProgram(), subscriptionRepository());
     }
 
     @Bean

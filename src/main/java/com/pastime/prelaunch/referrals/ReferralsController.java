@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.pastime.prelaunch.DefaultReferralCodeGenerator;
 import com.pastime.prelaunch.ReferralCodeGenerator;
+import com.pastime.prelaunch.SubscriptionRepository;
 
 @Controller
 @RequestMapping("/referrals")
@@ -21,26 +22,35 @@ public class ReferralsController {
     
     private final ReferralCodeGenerator codeGenerator = new DefaultReferralCodeGenerator();
     
-    public ReferralsController(ReferralProgram referralProgram) {
+    private final SubscriptionRepository subscriptionRepository;
+    
+    public ReferralsController(ReferralProgram referralProgram, SubscriptionRepository subscriptionRepository) {
         this.referralProgram = referralProgram;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     @RequestMapping(value="/{referralCode}", method=RequestMethod.GET)
     public String referralCode(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
         referralCode = cleanse(referralCode);
-        Integer total = referralProgram.getTotalReferrals(referralCode);
-        if (total == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        String name = exists(referralCode, response);
+        if (name == null) {
             return null;
         }
+        model.addAttribute("name", name);        
         model.addAttribute("referralCode", referralCode);
-        model.addAttribute("totalReferrals", total);     
+        model.addAttribute("totalReferrals", referralProgram.getTotalReferrals());  
         return "prelaunch/referrals/code-summary";
     }
 
     @RequestMapping(value="/{referralCode}/detail", method=RequestMethod.GET)
-    public String referralCodeDetail(@PathVariable String referralCode, Model model) {
-        referralCode = cleanse(referralCode);        
+    public String referralCodeDetail(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
+        referralCode = cleanse(referralCode);
+        String name = exists(referralCode, response);
+        if (name == null) {
+            return null;
+        }
+        model.addAttribute("name", name);        
+        model.addAttribute("referralCode", referralCode);
         model.addAttribute("referrals", referralProgram.getReferred(referralCode));        
         return "prelaunch/referrals/code-detail";
     }
@@ -51,6 +61,14 @@ public class ReferralsController {
             throw new IllegalArgumentException("Not valid referral code syntax");            
         }
         return referralCode;
+    }
+    
+    private String exists(String referralCode, HttpServletResponse response) throws IOException {
+        String name = subscriptionRepository.findFirstName(referralCode);
+        if (name == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+        return name;
     }
     
 }
