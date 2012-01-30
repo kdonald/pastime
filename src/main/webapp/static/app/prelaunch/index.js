@@ -1,4 +1,4 @@
-define(["jquery", "webshims", "handlebars", "text!./thanks.html", "jqueryui/dialog", "facebook"], function($, webshims, handlebars, thanksTemplate) {
+define(["jquery", "webshims", "handlebars", "text!./thanks.html", "jqueryui/dialog", "textselect", "facebook"], function($, webshims, handlebars, thanksTemplate) {
 
   webshims.setOptions({
     waitReady: false,
@@ -33,6 +33,10 @@ define(["jquery", "webshims", "handlebars", "text!./thanks.html", "jqueryui/dial
         method: "send",
         link: data.referralLink
       });        
+    });
+    thanks.find("#referralLink").on("click", function() {
+      console.log("text select");
+      $(this).textselect();
     });
     thanks.dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
   }

@@ -3,7 +3,7 @@
   <head>
     <title>Pastime - play sports together</title>
     <meta charset="utf-8" />
-    <meta name="description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play!" />
+    <meta name="description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play." />
     <meta name="keywords" content="sports, football, softball, basketball, soccer, volleyball, hockey, league, team, game, activity, performance, fun, cloud, SaaS" />
     <meta name="viewport" content="width=device-width">    
     <meta property="fb:app_id" content="212373618850030" />
@@ -15,11 +15,11 @@
     <meta property="og:type" content="website" />
     {{#referred}}
       <meta property="og:url" content="http://pastimebrevard.com?r={{referralCode}}" />
-      <meta property="og:description" content="Your friend {{ referredName }} thinks you're awesome. We do, too! Come play sports with us!" />            
+      <meta property="og:description" content="Your friend {{ referredName }} thinks you're awesome. We are, too. Come play sports with us!" />            
     {{/referred}}
     {{^referred}}
       <meta property="og:url" content="http://pastimebrevard.com" />
-      <meta property="og:description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play!" />      
+      <meta property="og:description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play." />      
     {{/referred}}
     <link rel="stylesheet" href="/static/app/0.1.0/prelaunch/index.css" />
     <link rel="stylesheet" href="/static/app/0.1.0/jqueryui-theme/standard.css" />
@@ -33,6 +33,7 @@
           "jquery": "../../libs/jquery/1.7.1/jquery",
           "jqueryui": "../../libs/jqueryui/1.8.17",
           "text": "../../libs/requirejs-text/1.0.2/text",
+          "textselect": "../../libs/textselect/1.0.0/textselect",
           "webshims": "../../libs/webshims/1.8.7/webshims"          
         },
         priority: ["common", "prelaunch/index"]

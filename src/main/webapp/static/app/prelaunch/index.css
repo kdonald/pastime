@@ -262,6 +262,7 @@
 
 #referralLink {
   color: #7d786b;
+  cursor: pointer;
   background-color: #f4f4f4;
   border: 1px solid lightGray;
   display: block;
