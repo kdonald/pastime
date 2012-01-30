@@ -1,0 +1,41 @@
+@IMPORT url("standard.css");
+
+#backdrop {
+  position: relative;
+}
+
+#sky {
+  background-color: #abe0fd;
+  height: 140px;
+}
+
+#grass {
+  background-color: #a5dc54;
+  height: 215px;
+}
+
+#foreground {
+  position: absolute;
+  top: 15px;
+  left: 60px;
+}
+
+#message {
+  position: absolute;
+  top: 20px;
+  left: 315px;
+  width: 400px;
+}
+
+#message h1 {
+  color: #fff;
+  font-size: 1.6em;
+  font-weight: 600;
+  margin: 0;
+}
+
+#message p {
+  color: #fff;
+  font-size: 1.2em;
+  margin: 0;
+}

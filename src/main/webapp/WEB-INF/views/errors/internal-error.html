@@ -15,7 +15,7 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://pastimebrevard.com" />
-    <link rel="stylesheet" href="/static/app/0.1.0/standard.css" />
+    <link rel="stylesheet" href="/static/app/0.1.0/error.css" />
     <script src="/static/modernizr-2.0.6.js"></script>    
   </head>
   <body>
@@ -29,8 +29,16 @@
         </nav>
       </div>
     </header>
-    <div id="main" class="pagecontent">
-      <h1>500</h1>
+    <div id="backdrop">
+      <div id="sky"></div>
+      <div id="grass"></div>
+      <div id="foreground">
+        <div id="message">
+          <h1>Something went wrong</h1>
+          <p>But don't worry, we're working on it. Take a timeout and check back later.</p>
+        </div>
+        <img src="/static//app/0.1.0/images/spike-error.png" alt="Spike" />
+      </div>
     </div>
     <footer class="pagecontent">
       <div class="pagecontent">
