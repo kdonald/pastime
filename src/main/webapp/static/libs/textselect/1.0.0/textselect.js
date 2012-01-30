@@ -1,21 +1,19 @@
 define(["jquery"], function($) {
 
   $.fn.textselect = function() {
-    var obj = this[0];
-    if ($.browser.msie) {
-        var range = obj.offsetParent.createTextRange();
-        range.moveToElementText(obj);
+    var doc = document;
+    var text = this[0];    
+    if (doc.body.createTextRange) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(text);
         range.select();
-    } else if ($.browser.mozilla || $.browser.opera) {
-        var selection = obj.ownerDocument.defaultView.getSelection();
-        var range = obj.ownerDocument.createRange();
-        range.selectNodeContents(obj);
+    } else if (window.getSelection) {
+        var selection = window.getSelection();        
+        var range = document.createRange();
+        range.selectNodeContents(text);
         selection.removeAllRanges();
         selection.addRange(range);
-    } else if ($.browser.safari) {
-        var selection = obj.ownerDocument.defaultView.getSelection();
-        selection.setBaseAndExtent(obj, 0, obj, 1);
-    }
+    }    
     return this;
   };
   

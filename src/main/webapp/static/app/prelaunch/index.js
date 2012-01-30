@@ -35,7 +35,6 @@ define(["jquery", "webshims", "handlebars", "text!./thanks.html", "jqueryui/dial
       });        
     });
     thanks.find("#referralLink").on("click", function() {
-      console.log("text select");
       $(this).textselect();
     });
     thanks.dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
