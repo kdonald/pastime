@@ -53,8 +53,10 @@ public class PrelaunchController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(@RequestParam(required=false) String r, Model model) {
-        if (r != null && referralCodeGenerator.meetsSyntax(r)) {
+        String firstName = findFirstName(r);
+        if (firstName != null) {
             model.addAttribute("referred", true);
+            model.addAttribute("referredName", firstName);
             model.addAttribute("referralCode", r);
         }
         return "prelaunch/index";
@@ -88,6 +90,13 @@ public class PrelaunchController {
 
     // internal helpers
 
+    private String findFirstName(String referralCode) {
+        if (referralCode == null || !referralCodeGenerator.meetsSyntax(referralCode)) {
+            return null;
+        }
+        return jdbcTemplate.queryForObject("SELECT first_name FROM prelaunch.subscriptions WHERE referral_code = ?", String.class, referralCode);
+    }
+    
     private Subscription findSubscription(String email) {
         String sql = "SELECT id, first_name, referral_code, unsubscribed FROM prelaunch.subscriptions WHERE email = ?";
         SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, email);
