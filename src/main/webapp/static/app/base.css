@@ -506,9 +506,9 @@ input[type="button"] {
   -ms-background-clip: padding-box;
   -o-background-clip: padding-box;
   background-clip: padding-box;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.90);
-  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.90);
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.90);  
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.80);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.80);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.80);  
   background-color: #6fc41d;  
   background-image: linear-gradient(top, #afd18c, #6fc41d); /* the standard */
   background-image: -moz-linear-gradient(top, #afd18c, #6fc41d); /* FF 3.6+ */
@@ -718,15 +718,6 @@ optgroup {
   font-family: Arial, "Liberation Sans", FreeSans, sans-serif;
 }
 
-input:invalid,
-button:invalid,
-select:invalid,
-textarea:invalid {
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  -o-box-shadow: none;
-  box-shadow: none;
-}
 input::-moz-focus-inner,
 button::-moz-focus-inner,
 select::-moz-focus-inner,
