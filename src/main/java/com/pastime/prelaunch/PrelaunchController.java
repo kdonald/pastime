@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,7 @@ public class PrelaunchController {
         if (referralCode == null || !referralCodeGenerator.meetsSyntax(referralCode)) {
             return null;
         }
-        return jdbcTemplate.queryForObject("SELECT first_name FROM prelaunch.subscriptions WHERE referral_code = ?", String.class, referralCode);
+        return singleResult(jdbcTemplate.query("SELECT first_name FROM prelaunch.subscriptions WHERE referral_code = ?", new SingleColumnRowMapper<String>(String.class), referralCode));
     }
     
     private Subscription findSubscription(String email) {
