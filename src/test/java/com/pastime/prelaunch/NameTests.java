@@ -10,6 +10,7 @@ public class NameTests {
     public void publicDisplayName() {
         Name name = new Name("Keith", "Donald");
         assertEquals("Keith D.", name.getPublicDisplayName());
+        assertEquals("Keith Donald", name.toString());
     }
     
 }

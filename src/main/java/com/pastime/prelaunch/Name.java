@@ -30,7 +30,7 @@ public class Name {
     }
 
     public String toString() {
-        return "[Name firstName='" + getFirstName() + "' lastName='" + getLastName() + "']";
+        return firstName + " " + lastName;
     }
 
 }
