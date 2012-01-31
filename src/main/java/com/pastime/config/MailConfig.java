@@ -13,7 +13,9 @@ public class MailConfig {
     
     @Bean
     public StringTemplateLoader templateLoader(ResourceLoader resourceLoader) {
-        return new JMustacheStringTemplateLoader(resourceLoader);
+       JMustacheStringTemplateLoader loader = new JMustacheStringTemplateLoader(resourceLoader);
+       // loader.setCache(false); // development only
+       return loader;
     }
 
     @Bean

@@ -35,6 +35,14 @@ public class WelcomeMailerTests {
         assertEquals("Welcome to Pastime", message.getSubject());
         assertTrue(((String) message.getContent()).contains("Keith"));        
         assertTrue(((String) message.getContent()).contains("123456"));
+        
+        Subscriber subscriber2 = new Subscriber("keridonald@gmail.com", new Name("Keri", "Donald"), "234567", null, new Date(1327417603859L));
+        welcomeMailer.subscriberAdded(subscriber2);
+        assertEquals(1, Mailbox.get("keridonald@gmail.com").getNewMessageCount());
+        Message message2 = Mailbox.get("keridonald@gmail.com").get(0);
+        assertEquals("Welcome to Pastime", message.getSubject());
+        assertTrue(((String) message2.getContent()).contains("Keri"));        
+        assertTrue(((String) message2.getContent()).contains("234567"));
     }
 
 }
