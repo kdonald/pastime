@@ -38,7 +38,7 @@ public class ReferralsController {
         }
         model.addAttribute("name", name);        
         model.addAttribute("referralCode", referralCode);
-        model.addAttribute("totalReferrals", referralProgram.getTotalReferrals());  
+        model.addAttribute("totalReferrals", referralProgram.getTotalReferrals(referralCode));  
         return "prelaunch/referrals/code-summary";
     }
 

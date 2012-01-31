@@ -7,6 +7,7 @@
       "jquery": "../libs/jquery/1.7.1/jquery",
       "jqueryui": "../libs/jqueryui/1.8.17",
       "text": "../libs/requirejs-text/1.0.2/text",
+      "textselect": "../libs/textselect/1.0.0/textselect",
       "webshims": "../libs/webshims/1.8.7/webshims"
     },   
     modules: [
