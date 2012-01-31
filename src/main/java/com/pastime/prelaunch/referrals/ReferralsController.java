@@ -30,7 +30,7 @@ public class ReferralsController {
     }
 
     @RequestMapping(value="/{referralCode}", method=RequestMethod.GET)
-    public String referralCode(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
+    public String summary(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
         referralCode = cleanse(referralCode);
         String name = exists(referralCode, response);
         if (name == null) {
@@ -43,7 +43,7 @@ public class ReferralsController {
     }
 
     @RequestMapping(value="/{referralCode}/detail", method=RequestMethod.GET)
-    public String referralCodeDetail(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
+    public String detail(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
         referralCode = cleanse(referralCode);
         String name = exists(referralCode, response);
         if (name == null) {
@@ -53,6 +53,19 @@ public class ReferralsController {
         model.addAttribute("referralCode", referralCode);
         model.addAttribute("referrals", referralProgram.getReferred(referralCode));        
         return "prelaunch/referrals/code-detail";
+    }
+
+    @RequestMapping(value="/{referralCode}/more", method=RequestMethod.GET)
+    public String more(@PathVariable String referralCode, Model model, HttpServletResponse response) throws IOException {
+        referralCode = cleanse(referralCode);
+        String name = exists(referralCode, response);
+        if (name == null) {
+            return null;
+        }
+        model.addAttribute("name", name);        
+        model.addAttribute("referralCode", referralCode);
+        model.addAttribute("referralLink", "http://pastimebrevard.com/?r=" + referralCode);
+        return "prelaunch/referrals/code-more";
     }
 
     private String cleanse(String referralCode) {

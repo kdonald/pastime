@@ -15,7 +15,7 @@ public final class AdminInterceptor extends HandlerInterceptorAdapter {
             if ("GET".equals(request.getMethod())) {
                 return true;
             } else if ("POST".equals(request.getMethod())) {
-                if ("i<3spike".equals(request.getParameter("password"))) {
+                if ("Spik3rulez9".equals(request.getParameter("password"))) {
                     adminCookieGenerator.addCookie(response);
                 }
                 new RedirectView("/admin", true).render(null, request, response);

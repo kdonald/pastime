@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Get More Referrals | {{ referralCode }}</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Tips you can use to get more referrals and increase your chances of winning FREE stuff." />
+    <meta name="keywords" content="Pastime, referrals, referral code, more, {{name}}, {{referralCode}}" />
+    <meta name="viewport" content="width=device-width">    
+    <meta property="fb:app_id" content="212373618850030" />
+    <meta property="fb:admins" content="1255689239" />
+    <meta property="og:title" content="{{name}}'s Pastime Referral Campaign" />
+    <meta property="og:description" content="Tips {{name}} can use to get more referrals and win FREE stuff." />
+    <meta property="og:url" content="http://pastimebrevard.com/referrals/{{referralCode}}/more" />    
+    <meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.0/images/p-icon.png" />
+    <meta property="og:site_name" content="Pastime" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="/static/app/0.1.0/prelaunch/referrals/referrals.css" />
+    <script src="/static/modernizr-2.0.6.js"></script>
+    <script type="text/javascript">   
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-28760845-1']);
+      _gaq.push(['_trackPageview']);    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();   
+    </script>         
+  </head>
+  <body>
+		<div id="fb-root"></div>
+		<script>(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) return;
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=212373618850030";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));</script>  
+    <header id="topbar">
+      <div class="pagecontent">
+        <a id="topbarLogo" href="/" title="Pastime">Pastime</a>
+        <nav>
+          <ul>
+            <li><a href="/">Home</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div id="main" class="pagecontent">
+      <h1>{{name}}'s Referrals</h1>
+      <nav>
+        <ul>
+          <li><a href="/referrals/{{referralCode}}">Summary</a></li>        
+          <li><a href="/referrals/{{referralCode}}/detail">Detail</a></li>
+          <li class="selected">Refer More</li>
+        </ul>
+      </nav>
+      <div id="content">
+		    <p>
+		      <strong>Remember:</strong> Each Brevard County resident you refer earns you a chance to win a free registration for you and your team.
+		      Get more referrals &amp; increase your odds!
+		    </p>
+		    <p>
+		      To get more referrals, simply send your friends an email or Facebook message asking them to subscribe to Pastime using your referral link.
+          You can also "Like" this page to post your referral link to your Facebook profile.
+		    </p>
+		    <p>
+		      Your Pastime referral link is:
+		      <span class="selectableText">{{referralLink}}</span>
+		    </p>
+        <div class="fb-send" data-href="{{referralLink}}"></div>		    
+        <div class="fb-like" data-href="{{referralLink}}" data-send="false" data-layout="button_count" data-show-faces="false"></div>
+      </div>
+    </div>
+    <footer>
+      <div class="pagecontent">
+        <p>&copy; 2012 Pastime Connect LLC. All rights reserved. <a href="/about">About</a>.</p>
+      </div>
+    </footer>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+      $.fn.textselect = function() {
+        var doc = document;
+        var text = this[0];    
+        if (doc.body.createTextRange) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(text);
+            range.select();
+        } else if (window.getSelection) {
+            var selection = window.getSelection();        
+            var range = document.createRange();
+            range.selectNodeContents(text);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }    
+        return this;
+      };    
+      
+      $(document).ready(function() {
+        $("span.selectableText").on("click", function() {
+          $(this).textselect();
+        });          
+      });
+    </script>    
+  </body>
+</html>

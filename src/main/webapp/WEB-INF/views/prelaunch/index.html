@@ -8,19 +8,19 @@
     <meta name="viewport" content="width=device-width">    
     <meta property="fb:app_id" content="212373618850030" />
     <meta property="fb:admins" content="1255689239" />
-    <meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.0/images/p-icon.png" />
-    <meta property="og:site_name" content="Pastime" />    
     <meta property="og:title" content="Pastime - play sports together" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:type" content="website" />
     {{#referred}}
+      <meta property="og:description" content="Your friend {{ referredName }} thinks you're awesome. We are, too. Come play sports with us!" />
       <meta property="og:url" content="http://pastimebrevard.com?r={{referralCode}}" />
-      <meta property="og:description" content="Your friend {{ referredName }} thinks you're awesome. We are, too. Come play sports with us!" />            
     {{/referred}}
     {{^referred}}
+      <meta property="og:description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play." />
       <meta property="og:url" content="http://pastimebrevard.com" />
-      <meta property="og:description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play." />      
     {{/referred}}
+    <meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.0/images/p-icon.png" />
+    <meta property="og:site_name" content="Pastime" />  
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
     <link rel="stylesheet" href="/static/app/0.1.0/prelaunch/index.css" />
     <link rel="stylesheet" href="/static/app/0.1.0/jqueryui-theme/standard.css" />
     <script src="/static/modernizr-2.0.6.js"></script>

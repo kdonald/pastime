@@ -260,24 +260,6 @@
   overflow: auto;
 }
 
-#referralLink {
-  color: #7d786b;
-  cursor: pointer;
-  background-color: #f4f4f4;
-  border: 1px solid lightGray;
-  display: block;
-  font-size: 1.2em;
-  margin-top: 4px;
-  padding: 10px;
-  text-align: center;
-  border-radius: 12px;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  background-clip: padding-box;
-  -moz-background-clip: padding;
-  -webkit-background-clip: padding-box;
-}
-
 footer {
   color: #9a9893;
   font-size: 0.8em;

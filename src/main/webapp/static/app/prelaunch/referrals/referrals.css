@@ -5,19 +5,32 @@
 }
 
 #main nav {
+  margin-top: 6px;
   float: left;
   padding-right: 10px;
 }
 
 #main nav ul li {
-  margin: 10px;
+  margin: 6px;
+  padding: 4px;
+}
+
+#main nav ul li.selected {
+  background-color: #7cc500;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;  
+  font-weight: bold;
+  color: #fff;
 }
 
 #content {
   border-left: 1px solid #ccc;
   float: left;
   margin-top: 12px;
+  min-height: 90px;
   padding-left: 25px;
+  width: 600px;
 }
 
 dl {

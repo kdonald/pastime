@@ -13,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.pastime.prelaunch.PrelaunchController;
+import com.pastime.prelaunch.SubscriberListeners;
 import com.pastime.prelaunch.SubscriptionRepository;
 import com.pastime.prelaunch.WelcomeMailer;
 import com.pastime.prelaunch.admin.AdminInterceptor;
@@ -42,7 +43,12 @@ public class PrelaunchConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public SubscriptionRepository subscriptionRepository() {
-        return new SubscriptionRepository(jdbcTemplate);
+        SubscriptionRepository repository = new SubscriptionRepository(jdbcTemplate);
+        SubscriberListeners listeners = new SubscriberListeners();
+        listeners.add(welcomeMailer());
+        listeners.add(referralProgram());
+        repository.setSubscriberListener(listeners);
+        return repository;
     }
     
     @Bean
