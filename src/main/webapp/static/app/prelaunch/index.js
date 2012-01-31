@@ -1,10 +1,10 @@
-define(["jquery", "webshims", "handlebars", "text!./thanks.html", "jqueryui/dialog", "textselect", "facebook"], function($, webshims, handlebars, thanksTemplate) {
+define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "jqueryui/dialog", "textselect", "facebook"], function($, handlebars, thanksTemplate) {
 
-  webshims.setOptions({
+  $.webshims.setOptions({
     waitReady: false,
     basePath: "/static/libs/webshims/1.8.7/shims/"
   });
-  webshims.polyfill("forms");
+  $.webshims.polyfill("forms");
   
   thanksTemplate = handlebars.compile(thanksTemplate);
   var api = createApi();
