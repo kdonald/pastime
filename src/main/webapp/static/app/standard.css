@@ -2,7 +2,7 @@
 
 .pagecontent {
   margin: auto;
-  width: 920px;  
+  width: 95%;
 }
 
 #topbar {  
@@ -40,11 +40,17 @@
 }
 
 footer {
-  clear: both;
-  width: 100%;
-  padding-top: 20px;
+  margin-top: 15px;
 }
 
 footer p {
   font-size: 0.8em;
+}
+
+@media only screen and (min-width: 480px) {
+
+  .pagecontent {
+    width: 920px;  
+  }
+
 }

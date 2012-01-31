@@ -1,18 +1,19 @@
 @IMPORT url("../../standard.css");
 
 #main { 
-  margin-top: 40px;
+  margin-top: 20px;
+  overflow: auto;
 }
 
 #main nav {
-  margin-top: 6px;
-  float: left;
-  padding-right: 10px;
+  width: 100%;
+  overflow: auto;
 }
-
+ 
 #main nav ul li {
-  margin: 6px;
+  margin-right: 6px;
   padding: 4px;
+  float: left;
 }
 
 #main nav ul li.selected {
@@ -24,19 +25,8 @@
   color: #fff;
 }
 
-#content {
-  border-left: 1px solid #ccc;
-  float: left;
-  margin-top: 12px;
-  min-height: 90px;
-  padding-left: 25px;
-  width: 600px;
-}
-
 dl {
   border: 1px solid #ccc;
-  margin: 0;
-  width: 400px;
 }
 
 dt {
@@ -57,8 +47,10 @@ dd {
 }
 
 table {
+  margin-top: 16px;
+  margin-bottom: 16px;
   border: 1px solid #ccc;
-  width: 600px;
+  width: 100%;
 }
 
 th {
@@ -84,3 +76,42 @@ tr:nth-child(2n+1) {
 td+td {
   border-left: 1px solid #CCC;
 }
+
+@media only screen and (min-width: 480px) {
+
+  #main nav {
+    float: left;
+    margin-top: 6px;
+    padding-right: 10px;
+    width: 104px;     
+  }
+  
+  #main nav ul li {
+    float: none;
+    margin: 6px;
+  }
+  
+  #content {
+    clear: none;
+    border-left: 1px solid #ccc;
+    float: left;
+    margin-top: 12px;
+    min-height: 290px;    
+    padding-left: 25px;
+    width: 600px;
+  }
+  
+  p {
+    margin-top: 0;
+  }
+  
+  dl {
+    margin: 0;
+  }
+  
+  table {
+    margin: 0;
+  }
+
+}
+
