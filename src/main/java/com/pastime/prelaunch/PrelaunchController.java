@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,7 +46,10 @@ public class PrelaunchController {
     }
 
     @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
-    public String unsubscribe(@Valid UnsubscribeForm form) {
+    public String unsubscribe(@Valid UnsubscribeForm form, BindingResult result) {
+        if (result.hasErrors()) {
+            return "prelaunch/unsubscribe";
+        }
         subscriptionRepository.unsubscribe(form.getEmail());
         return "redirect:/";
     }
