@@ -1,4 +1,4 @@
-package com.pastime.prelaunch;
+package com.pastime.prelaunch.referrals;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

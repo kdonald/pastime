@@ -10,7 +10,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class SubscriptionTestsConfig {
+public class SubscriptionRepositoryTestsConfig {
     
     @Bean
     public DataSource dataSource() {

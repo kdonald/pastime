@@ -44,19 +44,6 @@ public class SubscriptionRepository {
         return singleResult(jdbcTemplate.query("SELECT first_name FROM prelaunch.subscriptions WHERE referral_code = ?", new SingleColumnRowMapper<String>(String.class), referralCode));
     }
     
-    public Subscription findSubscription(String email) {
-        String sql = "SELECT id, first_name, referral_code, unsubscribed FROM prelaunch.subscriptions WHERE email = ?";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, email);
-        if (!rs.first()) {
-            return null;
-        }
-        boolean unsubscribed = rs.getBoolean("unsubscribed");
-        if (unsubscribed) {
-            jdbcTemplate.update("UPDATE prelaunch.subscriptions SET unsubscribed = false WHERE id  = ?", rs.getInt("id"));
-        }
-        return new Subscription(rs.getString("first_name"), referralLink(rs.getString("referral_code")));
-    }
-
     @Transactional
     public Subscription subscribe(SubscribeForm form) {
         Subscription subscription = findSubscription(form.getEmail());
@@ -77,7 +64,22 @@ public class SubscriptionRepository {
     public void unsubscribe(String email) {
         jdbcTemplate.update("UPDATE prelaunch.subscriptions SET unsubscribed = true WHERE email = ?", email);        
     }
+
+    // internal helpers
     
+    private Subscription findSubscription(String email) {
+        String sql = "SELECT id, first_name, referral_code, unsubscribed FROM prelaunch.subscriptions WHERE email = ?";
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, email);
+        if (!rs.first()) {
+            return null;
+        }
+        boolean unsubscribed = rs.getBoolean("unsubscribed");
+        if (unsubscribed) {
+            jdbcTemplate.update("UPDATE prelaunch.subscriptions SET unsubscribed = false WHERE id  = ?", rs.getInt("id"));
+        }
+        return new Subscription(rs.getString("first_name"), referralLink(rs.getString("referral_code")));
+    }
+
     private ReferredBy findReferredBy(String r) {
         if (!StringUtils.hasText(r)) {
             return null;
