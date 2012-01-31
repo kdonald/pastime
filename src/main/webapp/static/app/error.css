@@ -6,27 +6,20 @@
 
 #sky {
   background-color: #abe0fd;
-  height: 140px;
+  height: 160px;
 }
 
 #grass {
   background-color: #a5dc54;
-  height: 215px;
+  height: 300px;
 }
 
 #foreground {
   position: absolute;
-  top: 15px;
-  left: 60px;
+  top: 5px;
+  left: 5px;
 }
-
-#message {
-  position: absolute;
-  top: 20px;
-  left: 315px;
-  width: 400px;
-}
-
+  
 #message h1 {
   color: #fff;
   font-size: 1.6em;
@@ -38,4 +31,32 @@
   color: #fff;
   font-size: 1.2em;
   margin: 0;
+}
+
+@media only screen and (min-width: 480px) {
+
+  #sky {
+    height: 140px;
+  }
+
+  #grass {
+    height: 215px;
+  }
+  
+  #foreground {
+    position: absolute;
+    top: 15px;
+    left: 60px;
+  }
+  
+  #message {
+    position: absolute;
+    top: 20px;
+    left: 315px;
+  }
+  
+  #message {
+    width: 400px;
+  }
+  
 }
