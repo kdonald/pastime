@@ -92,11 +92,10 @@ td+td {
   }
   
   #content {
-    clear: none;
     border-left: 1px solid #ccc;
     float: left;
     margin-top: 12px;
-    min-height: 290px;    
+    height: 600px;    
     padding-left: 25px;
     width: 600px;
   }
