@@ -1,10 +1,11 @@
-define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "jqueryui/dialog", "textselect", "facebook"], function($, handlebars, thanksTemplate) {
+define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect", "facebook"], function($, handlebars, thanksTemplate) {
 
+  $.webshims.debug = false;
   $.webshims.setOptions({
     waitReady: false,
     basePath: "/static/libs/webshims/1.8.7/shims/"
   });
-  $.webshims.polyfill("forms");
+  $.webshims.polyfill();
   
   thanksTemplate = handlebars.compile(thanksTemplate);
   var api = createApi();
@@ -16,6 +17,7 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "jqueryui/di
       xhr.done(showSubscribedDialog);
       return false;
     });
+    $("#subscribe form button").removeAttr("disabled");    
   });
 
   function createApi() {
@@ -28,16 +30,16 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "jqueryui/di
   
   function showSubscribedDialog(data) {
     var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink })); 
-    thanks.find("a.fb-send-button").on("click", function() {
-      FB.ui({
-        method: "send",
-        link: data.referralLink
-      });        
-    });
     thanks.find("span.selectableText").on("click", function() {
       $(this).textselect();
     });
-    thanks.dialog({ title: "You're Subscribed!", modal: true, height: 450, width: 450 });
+    var result = $("#subscribeResult");
+    thanks.find("#thanksTitleBar span").on("click", function() {
+      result.fadeOut(500);
+    });
+    result.html(thanks);    
+    result.fadeIn(500);
+    FB.XFBML.parse(document.getElementById("thanks"));    
   }
   
 });

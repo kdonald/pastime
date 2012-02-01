@@ -38,7 +38,7 @@ public class SubscribeForm {
     }
     
     public void setEmail(String email) {
-        this.email = email.trim();
+        this.email = email.trim().toLowerCase();
     }
 
     public String getR() {

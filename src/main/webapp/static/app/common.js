@@ -1,3 +1,3 @@
-define(["jquery", "polyfiller", "text", "handlebars", "jqueryui/dialog", "textselect"], function() {
+define(["jquery", "polyfiller", "text", "handlebars"], function() {
   
 });
