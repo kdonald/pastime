@@ -2,6 +2,7 @@ package com.pastime.prelaunch;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.util.StringUtils;
 
 public class SubscribeForm {
     
@@ -22,7 +23,7 @@ public class SubscribeForm {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName.trim();
+        this.firstName = StringUtils.capitalize(firstName.trim());
     }
 
     public String getLastName() {
@@ -30,7 +31,7 @@ public class SubscribeForm {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName.trim();
+        this.lastName = StringUtils.capitalize(lastName.trim());
     }
 
     public String getEmail() {

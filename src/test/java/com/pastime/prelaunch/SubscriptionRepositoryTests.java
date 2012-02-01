@@ -177,9 +177,9 @@ public class SubscriptionRepositoryTests {
     public void subscribeReferredByCaseInsensitive() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         SubscribeForm form = new SubscribeForm();
-        form.setFirstName("Keith");
-        form.setLastName("Donald");
-        form.setEmail("keith.donald@gmail.com");
+        form.setFirstName("keith");
+        form.setLastName("donald");
+        form.setEmail("keitH.donald@gmail.com");
         Mockito.when(referralCodeGenerator.generateKey()).thenReturn("a3c2b5");        
         Subscription subscription = controller.subscribe(form);
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "a3c2b5", null, new Date()));
@@ -189,9 +189,9 @@ public class SubscriptionRepositoryTests {
 
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keridonald@gmail.com')", Boolean.class));
         form = new SubscribeForm();
-        form.setFirstName("Keri");
-        form.setLastName("Donald");
-        form.setEmail("keridonald@gmail.com");
+        form.setFirstName("keri");
+        form.setLastName("donald");
+        form.setEmail("keriDONALD@gmaIL.com");
         form.setR("A3c2B5");
         Mockito.when(referralCodeGenerator.generateKey()).thenReturn("234567");
         controller.setSubscriberListener(new SubscriberListener() {
