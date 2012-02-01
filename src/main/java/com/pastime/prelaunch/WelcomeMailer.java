@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,8 +30,8 @@ public class WelcomeMailer implements SubscriberListener {
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper welcome = new MimeMessageHelper(message);
-               welcome.setFrom("Keith Donald <keith@pastimebrevard.com>");
-               welcome.setTo(subscriber.getName() + "<" + subscriber.getEmail() + ">");
+               welcome.setFrom(new InternetAddress("keith@pastimebrevard.com", "Keith Donald"));
+               welcome.setTo(new InternetAddress(subscriber.getEmail(), subscriber.getName().toString()));
                welcome.setSubject("Welcome to Pastime");
                Map<String, Object> model = new HashMap<String, Object>(2, 1);
                model.put("firstName", subscriber.getName().getFirstName());
