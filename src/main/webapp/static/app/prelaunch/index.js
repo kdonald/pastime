@@ -3,9 +3,12 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect"
   $.webshims.debug = false;
   $.webshims.setOptions({
     waitReady: false,
-    basePath: "/static/libs/webshims/1.8.7/shims/"
+    basePath: "/static/libs/webshims/1.8.7/shims/",
+    forms: {
+      customMessages: true
+    }      
   });
-  $.webshims.polyfill();
+  $.webshims.polyfill("forms");
   
   thanksTemplate = handlebars.compile(thanksTemplate);
   var api = createApi();
