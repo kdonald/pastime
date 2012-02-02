@@ -7,7 +7,7 @@ GRANT USAGE ON SCHEMA prelaunch TO pastime;
 CREATE TABLE prelaunch.subscriptions (id serial CONSTRAINT pk_subscriptions PRIMARY KEY,
   email varchar(320) NOT NULL UNIQUE,
   first_name varchar(64) NOT NULL, 
-  last_name varchar(64),
+  last_name varchar(64) NOT NULL,
   referral_code char(6) NOT NULL UNIQUE,
   referred_by integer,
   created timestamp NOT NULL CONSTRAINT df_subscriptions_created DEFAULT now(),
