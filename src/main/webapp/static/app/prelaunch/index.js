@@ -1,4 +1,4 @@
-define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect", "facebook"], function($, handlebars, thanksTemplate) {
+define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect"], function($, handlebars, thanksTemplate) {
 
   $.webshims.debug = false;
   $.webshims.setOptions({
@@ -42,7 +42,9 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect"
     });
     result.html(thanks);    
     result.fadeIn(500);
-    FB.XFBML.parse(document.getElementById("thanks"));    
+    if (FB) {
+      FB.XFBML.parse(document.getElementById("thanks"));      
+    }
   }
   
 });
