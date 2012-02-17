@@ -3,7 +3,7 @@
 #card {
   background-color: #ffffff;
   border: none;
-  margin: 80px auto 0 auto;
+  margin: 60px auto 0 auto;
   position: relative;
   width: 980px;
 }
@@ -139,7 +139,7 @@
 
 #learn {
   overflow: hidden;
-  margin-bottom: 25px;
+  padding-bottom: 32px;
 }
 
 #learn h2 {
@@ -154,7 +154,7 @@
   border-right: 1px solid #5582ab;
   float: left;
   padding-right: 15px;
-  width: 175px;
+  width: 178px;
 }
 
 #formTeams {
@@ -162,13 +162,13 @@
   float: left;
   padding-left: 20px;
   padding-right: 15px;
-  width: 175px;
+  width: 177px;
 }
 
 #play {
   float: left;
   padding-left: 20px;
-  width: 175px;
+  width: 177px;
 }
 
 #comingSoon {
@@ -192,7 +192,7 @@
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   padding: 20px 90px 20px 20px;
-  width: 190px;
+  width: 195px;
 }
 
 #banner p {
@@ -208,15 +208,18 @@
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   margin-top: 20px;
-  padding: 20px;
-  width: 260px;
+  padding: 15px 20px 15px 20px;
+  width: 265px;
 }
 
 #subscribe p {
-  color: #15c5e4;
-  font-size: 1.2em;
-  margin: 0 0 8px 0;
   text-align: center;
+}
+
+#subscribe form > p:first-child {
+  color: #15c5e4;
+  font-size: 1.3em;
+  margin: 0 0 8px 0;
 }
 
 #firstName {
@@ -225,17 +228,24 @@
 
 #lastName {
   margin-left: 6px;
-  width: 157px;
+  width: 162px;
 }
 
 #email {
   margin-top: 8px;
-  width: 260px;
+  width: 265px;
 }
 
 #subscribe button {
   margin-top: 8px;
-  width: 260px;
+  width: 265px;
+}
+
+#subscribe aside p {
+  color: #777;
+  font-size: 0.6em;
+  line-height: 1.0em;
+  margin-bottom: 0;
 }
 
 #subscribeResult {
