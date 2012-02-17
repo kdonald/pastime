@@ -3,7 +3,7 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect"
   $.webshims.debug = false;
   $.webshims.setOptions({
     waitReady: false,
-    basePath: "/static/libs/webshims/1.8.8/shims/",
+    basePath: "/static/libs/webshims/1.8.8/shims/"   
   });
   $.webshims.polyfill("forms");
   
