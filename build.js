@@ -7,7 +7,7 @@
       "jquery": "../libs/jquery/1.7.1/jquery",
       "text": "../libs/requirejs-text/1.0.2/text",
       "textselect": "../libs/textselect/1.0.0/textselect",
-      "polyfiller": "../libs/webshims/1.8.7/polyfiller"
+      "polyfiller": "../libs/webshims/1.8.8/polyfiller"
     },   
     modules: [
         {
