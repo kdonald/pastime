@@ -2,12 +2,12 @@ package com.pastime.next;
 
 import java.util.Date;
 
+import javax.validation.Valid;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class NextController {
@@ -20,14 +20,23 @@ public class NextController {
 
     // http://pastimebrevard.com/hitmen/attendance/og-hitman?a=yes
     @RequestMapping(value="/{team}/attendance/{player}", method=RequestMethod.GET, params="a")
-    public void markAttendance(@PathVariable String team, @PathVariable String player, @RequestParam boolean a) {
-        jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team = ? and player = ?", a, new Date(), team, player);
+    public void markAttendanceForGames(@Valid AttendanceUpdate update) {
+        applyUpdate(update);
     }
 
     // http://pastimebrevard.com/hitmen/attendance/1/og-hitman?a=yes
     @RequestMapping(value="/{team}/attendance/{game}/{player}", method=RequestMethod.GET, params="a")
-    public void markAttendance(@PathVariable String team, @PathVariable int game, @PathVariable String player, @RequestParam boolean a) {
-        jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team = ? and game = ? and player = ?", a, new Date(), team, game, player);        
+    public void markAttendanceForGame(@Valid AttendanceUpdate update) {
+        applyUpdate(update);
+    }
+    
+    private void applyUpdate(AttendanceUpdate update) {
+        Date now = new Date();
+        if (update.getGame() != null) {
+            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team = ? and game = ? and player = ?", update.getA(), now, update.getTeam(), update.getGame(), update.getPlayer());
+        } else {
+            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team = ? and player = ?", update.getA(), now, update.getTeam(), update.getPlayer());            
+        }
     }
     
 }
