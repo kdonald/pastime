@@ -1,7 +1,5 @@
 package com.pastime.config;
 
-import java.util.Properties;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -24,6 +22,7 @@ public class MailConfig {
     public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setDefaultEncoding("UTF-8");
+        /* // development only
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
         mailSender.setUsername("keith@pastimeconnect.com");
@@ -32,6 +31,7 @@ public class MailConfig {
         properties.put("mail.smtp.auth", true);
         properties.put("mail.smtp.starttls.enable", true);
         mailSender.setJavaMailProperties(properties);
+        */        
         return mailSender;
     }
 
