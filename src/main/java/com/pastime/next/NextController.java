@@ -16,10 +16,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Controller;
 import org.springframework.templating.StringTemplateLoader;
+import org.springframework.ui.Model;
 import org.springframework.util.SlugUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class NextController {
@@ -38,18 +40,18 @@ public class NextController {
 
     // http://pastimebrevard.com/hitmen/attendance/og-hitman?a=yes
     @RequestMapping(value="/{team}/attendance/{player}", method=RequestMethod.GET, params="a")
-    public void markAttendanceForGames(@Valid AttendanceUpdate update) {
-        applyUpdate(update);
+    public String markAttendanceForGames(@Valid AttendanceUpdate update, Model model) {
+        return applyUpdate(update, model);
     }
 
     // http://pastimebrevard.com/hitmen/attendance/1/og-hitman?a=yes
     @RequestMapping(value="/{team}/attendance/{game}/{player}", method=RequestMethod.GET, params="a")
-    public void markAttendanceForGame(@Valid AttendanceUpdate update) {
-        applyUpdate(update);
+    public String markAttendanceForGame(@Valid AttendanceUpdate update, Model model) {
+        return applyUpdate(update, model);
     }
     
     @RequestMapping(value="/admin/next", method=RequestMethod.POST)
-    public void processNextGames(@RequestParam String team) {
+    public @ResponseBody String processNextGames(@RequestParam String team) {
         final String teamSlug = SlugUtils.toSlug(team);
         final Map<String, Object> nextGame = jdbcTemplate.queryForMap("SELECT number, start_time, opponent, game FROM next.games WHERE team_slug = ? ORDER BY number", teamSlug);
         Long game = (Long) nextGame.get("game");
@@ -74,15 +76,19 @@ public class NextController {
              };        
             mailSender.send(preparator);            
         }
+        return "success";
     }
     
-    private void applyUpdate(AttendanceUpdate update) {
+    private String applyUpdate(AttendanceUpdate update, Model model) {
         Date now = new Date();
         if (update.getGame() != null) {
-            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team_slug = ? and game = ? and registered_player_slug = ?", update.getA(), now, update.getTeam(), update.getGame(), update.getPlayer());
+            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team_slug = ? AND game = ? and registered_player_slug = ?", update.getA(), now, update.getTeam(), update.getGame(), update.getPlayer());
         } else {
-            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team_slug = ? and registered_player_slug = ?", update.getA(), now, update.getTeam(), update.getPlayer());            
+            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team_slug = ? AND registered_player_slug = ?", update.getA(), now, update.getTeam(), update.getPlayer());            
         }
+        model.addAttribute("attending", update.getA());
+        model.addAttribute("name", jdbcTemplate.queryForObject("SELECT name FROM next.game_attendance where team_slug = ? AND game = 1 AND registered_player_slug = ?", String.class, update.getTeam(), update.getPlayer()));
+        return "next/attendance-confirmation";        
     }
     
 }

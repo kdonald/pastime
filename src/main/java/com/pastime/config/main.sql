@@ -95,3 +95,6 @@ CREATE TABLE games (id bigserial CONSTRAINT pk_games PRIMARY KEY,
   CONSTRAINT fk_games_registered_team FOREIGN KEY (registered_team) REFERENCES registered_teams(id),
   CONSTRAINT fk_games_opponent FOREIGN KEY (opponent) REFERENCES registered_teams(id)  
 );
+
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO pastime;
+GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO pastime;

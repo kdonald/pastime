@@ -55,7 +55,7 @@ INSERT INTO registered_players (registered_team, player, number, nickname) value
 
 INSERT INTO games (registered_team, number, opponent, start_time) values (1, 1, 2, '2012/12/22 7:45:00-05:00');
 
-INSERT INTO next.games (team_slug, number, start_time, opponent, game) values ('hitmen', 1, '2012/12/22 7:45:00-05:00', 'Mergers & Acquisitions', 1);
+INSERT INTO next.games (team_slug, number, start_time, opponent, game) values ('hitmen', 1, '2012/12/22 19:45:00-05:00', 'Mergers & Acquisitions', 1);
 
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1,'donald', 'Keith', 1);
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'og-hitman', 'OG Hitman', 2);
