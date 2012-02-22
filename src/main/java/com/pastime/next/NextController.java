@@ -33,9 +33,9 @@ public class NextController {
     private void applyUpdate(AttendanceUpdate update) {
         Date now = new Date();
         if (update.getGame() != null) {
-            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team = ? and game = ? and player = ?", update.getA(), now, update.getTeam(), update.getGame(), update.getPlayer());
+            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team_slug = ? and game = ? and registered_player_slug = ?", update.getA(), now, update.getTeam(), update.getGame(), update.getPlayer());
         } else {
-            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team = ? and player = ?", update.getA(), now, update.getTeam(), update.getPlayer());            
+            jdbcTemplate.update("UPDATE next.game_attendance SET attending = ?, update_time = ? WHERE team_slug = ? and registered_player_slug = ?", update.getA(), now, update.getTeam(), update.getPlayer());            
         }
     }
     
