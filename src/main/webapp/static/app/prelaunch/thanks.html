@@ -6,20 +6,19 @@
   <div id="thanksContent">
     <h1>Thanks {{name}}!</h1>
     <p>We'll let you know as soon as Pastime is ready for you.</p>
-    <section id="referalls">
+    <section id="invite">
       <h2>Invite your friends</h2>
       <p>
-        Know others you'd like to play sports with? Invite them to join Pastime!
-        Each referral you make earns you a chance to win a free registration in a local sports league of your choice.
+        Know others you'd like to play sports with? Send them a Facebook message inviting them to join Pastime.
+        You could win a free registration in a league of your choice:
       </p>
+      <div id="send">
+        <fb:send id="sendButton" href="{{referralLink}}"></fb:send>    
+      </div>
       <p>
-        Simply send your friends an email or Facebook message inviting them to join using your referral link.
+        Not on Facebook? Copy your referral link into an email:
       </p>
-      <p>
-        Your referral link is:
-        <span class="selectableText">{{referralLink}}</span>
-      </p>
-      <fb:send id="sendButton" href="{{referralLink}}"></fb:send>    
-    </section>  
+      <div id="referralLink" class="selectableText">{{referralLink}}</div>
+    </section>
   </div>
 </div>

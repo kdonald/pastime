@@ -17,17 +17,17 @@
 <meta property="og:description" content="We make it easy to get out and play the sports you love. Discover leagues, form teams, and play." />
 <meta property="og:url" content="http://pastimebrevard.com" />
 {{/referred}}
-<meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.1/images/p-icon.png" />
+<meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.2/images/p-icon.png" />
 <meta property="og:site_name" content="Pastime" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:type" content="website" />
-<link rel="stylesheet" href="/static/app/0.1.1/prelaunch/index.css" />
+<link rel="stylesheet" href="/static/app/0.1.2/prelaunch/index.css" />
 <script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
 <script src="/static/modernizr-2.5.2.js"></script>
 <script src="/static/require-1.0.4.js"></script>
 <script>
   require.config({
-    baseUrl : "/static/app/0.1.1",
+    baseUrl : "/static/app/0.1.2",
     paths : {
       "handlebars" : "../../libs/handlebars/1.0.0.beta6/handlebars",
       "jquery" : "../../libs/jquery/1.7.1/jquery",
@@ -126,8 +126,7 @@
           <h2>Play</h2>
           <p>
             Ready to play?
-            We get you signed up on-line in seconds.
-            Our sponsors help save you money.
+            Register on-line, get schedules and reminders, and show off your results.
             It's never been easier to play real sports.
           </p>
         </section>
@@ -150,7 +149,7 @@
         </form>
       </div>
     </div>
-    <div id="subscribeResult"></div>
+    <div id="subscribeResult" style="display:none;"></div>
   </div>
   <footer>
     <p>
@@ -162,5 +161,6 @@
       <a class="mail" target="_blank" href="mailto:keith@pastimebrevard.com">Mail</a>
     </div>
   </footer>
+  <div id="modalOverlay" style="display:none;"></div>  
 </body>
 </html>

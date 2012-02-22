@@ -17,10 +17,12 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect"
     var subscribeForm = $("#subscribe form");
     subscribeForm.on("submit", function() {
       var xhr = api.subscribe(subscribeForm);
-      xhr.done(showSubscribedDialog);
+      xhr.done(function(data) {
+        showSubscribedDialog(subscribeForm, data);
+      });
       return false;
     });
-    $("#subscribe form button").removeAttr("disabled");    
+    subscribeForm.find("button").removeAttr("disabled");    
   });
 
   function createApi() {
@@ -31,20 +33,24 @@ define(["jquery", "handlebars", "text!./thanks.html", "polyfiller", "textselect"
     };
   }
   
-  function showSubscribedDialog(data) {
+  function showSubscribedDialog(subscribeForm, data) {
+    var modalOverlay = $("#modalOverlay");
     var thanks = $(thanksTemplate({ name: data.firstName, referralLink: data.referralLink })); 
-    thanks.find("span.selectableText").on("click", function() {
+    thanks.find("div.selectableText").on("click", function() {
       $(this).textselect();
     });
     var result = $("#subscribeResult");
     thanks.find("#thanksTitleBar span").on("click", function() {
+      modalOverlay.fadeOut(500);      
       result.fadeOut(500);
+      subscribeForm[0].reset();
     });
-    result.html(thanks);    
-    result.fadeIn(500);
+    result.html(thanks);
     if (FB) {
       FB.XFBML.parse(document.getElementById("thanks"));      
     }
+    modalOverlay.fadeIn(500);
+    result.fadeIn(500);    
   }
   
 });

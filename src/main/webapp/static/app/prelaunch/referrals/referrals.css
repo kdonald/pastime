@@ -77,6 +77,12 @@ td+td {
   border-left: 1px solid #CCC;
 }
 
+#referralLink {
+  color: #908a7f;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
 @media only screen and (min-width: 480px) {
 
   #main nav {

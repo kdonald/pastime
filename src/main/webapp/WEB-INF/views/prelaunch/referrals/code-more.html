@@ -11,11 +11,11 @@
     <meta property="og:title" content="{{name}}'s Pastime Referral Campaign" />
     <meta property="og:description" content="Tips {{name}} can use to get more referrals and win FREE stuff." />
     <meta property="og:url" content="http://pastimebrevard.com/referrals/{{referralCode}}/more" />    
-    <meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.1/images/p-icon.png" />
+    <meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.2/images/p-icon.png" />
     <meta property="og:site_name" content="Pastime" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
-    <link rel="stylesheet" href="/static/app/0.1.1/prelaunch/referrals/referrals.css" />
+    <link rel="stylesheet" href="/static/app/0.1.2/prelaunch/referrals/referrals.css" />
     <script src="/static/modernizr-2.5.2.js"></script>
     <script type="text/javascript">   
       var _gaq = _gaq || [];
@@ -67,8 +67,8 @@
 		    </p>
 		    <p>
 		      Your Pastime referral link is:
-		      <span class="selectableText">{{referralLink}}</span>
 		    </p>
+        <div id="referralLink" class="selectableText">{{referralLink}}</div>
 		    <div id="social">
 		      <div class="fb-send" data-href="{{referralLink}}"></div>        
 		      <div class="fb-like" data-href="{{referralLink}}" data-send="false" data-layout="button_count" data-show-faces="false"></div>
@@ -100,7 +100,7 @@
       };    
       
       $(document).ready(function() {
-        $("span.selectableText").on("click", function() {
+        $("div.selectableText").on("click", function() {
           $(this).textselect();
         });          
       });
