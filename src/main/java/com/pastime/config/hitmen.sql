@@ -59,8 +59,8 @@ INSERT INTO next.games (team_slug, number, start_time, opponent, game) values ('
 
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1,'donald', 'Keith', 1);
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'og-hitman', 'OG Hitman', 2);
-INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'barefoot', 'Barefoot', 3);
-INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'fish', 'Fish', 4);
+INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'fish', 'Fish', 3);
+INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'barefoot', 'Barefoot', 4);
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'puma', 'Puma', 5);
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'dubya', 'Dubya', 6);
 INSERT INTO next.game_attendance (team_slug, game, registered_player_slug, name, player) values ('hitmen', 1, 'petrone', 'Joe', 7);
