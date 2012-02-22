@@ -8,8 +8,8 @@ INSERT INTO players (email, first_name, last_name, number, nickname, referral_co
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('jasona.berry@regions.com', 'Jason', 'Berry', 11, null, '4eys8c', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('431larochelle@gmail.com', 'Neil', 'Larochelle', 4, null, 'dxd6sn', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('nunez.aldo@yahoo.com', 'Aldo', 'Nunez', 13, 'Abdoolish', 'zuvx2d', null);
-INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('slickp32@gmail.com', 'Dale', 'P.', 22, 'Slick P', 'jrbji2', null);
-INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('keith.donald@gmail.com', 'Dez', 'J.', 23, 'Game Changer', 'zrxmvn', null);
+INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('slickp32@gmail.com', 'Dale', 'Haines', 22, 'Slick P', 'jrbji2', null);
+INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('keith.donald@gmail.com', 'Dez', 'Carver', 23, 'Game Changer', 'zrxmvn', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('stomko@harris.com', 'Steve', 'Tomko', 99, null, 'clnyz5', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('dmurra05@harris.com', 'Dave', 'Murray', 7, null, 'wrg8co', null);
 
