@@ -139,7 +139,7 @@
 
 #learn {
   overflow: hidden;
-  padding-bottom: 32px;
+  padding-bottom: 18px;
 }
 
 #learn h2 {
@@ -246,7 +246,7 @@
   color: #777;
   font-size: 0.6em;
   line-height: 1.0em;
-  margin-bottom: 0;
+  margin-bottom: 4px;
 }
 
 #subscribeResult {
