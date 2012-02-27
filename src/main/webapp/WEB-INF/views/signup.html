@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:fb="http://ogp.me/ns/fb#" class="no-js" lang="en">
+<head>
+<title>Pastime - Sign Up</title>
+<meta charset="utf-8" />
+<meta name="description" content="Come play sports with us." />
+<meta name="keywords" content="pastime, signup, login, join, account" />
+<meta name="viewport" content="width=device-width">
+<meta property="fb:app_id" content="212373618850030" />
+<meta property="fb:admins" content="1255689239" />
+<meta property="og:title" content="Pastime - Sign Up" />
+{{#referred}}
+<meta property="og:description" content="{{ referredName }} wants to play sports with you. Join us at Pastime!" />
+<meta property="og:url" content="http://pastimebrevard.com/signup?r={{referralCode}}" />
+{{/referred}}
+{{^referred}}
+<meta property="og:description" content="Come play sports with us." />
+<meta property="og:url" content="http://pastimebrevard.com/signup" />
+{{/referred}}
+<meta property="og:image" content="http://pastimebrevard.com/static/app/0.1.2/images/p-icon.png" />
+<meta property="og:site_name" content="Pastime" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="website" />
+<link rel="stylesheet" href="/static/app/0.1.2/signup.css" />
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+<script src="/static/modernizr-2.5.2.js"></script>
+<script src="/static/require-1.0.4.js"></script>
+<script>
+  require.config({
+    baseUrl : "/static/app/0.1.2",
+    paths : {
+      "handlebars" : "../../libs/handlebars/1.0.0.beta6/handlebars",
+      "jquery" : "../../libs/jquery/1.7.1/jquery",
+      "text" : "../../libs/requirejs-text/1.0.2/text",
+      "textselect" : "../../libs/textselect/1.0.0/textselect",
+      "polyfiller" : "../../libs/webshims/1.8.7/polyfiller"
+    },
+    priority : [ "common", "prelaunch/index" ]
+  });
+</script>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push([ '_setAccount', 'UA-28760845-1' ]);
+  _gaq.push([ '_trackPageview' ]);
+  (function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+</head>
+<body>
+  <div id="main-no-js">
+    <p>JavaScript must be enabled to use this site. Please enable JavaScript in your browser and refresh the page.</p>
+  </div>
+  <header id="topbar">
+    <div class="pagecontent">
+      <a id="topbarLogo" href="/" title="Pastime">Pastime</a>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div id="main" class="pagecontent">
+    <form id="signup" action="/signup" method="post">
+      <h1>Sign Up</h1>
+      <fieldset>
+        <legend><strong>Name</strong></legend>
+        <input id="firstname" type="text" name="firstName" placeholder="First" required />
+        <input id="lastname" type="text" name="firstName" placeholder="Last" required class="last" />    
+      </fieldset>
+      <label>
+        <strong>Email</strong>
+        <input type="email" name="email" required placeholder="you@address" />    
+      </label>
+      <label>
+        <strong>Password</strong>
+        <input type="password" name="password" placeholder="at least 6 characters" required />    
+      </label>
+      <fieldset>
+        <legend>
+          <strong>Birthday</strong> <a href="#why-birthday">Why?</a>
+        </legend>
+        <select id="month" name="month">
+          <option value="" disabled="disabled">Month</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+        <input id="day" type="text" name="day" placeholder="Day" required pattern="[0-9][0-9]" title="two digit day" required size="2" />
+        <input id="year" type="text" name="year" placeholder="Year" required pattern="[0-9][0-9][0-9][0-9]" title="four digit year" size="4" class="last" />          
+      </fieldset>
+      <label>
+        <strong>Gender</strong> <a href="#why-gender">Why?</a>
+        <select name="gender">
+          <option value="" disabled="disabled">I am...</option>
+          <option value="m">Male</option>
+          <option value="f">Female</option>            
+        </select>
+      </label>
+      <label>
+        <strong>ZIP Code</strong> <a href="#why-zipcode">Why?</a>
+        <input type="text" name="zipcode" placeholder="5 digits" required pattern="[0-9]{5}" title="five digit ZIP code" size="5" />        
+      </label>
+      <button>Sign Up</button>
+    </form>  
+  </div>  
+  <footer>
+    <div class="pagecontent">
+      <p>&copy; 2012 Pastime. All rights reserved. <a href="/about">About</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -32,7 +32,7 @@ public class WebConfig extends BaseWebConfig {
     @Bean
     public ViewResolver viewResolver(ResourceLoader resourceLoader) {
         JMustacheViewResolver resolver = new JMustacheViewResolver(resourceLoader);
-        // resolver.setCache(false); // development only
+        resolver.setCache(false); // development only
         return resolver;
     }
     
@@ -47,7 +47,8 @@ public class WebConfig extends BaseWebConfig {
     protected void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/errors/bad-request");
         registry.addViewController("/errors/resource-not-found");
-        registry.addViewController("/errors/internal-error");        
+        registry.addViewController("/errors/internal-error");    
+        registry.addViewController("/signup");
         super.addViewControllers(registry);
     }
 

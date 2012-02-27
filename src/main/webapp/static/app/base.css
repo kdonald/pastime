@@ -539,7 +539,7 @@ input[type="button"] {
   font: bold 12px/1.3 "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
   outline: 0;
   overflow: visible;
-  margin: 0;
+  /* EDIT: not needed since our reset takes care of this - margin: 0; */
   padding: 3px 10px;
   text-shadow: white 0 1px 1px;
   vertical-align: top;
@@ -622,7 +622,7 @@ input[type="week"] {
   border-color: #848484 #c1c1c1 #e1e1e1;
   color: black;
   outline: 0;
-  margin: 0;
+  /* EDIT: not needed since our reset takes care of this - margin: 0; */
   padding: 2px 3px;
   text-align: left;
   font-size: 13px;
@@ -707,7 +707,7 @@ select[size="1"] {
   select,
   select[size="0"],
   select[size="1"] {
-    background-image: url('../images/select_arrow.gif?1298351050');
+    background-image: url('../0.1.2/images/select_arrow.gif');
     background-repeat: no-repeat;
     background-position: right center;
     padding-right: 20px;
@@ -834,4 +834,28 @@ a:hover {
 nav ul {
   margin: 0;
   padding: 0;
+}
+
+/* no js handling */
+
+.no-js #card {
+  display: none;
+}
+
+.js #card {
+  display: block;
+}
+
+.js #main-no-js {
+  display: none;
+}
+
+#main-no-js  {
+  margin: 5px auto;
+  width: 980px;
+}
+
+#main-no-js p {
+  padding-left: 30px;
+  float: left;
 }

@@ -379,27 +379,3 @@ a.mail {
   width: 26px;
   text-indent: -9999px;
 }
-
-/* no js handling */
-
-.no-js #card {
-  display: none;
-}
-
-.js #card {
-  display: block;
-}
-
-.js #main-no-js {
-  display: none;
-}
-
-#main-no-js  {
-  margin: 5px auto;
-  width: 980px;
-}
-
-#main-no-js p {
-  padding-left: 30px;
-  float: left;
-}
