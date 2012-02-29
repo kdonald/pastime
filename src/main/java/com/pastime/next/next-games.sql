@@ -6,26 +6,27 @@ CREATE SCHEMA next;
 GRANT USAGE ON SCHEMA next TO pastime;
 
 -- Pastime Next Games e.g. Hitmen vs Mergers on Feb 22, 2012
-CREATE TABLE next.games (team_slug varchar(16),
+CREATE TABLE next.games (team integer,
   number smallint NOT NULL,
   start_time timestamp NOT NULL,
-  opponent varchar(64) NOT NULL,
-  game bigint NOT NULL,
-  CONSTRAINT pk_games PRIMARY KEY (team_slug, number),
-  CONSTRAINT fk_games_game FOREIGN KEY (game) REFERENCES games(id)  
+  league integer NOT NULL,
+  season integer NOT NULL,
+  game smallint NOT NULL,
+  game_opponent_name varchar(64) NOT NULL,
+  CONSTRAINT pk_games PRIMARY KEY (team, number),
+  CONSTRAINT fk_games_game FOREIGN KEY (league, season, team, game) REFERENCES games(league, season, team, number)
 );
   
 -- Pastime Next Game Attendance e.g. Keith Donald attending Hitmen game 1 this week
-CREATE TABLE next.game_attendance (team_slug varchar(16),
+CREATE TABLE next.game_attendance (team integer,
   game smallint,
-  registered_player_slug varchar(16),
+  player integer,
+  player_name varchar(64) NOT NULL,
   attending boolean,
   update_time timestamp,
-  name varchar(64),  
-  player integer NOT NULL,
-  CONSTRAINT pk_game_attendance PRIMARY KEY (team_slug, game, registered_player_slug),
-  CONSTRAINT fk_game_attendance_game FOREIGN KEY (team_slug, game) REFERENCES next.games(team_slug, number),
-  CONSTRAINT fk_game_attendance_player FOREIGN KEY (player) REFERENCES players(id)  
+  CONSTRAINT pk_game_attendance PRIMARY KEY (team, game, player),
+  CONSTRAINT fk_game_attendance_game FOREIGN KEY (team, game) REFERENCES next.games(team, number),
+  CONSTRAINT fk_game_attendance_player FOREIGN KEY (player) REFERENCES players(id)
 );
 
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA next TO pastime;

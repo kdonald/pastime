@@ -26,41 +26,43 @@ DROP TABLE format_rules;
 DROP TABLE formats;
 DROP TABLE sports;
 
--- Pastime Sports e.g. Flag Football --
-CREATE TABLE sports (name varchar(64) pk_sports PRIMARY KEY,
+-- Pastime Sports e.g. Flag Football
+CREATE TABLE sports (name varchar(64) CONSTRAINT pk_sports PRIMARY KEY,
   logo varchar(256)
 );
 
--- Pastime Sport Formats e.g. 7 on 7 Flag Football --
+-- Pastime Sport Formats e.g. 7 on 7 Flag Football
 CREATE TABLE formats (sport varchar(64),
   name varchar(64) NOT NULL,
-  CONSTRAINT pk_formats PRIMARY KEY (sport, name),  
+  description varchar(256),
+  CONSTRAINT pk_formats PRIMARY KEY (sport, name),
+  CONSTRAINT fk_formats_sport FOREIGN KEY (sport) REFERENCES sports(name) ON DELETE CASCADE   
 );
 
--- Pastime Format Rules e.g. Games are 12 minutes long. --
+-- Pastime Format Rules e.g. Games are 12 minutes long.
 CREATE TABLE format_rules (sport varchar(64),
   format varchar(64),
   number smallint,
   title varchar(64),
-  description varchar(1024),
+  description varchar(256),
   CONSTRAINT pk_format_rules PRIMARY KEY (sport, format, number),
-  CONSTRAINT fk_format_rules_format FOREIGN KEY (format) REFERENCES formats(id)  
+  CONSTRAINT fk_format_rules_format FOREIGN KEY (sport, format) REFERENCES formats(sport, name) ON DELETE CASCADE  
 );
 
 -- Pastime Players e.g. Keith Donald, Alexander Weaver, Jason Konicki, etc.
 CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
   first_name varchar(64) NOT NULL,
   last_name varchar(64) NOT NULL,
-  password varchar(16) NOT NULL,  
+  password varchar(16) NOT NULL,
   birthday date NOT NULL,
   minor boolean,
-  gender char(1) NOT NULL,
+  gender char(1) NOT NULL, -- (m)ale, (f)emale
   street_address varchar(128),
   city varchar(64),
   state char(2),  
   zip_code char(5) NOT NULL,
-  latitude double,
-  longitude double,
+  latitude real,
+  longitude real,
   number smallint,
   nickname varchar(16),
   picture varchar(256),
@@ -70,26 +72,26 @@ CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
   referral_code char(6) NOT NULL UNIQUE,
   referred_by integer, 
   created timestamp NOT NULL CONSTRAINT df_players_created DEFAULT now(),
-  deleted boolean NOT NULL CONSTRAINT df_players_deleted DEFAULT false,  
+  deleted boolean,  
   CONSTRAINT fk_players_referred_by FOREIGN KEY (referred_by) REFERENCES players(id)  
 );
 
 -- Player email addresses e.g. Keith Donald home, Keith Donald work
 CREATE TABLE player_emails (player integer,
   email varchar(320),
-  label varchar(64) NOT NULL,
+  label varchar(64) NOT NULL, -- home, work, facebook, etc.
   primary_email boolean,
   CONSTRAINT pk_player_emails PRIMARY KEY (player, email),
-  CONSTRAINT fk_player_emails_player FOREIGN KEY (player) REFERENCES players(id)
+  CONSTRAINT fk_player_emails_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
 );
 
 -- Player phone numbers e.g. Keith Donald home, Keith Donald mobile
 CREATE TABLE player_phones (player integer,
   number varchar(16),
-  label varchar(64) NOT NULL,
+  label varchar(64) NOT NULL, -- home, work, mobile, etc.
   primary_phone boolean,
   CONSTRAINT pk_player_phones PRIMARY KEY (player, number),
-  CONSTRAINT fk_player_phones_player FOREIGN KEY (player) REFERENCES players(id)
+  CONSTRAINT fk_player_phones_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
 );
 
 -- Player medical conditions of relevance e.g. asthma, allergies
@@ -97,7 +99,7 @@ CREATE TABLE player_medical_conditions (player integer,
   condition varchar(64),
   more_information varchar(256),
   CONSTRAINT pk_player_medical_conditions PRIMARY KEY (player, condition),
-  CONSTRAINT fk_player_medical_conditions_player FOREIGN KEY (player) REFERENCES players(id)
+  CONSTRAINT fk_player_medical_conditions_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
 );
 
 -- Player allergies e.g. peanuts
@@ -105,7 +107,7 @@ CREATE TABLE player_allergies (player integer,
   allergy varchar(64),
   more_information varchar(256),
   CONSTRAINT pk_player_allergies PRIMARY KEY (player, allergy),
-  CONSTRAINT fk_player_allergies_player FOREIGN KEY (player) REFERENCES players(id)
+  CONSTRAINT fk_player_allergies_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
 );
 
 -- Sports players play e.g. Keith Donald plays flag football, softball, basketball, and volleyball.
@@ -114,16 +116,17 @@ CREATE TABLE player_sports (player integer,
   rank smallint,
   level smallint, -- 1-5 self-assessment of skill, 5 being the highest
   CONSTRAINT pk_player_sports PRIMARY KEY (player, sport),
-  CONSTRAINT fk_player_sports_player FOREIGN KEY (player) REFERENCES players(id),
-  CONSTRAINT fk_player_sports_sport FOREIGN KEY (sport) REFERENCES sports(name)  
+  CONSTRAINT fk_player_sports_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE,
+  CONSTRAINT fk_player_sports_sport FOREIGN KEY (sport) REFERENCES sports(name),
+  CONSTRAINT uq_player_sports_rank UNIQUE (player, rank)
 );
 
 -- Player children e.g. Keith Donald's children are Annabelle, Corgan, and Juliet.
 CREATE TABLE player_children (player integer,
   child integer,
   CONSTRAINT pk_player_child PRIMARY KEY (player, child),
-  CONSTRAINT fk_player_children_player FOREIGN KEY (player) REFERENCES players(id),  
-  CONSTRAINT fk_player_children_child FOREIGN KEY (child) REFERENCES players(id)
+  CONSTRAINT fk_player_children_player FOREIGN KEY (player) REFERENCES players(id),
+  CONSTRAINT fk_player_children_child FOREIGN KEY (child) REFERENCES players(id) ON DELETE CASCADE
 );
 
 -- Pastime Franchises e.g. Hitmen
@@ -147,18 +150,22 @@ CREATE TABLE team_players (team integer,
   player integer,
   number smallint,
   nickname varchar(16),
-  picture varchar(255),
+  picture varchar(256),
+  status char(1), -- (a)ctive, (i)njured, on (l)eave, (r)etired
+  joined date,
+  retired date,
   CONSTRAINT pk_team_players PRIMARY KEY (team, player),  
-  CONSTRAINT fk_team_players_team FOREIGN KEY (team) REFERENCES teams(id),
+  CONSTRAINT fk_team_players_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
   CONSTRAINT fk_team_players_player FOREIGN KEY (player) REFERENCES players(id),
-  CONSTRAINT uq_team_number FOREIGN KEY (team, number),
-  CONSTRAINT uq_team_nickname FOREIGN KEY (team, nickname)  
+  CONSTRAINT uq_team_players_number UNIQUE (team, number),
+  CONSTRAINT uq_team_players_nickname UNIQUE (team, nickname)  
 );
 
 -- Pastime Organizations e.g. Brevard County Parks and Recreation, Sandox Volleyball
 CREATE TABLE organizations (id serial CONSTRAINT pk_organizations PRIMARY KEY,
   name varchar(128) NOT NULL,
   logo varchar(256),
+  founded date,  
   website varchar(256)
 );
 
@@ -169,12 +176,12 @@ CREATE TABLE venues (id serial CONSTRAINT pk_venues PRIMARY KEY,
   city varchar(64) NOT NULL,
   state char(2) NOT NULL,
   zip_code char(5) NOT NULL,
-  latitude double NOT NULL,  
-  longitude double NOT NULL
+  latitude real NOT NULL,  
+  longitude real NOT NULL
 );
 
 -- Pastime Sponsors e.g. Fired Up Pizza
-CREATE TABLE sponsor (id serial CONSTRAINT pk_organizations PRIMARY KEY,
+CREATE TABLE sponsors (id serial CONSTRAINT pk_sponsor PRIMARY KEY,
   name varchar(128) NOT NULL,
   logo varchar(256),
   website varchar(256)
@@ -195,7 +202,7 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
   roster_min_female smallint,
   skill_level_min smallint,
   skill_level_max smallint,
-  registration_type char(1) -- (t)eam, (i)ndividual
+  registration_type char(1), -- (t)eam, (i)ndividual
   registration_fee money,
   registration_fee_earlybird money,  
   organization integer NOT NULL,
@@ -203,7 +210,7 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
   CONSTRAINT fk_leagues_sport FOREIGN KEY (sport) REFERENCES sports(name),
   CONSTRAINT fk_leagues_format FOREIGN KEY (sport, format) REFERENCES formats(sport, name),  
   CONSTRAINT fk_leagues_organization FOREIGN KEY (organization) REFERENCES organizations(id),
-  CONSTRAINT uq_organization_league_name UNIQUE (organization, name)
+  CONSTRAINT uq_leagues_organization_league_name UNIQUE (organization, name)
 );
 
 -- League staff e.g. Commissioner
@@ -211,9 +218,12 @@ CREATE TABLE league_staff (league integer,
   player integer,
   role varchar(64) NOT NULL, -- Commissioner, Assistant, Referee
   picture varchar(256),
+  status char(1), -- (a)ctive, (r)etired
+  joined date,
+  retired date,
   CONSTRAINT pk_league_staff PRIMARY KEY (league, player),
-  CONSTRAINT fk_league_staff_league FOREIGN KEY (league) REFERENCES leagues(id),
-  CONSTRAINT fk_league_staff_player FOREIGN KEY (player) REFERENCES player(id)  
+  CONSTRAINT fk_league_staff_league FOREIGN KEY (league) REFERENCES leagues(id) ON DELETE CASCADE,
+  CONSTRAINT fk_league_staff_player FOREIGN KEY (player) REFERENCES players(id)  
 );
 
 -- League to Venue Associations
@@ -221,33 +231,33 @@ CREATE TABLE league_venues (league integer,
   venue integer,
   primary_venue boolean,
   CONSTRAINT pk_league_venues PRIMARY KEY (league, venue),
-  CONSTRAINT fk_league_venues_league FOREIGN KEY (league) REFERENCES leagues(id),
-  CONSTRAINT fk_league_venues_venue FOREIGN KEY (venue) REFERENCES venues(id)  
+  CONSTRAINT fk_league_venues_league FOREIGN KEY (league) REFERENCES leagues(id) ON DELETE CASCADE,
+  CONSTRAINT fk_league_venues_venue FOREIGN KEY (venue) REFERENCES venues(id)
 );
 
 -- Pastime League Seasons e.g. South Brevard Adult Flag Football Winter 2012
 CREATE TABLE seasons (league integer,
   number integer,
+  league_name varchar(64) NOT NULL, -- for history since league name can change
   name varchar(64) NOT NULL,
   start_date date,
   registration_opens date,
   registration_closes date,
-  status char(1) NOT NULL, -- (n)ew, registration (o)pen, registration (c)losed, (r)unning, x: over
+  status char(1) NOT NULL, -- (n)ew, registration (o)pen, registration (c)losed, (r)unning, (x) over
   created timestamp NOT NULL CONSTRAINT df_seasons_created DEFAULT now(),  
-  league_name varchar(64) NOT NULL,
   CONSTRAINT pk_seasons PRIMARY KEY (league, number),  
   CONSTRAINT fk_seasons_league FOREIGN KEY (league) REFERENCES leagues(id)
 );
 
 -- Pastime Free Agents e.g. Efren Blackledge
 CREATE TABLE free_agents (league integer,
-  season bigint,
+  season integer,
   player integer,
   created timestamp NOT NULL CONSTRAINT df_free_agent_created DEFAULT now(),
   message varchar(256),
   CONSTRAINT pk_free_agents PRIMARY KEY (league, season, player),  
   CONSTRAINT fk_free_agent_season FOREIGN KEY (league, season) REFERENCES seasons(league, number),
-  CONSTRAINT fk_free_agent_player FOREIGN KEY (player) REFERENCES players(id),  
+  CONSTRAINT fk_free_agent_player FOREIGN KEY (player) REFERENCES players(id)
 );
 
 -- Pool of registered individual players, serves as input into a draft. Individual registration leagues only.
@@ -267,7 +277,7 @@ CREATE TABLE player_pool (league integer,
 CREATE TABLE registered_teams (league integer,
   season integer,
   team integer,
-  name varchar(64) NOT NULL,
+  name varchar(64) NOT NULL, -- for history since team name can change
   captain integer NOT NULL,
   status char(1) NOT NULL, -- registration (c)onfirmed, (n)eeds players, (p)ending payment
   created timestamp NOT NULL CONSTRAINT df_registered_team_created DEFAULT now(),  
@@ -277,19 +287,20 @@ CREATE TABLE registered_teams (league integer,
   CONSTRAINT fk_registered_teams_season FOREIGN KEY (league, season) REFERENCES seasons(league, number),  
   CONSTRAINT fk_registered_teams_team FOREIGN KEY (team) REFERENCES teams(id),
   CONSTRAINT fk_registered_teams_captain FOREIGN KEY (captain) REFERENCES players(id),
-  CONSTRAINT uq_team_name UNIQUE (league, season, name)
+  CONSTRAINT uq_registered_teams_team_name UNIQUE (league, season, name)
 );
 
 -- Pastime Team Registration Payments Due e.g. Brian Fisher $480.00; Brian Fisher $25.00, Keith Donald $25.00, etc.
-CREATE TABLE registered_team_payments (season bigint,
+CREATE TABLE registered_team_payments (league integer,
+  season integer,
   team integer,
   player integer,
   payment_date timestamp,
-  amount,
-  reference_number,
+  amount money,
+  reference_number varchar(16),
   created timestamp NOT NULL CONSTRAINT df_registered_team_payments_created DEFAULT now(),  
-  CONSTRAINT pk_registered_team_payments PRIMARY KEY (season, team, player),
-  CONSTRAINT fk_registered_team_payments_registered_team FOREIGN KEY (season, team) REFERENCES registered_teams(season, team),
+  CONSTRAINT pk_registered_team_payments PRIMARY KEY (league, season, team, player),
+  CONSTRAINT fk_registered_team_payments_registered_team FOREIGN KEY (league, season, team) REFERENCES registered_teams(league, season, team),
   CONSTRAINT fk_registered_team_payments_player FOREIGN KEY (player) REFERENCES players(id)
 );
 
@@ -298,15 +309,15 @@ CREATE TABLE registered_players (league integer,
   season integer,
   team integer,  
   player integer,
-  number smallint NOT NULL,
-  nickname varchar(16),
+  number smallint NOT NULL, -- for history since number can change
+  nickname varchar(16), -- for history since nickname can change
   sub boolean,
   created timestamp NOT NULL CONSTRAINT df_registered_player_created DEFAULT now(),
   CONSTRAINT pk_registered_players PRIMARY KEY (league, season, team, player),
   CONSTRAINT fk_registered_players_registered_team FOREIGN KEY (league, season, team) REFERENCES registered_teams(league, season, team),
   CONSTRAINT fk_registered_players_player FOREIGN KEY (player) REFERENCES players(id),
-  CONSTRAINT uq_team_number UNIQUE (league, season, team, number),
-  CONSTRAINT uq_team_nickname UNIQUE (league, season, team, nickname)  
+  CONSTRAINT uq_registered_players_team_number UNIQUE (league, season, team, number),
+  CONSTRAINT uq_registered_players_team_nickname UNIQUE (league, season, team, nickname)  
 );
 
 -- Pastime Team Sponsorship e.g. Fired Up Pizza Hitmen $250.00
@@ -317,7 +328,7 @@ CREATE TABLE registered_team_sponsorship (league integer,
   amount money,
   reference_number varchar(16),
   created timestamp NOT NULL CONSTRAINT df_registered_team_sponsorship_created DEFAULT now(),
-  CONSTRAINT pk_registered_team_sponorship PRIMARY KEY (league, season, team, sponsor),
+  CONSTRAINT pk_registered_team_sponsorship PRIMARY KEY (league, season, team, sponsor),
   CONSTRAINT fk_registered_team_sponsorship_registered_team FOREIGN KEY (league, season, team) REFERENCES registered_teams(league, season, team),
   CONSTRAINT fk_registered_team_sponsorship_sponsor FOREIGN KEY (sponsor) REFERENCES sponsors(id)    
 );
@@ -335,15 +346,12 @@ CREATE TABLE games (league integer,
 );
 
 -- unique http://pastime.com/{username}
-CREATE TABLE usernames (name CONSTRAINT pk_usernames PRIMARY KEY,
+CREATE TABLE usernames (name varchar(16) CONSTRAINT pk_usernames PRIMARY KEY,
   username_type char(1), -- (p)layer, (t)eam, (l)eague
   player_id integer,
   team_id integer,
   league_id integer,
   CONSTRAINT fk_usernames_player_id FOREIGN KEY (player_id) REFERENCES players(id),
   CONSTRAINT fk_usernames_team_id FOREIGN KEY (team_id) REFERENCES teams(id),
-  CONSTRAINT fk_usernames_league_id FOREIGN KEY (league_id) REFERENCES leagues(id),  
+  CONSTRAINT fk_usernames_league_id FOREIGN KEY (league_id) REFERENCES leagues(id)
 );
-
-GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO pastime;
-GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO pastime;
