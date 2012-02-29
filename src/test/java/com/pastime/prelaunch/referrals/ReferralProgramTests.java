@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.pastime.prelaunch.Name;
+import com.pastime.players.Name;
 import com.pastime.prelaunch.Subscriber;
 import com.pastime.prelaunch.Subscriber.ReferredBy;
 import com.pastime.prelaunch.referrals.Referral;

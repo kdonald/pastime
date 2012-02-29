@@ -1,0 +1,33 @@
+@IMPORT url("standard.css");
+
+p {
+  font-size: 13px;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+ul {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+  overflow: auto;
+}
+
+ul li {
+  float: left;
+  margin-right: 8px;
+}
+
+ul li img {
+  width: 32px;
+  height: 32px;
+  border: thin;
+}
+
+#screen {
+  background: whiteSmoke;
+  width: 320px;
+  padding: 20px;
+}

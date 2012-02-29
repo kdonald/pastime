@@ -2,7 +2,7 @@
 
 .pagecontent {
   margin: auto;
-  width: 95%;
+  width: 100%;
 }
 
 #topbar {  
@@ -13,7 +13,7 @@
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #02519c), color-stop(100%, #2a7cc6)); /* Safari 4+, Chrome 2+ */
   background-image: -webkit-linear-gradient(top, #02519c, #2a7cc6); /* Safari 5.1+, Chrome 10+ */
   background-image: -o-linear-gradient(top, #02519c, #2a7cc6); /* Opera 11.10 */
-  height: 49px;  
+  height: 49px;
 }
 
 #topbarLogo {
@@ -53,4 +53,71 @@ footer p {
     width: 920px;  
   }
 
+}
+
+/* standard forms */
+
+form {
+  background: whiteSmoke;
+  width: 280px; 
+  overflow: hidden;
+  padding: 20px;
+}
+
+form h1 {
+  margin-top: 0;
+}
+
+fieldset {
+  border: 0;
+  margin: 0 0 1.5em 0;
+  padding: 0;
+  width: 100%;
+}
+
+form a {
+  font-size: 11px;
+}
+
+fieldset input {
+  display: inline-block;
+  margin-bottom: 0;
+  margin-right: 8px;
+  width: auto;
+}
+
+fieldset input.last {
+  margin-right: 0;
+}
+
+fieldset select {
+  display: inline-block;
+  margin-bottom: 0;
+  margin-right: 8px;
+  width: auto;
+}
+
+legend {
+  margin: 0;
+  padding: 0
+}
+
+legend strong,label strong {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+label.password strong {
+  width: 100%;
+}
+
+input,select {
+  margin-bottom: 1.5em;
+  width: 100%;
+}
+
+button {
+  float: right;
 }

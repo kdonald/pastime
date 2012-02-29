@@ -2,6 +2,8 @@ package com.pastime.prelaunch;
 
 import java.util.Date;
 
+import com.pastime.players.Name;
+
 public class Subscriber {
     
     private final String email;

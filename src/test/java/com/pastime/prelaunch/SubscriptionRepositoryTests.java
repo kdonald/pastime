@@ -21,6 +21,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pastime.players.Name;
+
 @ContextConfiguration(classes=SubscriptionRepositoryTestsConfig.class)
 @Transactional
 @RunWith(value=SpringJUnit4ClassRunner.class)

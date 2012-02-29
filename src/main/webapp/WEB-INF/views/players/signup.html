@@ -71,23 +71,21 @@
       <h1>Sign Up</h1>
       <fieldset>
         <legend><strong>Name</strong></legend>
-        <input id="firstname" type="text" name="firstName" placeholder="First" required />
-        <input id="lastname" type="text" name="firstName" placeholder="Last" required class="last" />    
+        <input id="firstname" type="text" name="firstName" placeholder="First" required /><input id="lastname" type="text" name="lastName" placeholder="Last" required class="last" />    
       </fieldset>
       <label>
         <strong>Email</strong>
         <input type="email" name="email" required placeholder="you@address" />    
       </label>
-      <label>
+      <label class="password">
         <strong>Password</strong>
-        <input type="password" name="password" placeholder="at least 6 characters" required />    
+        <input type="password" name="password" required placeholder="at least 6 characters" />    
       </label>
       <fieldset>
         <legend>
           <strong>Birthday</strong> <a href="#why-birthday">Why?</a>
         </legend>
         <select id="month" name="month">
-          <option value="" disabled="disabled">Month</option>
           <option value="1">January</option>
           <option value="2">February</option>
           <option value="3">March</option>
@@ -100,21 +98,18 @@
           <option value="10">October</option>
           <option value="11">November</option>
           <option value="12">December</option>
-        </select>
-        <input id="day" type="text" name="day" placeholder="Day" required pattern="[0-9][0-9]" title="two digit day" required size="2" />
-        <input id="year" type="text" name="year" placeholder="Year" required pattern="[0-9][0-9][0-9][0-9]" title="four digit year" size="4" class="last" />          
+        </select><input id="day" type="text" name="day" placeholder="Day" required pattern="[0-9][0-9]" title="two digit day" required size="2" /><input id="year" type="text" name="year" placeholder="Year" required pattern="[0-9][0-9][0-9][0-9]" title="four digit year" size="4" class="last" />          
       </fieldset>
       <label>
         <strong>Gender</strong> <a href="#why-gender">Why?</a>
         <select name="gender">
-          <option value="" disabled="disabled">I am...</option>
           <option value="m">Male</option>
           <option value="f">Female</option>            
         </select>
       </label>
       <label>
         <strong>ZIP Code</strong> <a href="#why-zipcode">Why?</a>
-        <input type="text" name="zipcode" placeholder="5 digits" required pattern="[0-9]{5}" title="five digit ZIP code" size="5" />        
+        <input type="text" name="zipCode" placeholder="5 digits" required pattern="[0-9]{5}" title="five digit ZIP code" size="5" />        
       </label>
       <button>Sign Up</button>
     </form>  

@@ -16,6 +16,8 @@ import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.templating.JMustacheStringTemplateLoader;
 
+import com.pastime.players.Name;
+
 public class WelcomeMailerTests {
 
     private WelcomeMailer welcomeMailer;

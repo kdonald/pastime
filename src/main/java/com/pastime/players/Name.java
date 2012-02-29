@@ -1,4 +1,4 @@
-package com.pastime.prelaunch;
+package com.pastime.players;
 
 
 public class Name {

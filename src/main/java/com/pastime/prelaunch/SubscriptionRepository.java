@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.pastime.players.Name;
 import com.pastime.prelaunch.Subscriber.ReferredBy;
 
 public class SubscriptionRepository {
