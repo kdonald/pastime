@@ -47,9 +47,12 @@ public class SignupController {
         String referralCode = generateUniqueReferralCode();
         ReferredBy referredBy = findReferredBy(signupForm.getR());
         Date created = new Date();
-        Integer playerId = SqlStatements.use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                "id", Integer.class, signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
-        jdbcTemplate.update("INSERT INTO player_emails (player, email, label, primary_email) VALUES (?, ?, ?, ?)", playerId, signupForm.getEmail(), "home", true);
+        if (jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM player_emails WHERE email = ?)", Boolean.class, signupForm.getEmail())) {
+            return new ResponseEntity<Integer>(-1, HttpStatus.BAD_REQUEST);
+        }
+        Integer playerId = SqlStatements.use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
+                signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
+        jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
         URI url = UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/players/{id}").buildAndExpand(playerId).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
