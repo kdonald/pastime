@@ -18,6 +18,9 @@ public class SignupForm {
     private String lastName;
 
     @NotEmpty
+    private String password;
+    
+    @NotEmpty
     private String email;
     
     @NotNull
@@ -60,6 +63,14 @@ public class SignupForm {
 
     public void setEmail(String email) {
         this.email = email.trim().toLowerCase();
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public int getMonth() {

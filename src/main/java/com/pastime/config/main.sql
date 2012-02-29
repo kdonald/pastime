@@ -77,20 +77,20 @@ CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
 );
 
 -- Player email addresses e.g. Keith Donald home, Keith Donald work
-CREATE TABLE player_emails (player integer,
-  email varchar(320),
+CREATE TABLE player_emails (email varchar(320),
   label varchar(64) NOT NULL, -- home, work, facebook, etc.
   primary_email boolean,
-  CONSTRAINT pk_player_emails PRIMARY KEY (player, email),
+  player integer,
+  CONSTRAINT pk_player_emails PRIMARY KEY (email),
   CONSTRAINT fk_player_emails_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
 );
 
 -- Player phone numbers e.g. Keith Donald home, Keith Donald mobile
-CREATE TABLE player_phones (player integer,
-  number varchar(16),
+CREATE TABLE player_phones (number varchar(16),
   label varchar(64) NOT NULL, -- home, work, mobile, etc.
   primary_phone boolean,
-  CONSTRAINT pk_player_phones PRIMARY KEY (player, number),
+  player integer,  
+  CONSTRAINT pk_player_phones PRIMARY KEY (number),
   CONSTRAINT fk_player_phones_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
 );
 
@@ -355,3 +355,6 @@ CREATE TABLE usernames (name varchar(16) CONSTRAINT pk_usernames PRIMARY KEY,
   CONSTRAINT fk_usernames_team_id FOREIGN KEY (team_id) REFERENCES teams(id),
   CONSTRAINT fk_usernames_league_id FOREIGN KEY (league_id) REFERENCES leagues(id)
 );
+
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO pastime;
+GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO pastime;

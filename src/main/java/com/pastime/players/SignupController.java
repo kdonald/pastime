@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlStatements;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,12 +42,14 @@ public class SignupController {
     }
 
     @RequestMapping(value="/signup", method=RequestMethod.POST)
+    @Transactional
     public ResponseEntity<Integer> signup(@Valid SignupForm signupForm) {
         String referralCode = generateUniqueReferralCode();
         ReferredBy referredBy = findReferredBy(signupForm.getR());
         Date created = new Date();
-        Integer playerId = SqlStatements.use(jdbcTemplate).insert("INSERT INTO players (email, first_name, last_name, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                "id", Integer.class, signupForm.getEmail(), signupForm.getFirstName(), signupForm.getLastName(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
+        Integer playerId = SqlStatements.use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "id", Integer.class, signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
+        jdbcTemplate.update("INSERT INTO player_emails (player, email, label, primary_email) VALUES (?, ?, ?, ?)", playerId, signupForm.getEmail(), "home", true);
         URI url = UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/players/{id}").buildAndExpand(playerId).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
@@ -74,4 +77,7 @@ public class SignupController {
             }
         } while (true);
     }
+    
+    // cglib ceremony
+    public SignupController() {}
 }
