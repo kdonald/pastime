@@ -1,14 +1,14 @@
 DROP TABLE games;
-DROP TABLE team_sponsorship;
-DROP TABLE sponsors;
+DROP TABLE registered_team_sponsorship;
 DROP TABLE registered_players;
-DROP TABLE team_payments;
+DROP TABLE registered_team_payments;
 DROP TABLE registered_teams;
 DROP TABLE free_agents;
 DROP TABLE seasons;
 DROP TABLE league_staff;
 DROP TABLE league_venues;
 DROP TABLE leagues;
+DROP TABLE sponsors;
 DROP TABLE venues;
 DROP TABLE organizations;
 DROP TABLE team_players;
@@ -149,6 +149,13 @@ CREATE TABLE venues (id serial CONSTRAINT pk_venues PRIMARY KEY,
   longitude double NOT NULL
 );
 
+-- Pastime Sponsors e.g. Fired Up Pizza
+CREATE TABLE sponsor (id serial CONSTRAINT pk_organizations PRIMARY KEY,
+  name varchar(128) NOT NULL,
+  logo varchar(256),
+  website varchar(256)
+);
+
 -- Pastime Leagues e.g. South Brevard Adult Flag Football, Sandbox Open/AA/A/B
 CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
   name varchar(128) NOT NULL,
@@ -231,15 +238,15 @@ CREATE TABLE registered_teams (id bigserial CONSTRAINT pk_registered_teams PRIMA
 );
 
 -- Pastime Team Registration Payments Due e.g. Brian Fisher $480.00; Brian Fisher $25.00, Keith Donald $25.00, etc.
-CREATE TABLE team_payments (registered_team bigint NOT NULL,
+CREATE TABLE registered_team_payments (registered_team bigint NOT NULL,
   player NOT NULL,
   payment_date timestamp,
   amount,
   reference_number,
-  created timestamp NOT NULL CONSTRAINT df_team_payments_created DEFAULT now(),  
-  CONSTRAINT pk_team_payments PRIMARY KEY (registered_team, player),
-  CONSTRAINT fk_team_payments_registered_team FOREIGN KEY (registered_team) REFERENCES registered_teams(id),
-  CONSTRAINT fk_team_payments_player FOREIGN KEY (player) REFERENCES players(id)
+  created timestamp NOT NULL CONSTRAINT df_registered_team_payments_created DEFAULT now(),  
+  CONSTRAINT pk_registered_team_payments PRIMARY KEY (registered_team, player),
+  CONSTRAINT fk_registered_team_payments_registered_team FOREIGN KEY (registered_team) REFERENCES registered_teams(id),
+  CONSTRAINT fk_registered_team_payments_player FOREIGN KEY (player) REFERENCES players(id)
 );
 
 -- Pastime Player Registrations e.g. Keith Donald - Hitmen - South Brevard Adult Flag Football Winter 2012
@@ -254,22 +261,15 @@ CREATE TABLE registered_players (id bigserial CONSTRAINT pk_registered_players P
   CONSTRAINT fk_registered_players_player FOREIGN KEY (player) REFERENCES players(id)    
 );
 
--- Pastime Sponsors e.g. Fired Up Pizza
-CREATE TABLE sponsor (id serial CONSTRAINT pk_organizations PRIMARY KEY,
-  name varchar(128) NOT NULL,
-  logo varchar(256),
-  website varchar(256)
-);
-
 -- Pastime Team Sponsorship e.g. Fired Up Pizza Hitmen $250.00
-CREATE TABLE team_sponsorship (id bigserial CONSTRAINT pk_team_sponsorship PRIMARY KEY,
+CREATE TABLE registered_team_sponsorship (id bigserial CONSTRAINT pk_registered_team_sponsorship PRIMARY KEY,
   registered_team bigint NOT NULL,
   sponsor integer NOT NULL,
   amount money,
   reference_number varchar(16),
-  created timestamp NOT NULL CONSTRAINT df_team_sponsorship_created DEFAULT now(),
-  CONSTRAINT fk_team_sponsorship_registered_team FOREIGN KEY (registered_team) REFERENCES registered_teams(id),
-  CONSTRAINT fk_team_sponsorship_sponsor FOREIGN KEY (sponsor) REFERENCES sponsors(id)    
+  created timestamp NOT NULL CONSTRAINT df_registered_team_sponsorship_created DEFAULT now(),
+  CONSTRAINT fk_registered_team_sponsorship_registered_team FOREIGN KEY (registered_team) REFERENCES registered_teams(id),
+  CONSTRAINT fk_registered_team_sponsorship_sponsor FOREIGN KEY (sponsor) REFERENCES sponsors(id)    
 );
 
 -- Pastime Games e.g. Week 1 - Hitmen - South Brevard Adult Flag Football Winter 2012
