@@ -1,3 +1,4 @@
+DROP TABLE usernames;
 DROP TABLE games;
 DROP TABLE registered_team_sponsorship;
 DROP TABLE registered_players;
@@ -13,15 +14,34 @@ DROP TABLE venues;
 DROP TABLE organizations;
 DROP TABLE team_players;
 DROP TABLE teams;
-DROP TABLE format_rules;
-DROP TABLE formats;
 DROP TABLE player_children;
 DROP TABLE player_sports;
-DROP TABLE sports;
 DROP TABLE player_phones;
 DROP TABLE player_emails;
 DROP TABLE players;
-DROP TABLE usernames;
+DROP TABLE format_rules;
+DROP TABLE formats;
+DROP TABLE sports;
+
+-- Pastime Sports e.g. Flag Football --
+CREATE TABLE sports (id serial CONSTRAINT pk_sports PRIMARY KEY,
+  name varchar(64) NOT NULL UNIQUE,
+  logo varchar(256)
+);
+
+-- Pastime Sport Formats e.g. 7 on 7 Flag Football --
+CREATE TABLE formats (id serial CONSTRAINT pk_formats PRIMARY KEY,
+  name varchar(64) NOT NULL
+);
+
+-- Pastime Format Rules e.g. Games are 12 minutes long. --
+CREATE TABLE format_rules (format integer,
+  number smallint,
+  title varchar(64),
+  description varchar(1024),
+  CONSTRAINT pk_format_rules PRIMARY KEY (format, number),
+  CONSTRAINT fk_format_rules_format FOREIGN KEY (format) REFERENCES formats(id)  
+);
 
 -- Pastime Players e.g. Keith Donald, Alexander Weaver, Jason Konicki, etc.
 CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
@@ -67,12 +87,6 @@ CREATE TABLE player_phones (player integer,
   CONSTRAINT fk_player_phones_player FOREIGN KEY (player) REFERENCES players(id)
 );
 
--- Pastime Sports e.g. Flag Football --
-CREATE TABLE sports (id serial CONSTRAINT pk_sports PRIMARY KEY,
-  name varchar(64) NOT NULL UNIQUE,
-  logo varchar(256)
-);
-
 -- Sports players play e.g. Keith Donald plays flag football, softball, basketball, and volleyball.
 CREATE TABLE player_sports (player integer,
   sport integer,
@@ -88,20 +102,6 @@ CREATE TABLE player_children (player integer,
   CONSTRAINT pk_player_child PRIMARY KEY (player, child),
   CONSTRAINT fk_player_children_player FOREIGN KEY (player) REFERENCES players(id),  
   CONSTRAINT fk_player_children_child FOREIGN KEY (child) REFERENCES players(id)
-);
-
--- Pastime Sport Formats e.g. 7 on 7 Flag Football --
-CREATE TABLE formats (id serial CONSTRAINT pk_formats PRIMARY KEY,
-  name varchar(64) NOT NULL
-);
-
--- Pastime Format Rules e.g. Games are 12 minutes long. --
-CREATE TABLE format_rules (format integer,
-  number smallint,
-  title varchar(64),
-  description varchar(1024),
-  CONSTRAINT pk_format_rules PRIMARY KEY (format, number),
-  CONSTRAINT fk_format_rules_format FOREIGN KEY (format) REFERENCES formats(id)  
 );
 
 -- Pastime Franchises e.g. Hitmen
@@ -282,6 +282,7 @@ CREATE TABLE games (id bigserial CONSTRAINT pk_games PRIMARY KEY,
   CONSTRAINT fk_games_opponent FOREIGN KEY (opponent) REFERENCES registered_teams(id)  
 );
 
+-- unique http://pastime.com/{username}
 CREATE TABLE usernames (name CONSTRAINT pk_usernames PRIMARY KEY,
   username_type char(1), -- (p)layer, (t)eam, (l)eague
   player_id integer,
