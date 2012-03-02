@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import org.springframework.jdbc.core.SqlStatements;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringCookieGenerator;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +35,8 @@ public class SecurityController {
 
     private JdbcTemplate jdbcTemplate;
     
+    private StringCookieGenerator cookieGenerator = new StringCookieGenerator("auth_token");
+    
     public SecurityController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -43,7 +47,7 @@ public class SecurityController {
     }
     
     @RequestMapping(value="/signin", method=RequestMethod.POST, produces="application/json")
-    public ResponseEntity<? extends Object> signin(@Valid SigninForm form) {
+    public ResponseEntity<? extends Object> signin(@Valid SigninForm form, HttpServletResponse response) {
         SqlRowSet rs;
         if (form.isEmail()) {
             rs = jdbcTemplate.queryForRowSet("select p.id, p.password FROM player_emails e inner join players p on e.player = p.id WHERE e.email = ?", form.getName());
@@ -73,7 +77,7 @@ public class SecurityController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("password doesn't match"), HttpStatus.BAD_REQUEST);               
         }
         Player player = new Player(rs.getInt("id"));
-        SecurityContext.setCurrentPlayer(player);
+        signinSession(player, response);
         return new ResponseEntity<Object>(player, HttpStatus.OK);           
     }
 
@@ -84,7 +88,7 @@ public class SecurityController {
     
     @RequestMapping(value="/signup", method=RequestMethod.POST, produces="application/json")
     @Transactional
-    public ResponseEntity<? extends Object> signup(@Valid SignupForm signupForm) {
+    public ResponseEntity<? extends Object> signup(@Valid SignupForm signupForm, HttpServletResponse response) {
         if (playerExists(signupForm.getEmail())) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("email already exists"), HttpStatus.BAD_REQUEST);
         }
@@ -98,7 +102,13 @@ public class SecurityController {
         URI url = UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/players/{id}").buildAndExpand(player.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
+        signinSession(player, response);
         return new ResponseEntity<Player>(player, headers, HttpStatus.CREATED);
+    }
+
+    private void signinSession(Player player, HttpServletResponse response) {
+        SecurityContext.setCurrentPlayer(player);
+        cookieGenerator.addCookie(player.getId().toString(), response);        
     }
     
     private boolean playerExists(String email) {
