@@ -217,6 +217,7 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
 CREATE TABLE league_staff (league integer,
   player integer,
   role varchar(64) NOT NULL, -- Commissioner, Assistant, Referee
+  admin boolean, -- league site admin?
   picture varchar(256),
   status char(1), -- (a)ctive, (r)etired
   joined date,
@@ -346,14 +347,14 @@ CREATE TABLE games (league integer,
 );
 
 -- unique http://pastime.com/{username}
-CREATE TABLE usernames (name varchar(16) CONSTRAINT pk_usernames PRIMARY KEY,
+CREATE TABLE usernames (username varchar(16) CONSTRAINT pk_usernames PRIMARY KEY,
   username_type char(1), -- (p)layer, (t)eam, (l)eague
-  player_id integer,
-  team_id integer,
-  league_id integer,
-  CONSTRAINT fk_usernames_player_id FOREIGN KEY (player_id) REFERENCES players(id),
-  CONSTRAINT fk_usernames_team_id FOREIGN KEY (team_id) REFERENCES teams(id),
-  CONSTRAINT fk_usernames_league_id FOREIGN KEY (league_id) REFERENCES leagues(id)
+  player integer,
+  team integer,
+  league integer,
+  CONSTRAINT fk_usernames_player_id FOREIGN KEY (player) REFERENCES players(id),
+  CONSTRAINT fk_usernames_team_id FOREIGN KEY (team) REFERENCES teams(id),
+  CONSTRAINT fk_usernames_league_id FOREIGN KEY (league) REFERENCES leagues(id)
 );
 
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO pastime;

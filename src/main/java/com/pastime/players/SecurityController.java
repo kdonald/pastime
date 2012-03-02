@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlStatements;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -26,37 +27,82 @@ import com.pastime.prelaunch.DefaultReferralCodeGenerator;
 import com.pastime.prelaunch.ReferralCodeGenerator;
 
 @Controller
-public class SignupController {
+public class SecurityController {
 
     private ReferralCodeGenerator referralCodeGenerator = new DefaultReferralCodeGenerator();
 
     private JdbcTemplate jdbcTemplate;
     
-    public SignupController(JdbcTemplate jdbcTemplate) {
+    public SecurityController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @RequestMapping(value="/signin", method=RequestMethod.GET)
+    public String signin() {
+        return "players/signin";
+    }
+    
+    @RequestMapping(value="/signin", method=RequestMethod.POST, produces="application/json")
+    public ResponseEntity<? extends Object> signin(@Valid SigninForm form) {
+        SqlRowSet rs;
+        if (form.isEmail()) {
+            rs = jdbcTemplate.queryForRowSet("select p.id, p.password FROM player_emails e inner join players p on e.player = p.id WHERE e.email = ?", form.getName());
+            if (!rs.last()) {
+                return new ResponseEntity<ErrorBody>(new ErrorBody("email not on file"), HttpStatus.BAD_REQUEST);               
+            }
+            if (rs.getRow() != 1) {
+                throw new IllegalStateException("Not a unique email address - should never happen");
+            }
+        } else {
+            rs = jdbcTemplate.queryForRowSet("select username_type, player, team, league FROM usernames where username = ?", form.getName());
+            if (!rs.last()) {
+                return new ResponseEntity<ErrorBody>(new ErrorBody("username not on file"), HttpStatus.BAD_REQUEST);               
+            }
+            if (rs.getRow() != 1) {
+                throw new IllegalStateException("Not a unique username - should never happen");
+            }            
+            String type = rs.getString("username_type");
+            if ("p".equals(type)) {
+                rs = jdbcTemplate.queryForRowSet("select p.id, p.password FROM player p where p.id = ?", rs.getInt("player"));
+            } else {
+                throw new UnsupportedOperationException("Not yet supported");
+            }
+        }
+        String password = rs.getString("password");
+        if (!password.equals(form.getPassword())) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("password doesn't match"), HttpStatus.BAD_REQUEST);               
+        }
+        Player player = new Player(rs.getInt("id"));
+        SecurityContext.setCurrentPlayer(player);
+        return new ResponseEntity<Object>(player, HttpStatus.OK);           
     }
 
     @RequestMapping(value="/signup", method=RequestMethod.GET)
     public String signup() {
         return "players/signup";
     }
-
-    @RequestMapping(value="/signup", method=RequestMethod.POST)
+    
+    @RequestMapping(value="/signup", method=RequestMethod.POST, produces="application/json")
     @Transactional
-    public ResponseEntity<Integer> signup(@Valid SignupForm signupForm) {
+    public ResponseEntity<? extends Object> signup(@Valid SignupForm signupForm) {
+        if (playerExists(signupForm.getEmail())) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("email already exists"), HttpStatus.BAD_REQUEST);
+        }
         String referralCode = generateUniqueReferralCode();
         ReferredBy referredBy = findReferredBy(signupForm.getR());
-        Date created = new Date();
-        if (jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM player_emails WHERE email = ?)", Boolean.class, signupForm.getEmail())) {
-            return new ResponseEntity<Integer>(-1, HttpStatus.BAD_REQUEST);
-        }
+        Date created = new Date();        
         Integer playerId = SqlStatements.use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
                 signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
-        URI url = UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/players/{id}").buildAndExpand(playerId).toUri();
+        Player player = new Player(playerId);
+        URI url = UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/players/{id}").buildAndExpand(player.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
-        return new ResponseEntity<Integer>(playerId, headers, HttpStatus.CREATED);
+        return new ResponseEntity<Player>(player, headers, HttpStatus.CREATED);
+    }
+    
+    private boolean playerExists(String email) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM player_emails WHERE email = ?)", Boolean.class, email);        
     }
     
     private ReferredBy findReferredBy(String r) {
@@ -82,5 +128,5 @@ public class SignupController {
     }
     
     // cglib ceremony
-    public SignupController() {}
+    public SecurityController() {}
 }
