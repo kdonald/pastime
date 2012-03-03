@@ -56,7 +56,7 @@ public class SubscriptionRepositoryTests {
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         Map<String, Object> row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keith.donald@gmail.com'");
         assertNotNull(row.get("id"));
@@ -79,13 +79,13 @@ public class SubscriptionRepositoryTests {
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         subscription = controller.subscribe(form);
         Mockito.verifyNoMoreInteractions(subscriberListener);
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));        
     }
 
@@ -113,7 +113,7 @@ public class SubscriptionRepositoryTests {
         subscription = controller.subscribe(form);
         assertEquals(subscription.getFirstName(), "Keri");    
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=234567", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=234567", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keridonald@gmail.com')", Boolean.class));
         Map<String, Object> row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keridonald@gmail.com'");
         assertNotNull(row.get("id"));
@@ -137,7 +137,7 @@ public class SubscriptionRepositoryTests {
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());        
 
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         Map<String, Object> row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keith.donald@gmail.com'");
@@ -162,7 +162,7 @@ public class SubscriptionRepositoryTests {
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());        
 
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
         Map<String, Object> row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keith.donald@gmail.com'");
@@ -187,7 +187,7 @@ public class SubscriptionRepositoryTests {
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "a3c2b5", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=a3c2b5", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=a3c2b5", subscription.getReferralLink());        
 
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keridonald@gmail.com')", Boolean.class));
         form = new SubscribeForm();
@@ -205,7 +205,7 @@ public class SubscriptionRepositoryTests {
         subscription = controller.subscribe(form);
         assertEquals(subscription.getFirstName(), "Keri");    
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=234567", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=234567", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keridonald@gmail.com')", Boolean.class));
         Map<String, Object> row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keridonald@gmail.com'");
         assertNotNull(row.get("id"));
@@ -228,7 +228,7 @@ public class SubscriptionRepositoryTests {
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals(subscription.getFirstName(), "Keith");        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
 
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keridonald@gmail.com')", Boolean.class));
@@ -247,7 +247,7 @@ public class SubscriptionRepositoryTests {
         subscription = controller.subscribe(form);
         assertEquals(subscription.getFirstName(), "Keri");    
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=234567", subscription.getReferralLink());        
+        assertEquals("http://pastime.com/?r=234567", subscription.getReferralLink());        
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keridonald@gmail.com')", Boolean.class));
         Map<String, Object> row = jdbcTemplate.queryForMap("select id, first_name, last_name, referral_code, referred_by, created, unsubscribed from prelaunch.subscriptions where email = 'keridonald@gmail.com'");
         assertNotNull(row.get("id"));
@@ -279,13 +279,13 @@ public class SubscriptionRepositoryTests {
         form.setEmail("keith.donald@gmail.com");
         Subscription subscription = controller.subscribe(form);
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
-        assertEquals("http://pastimebrevard.com/?r=123456", subscription.getReferralLink());
+        assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());
         form.setEmail("keith@pastimebrevard.com");
         controller.setReferralCodeGenerator(new DuplicateReturningReferralCodeGenerator());
         subscription = controller.subscribe(form);
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith@pastimebrevard.com", new Name("Keith", "Donald"), "234567", null, new Date()));        
         assertNotNull(subscription.getReferralLink());
-        assertEquals("http://pastimebrevard.com/?r=234567", subscription.getReferralLink());
+        assertEquals("http://pastime.com/?r=234567", subscription.getReferralLink());
         assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastimebrevard.com')", Boolean.class));
     }
 

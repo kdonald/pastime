@@ -38,13 +38,13 @@ public class NextController {
         this.templateLoader = templateLoader;
     }
 
-    // http://pastimebrevard.com/hitmen/attendance/og-hitman?a=yes
+    // http://pastime.com/hitmen/attendance/og-hitman?a=yes
     @RequestMapping(value="/{team}/attendance/{player}", method=RequestMethod.GET, params="a")
     public String markAttendanceForGames(@Valid AttendanceUpdate update, Model model) {
         return applyUpdate(update, model);
     }
 
-    // http://pastimebrevard.com/hitmen/attendance/1/og-hitman?a=yes
+    // http://pastime.com/hitmen/attendance/1/og-hitman?a=yes
     @RequestMapping(value="/{team}/attendance/{game}/{player}", method=RequestMethod.GET, params="a")
     public String markAttendanceForGame(@Valid AttendanceUpdate update, Model model) {
         return applyUpdate(update, model);

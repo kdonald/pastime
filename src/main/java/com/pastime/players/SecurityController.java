@@ -99,7 +99,7 @@ public class SecurityController {
                 signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
         Player player = new Player(playerId);
-        URI url = UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/players/{id}").buildAndExpand(player.getId()).toUri();
+        URI url = UriComponentsBuilder.fromHttpUrl("http://pastime.com/players/{id}").buildAndExpand(player.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
         signinSession(player, response);

@@ -44,8 +44,8 @@ public class WelcomeMailer implements SubscriberListener {
 
     private String welcomeBody(Subscriber subscriber) {
         Map<String, Object> model = new HashMap<String, Object>(2, 1); 
-        model.put("referralLink", "http://pastimebrevard.com/?r=" + subscriber.getReferralCode());
-        model.put("referralInsightsLink", "http://pastimebrevard.com/referrals/" + subscriber.getReferralCode());
+        model.put("referralLink", "http://pastime.com/?r=" + subscriber.getReferralCode());
+        model.put("referralInsightsLink", "http://pastime.com/referrals/" + subscriber.getReferralCode());
         return templateLoader.getTemplate("prelaunch/mail/welcome").render(model);
     }
     

@@ -24,7 +24,7 @@ public class SubscriptionRepository {
 
     private SubscriberListener subscriberListener;
 
-    private String applicationUrl = "http://pastimebrevard.com";
+    private String applicationUrl = "http://pastime.com";
 
     public SubscriptionRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

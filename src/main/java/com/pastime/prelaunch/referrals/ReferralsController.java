@@ -64,7 +64,7 @@ public class ReferralsController {
         }
         model.addAttribute("name", name);        
         model.addAttribute("referralCode", referralCode);
-        model.addAttribute("referralLink", "http://pastimebrevard.com/?r=" + referralCode);
+        model.addAttribute("referralLink", "http://pastime.com/?r=" + referralCode);
         return "prelaunch/referrals/code-more";
     }
 

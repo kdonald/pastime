@@ -31,7 +31,7 @@ public class TeamsController {
         jdbcTemplate.update("INSERT INTO team_admins (team, player) VALUES (?, ?)", teamId, player.getId());
         Team team = new Team(teamId);        
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(UriComponentsBuilder.fromHttpUrl("http://pastimebrevard.com/teams/{id}").buildAndExpand(team.getId()).toUri());
+        headers.setLocation(UriComponentsBuilder.fromHttpUrl("http://pastime.com/teams/{id}").buildAndExpand(team.getId()).toUri());
         return new ResponseEntity<Object>(team, headers, HttpStatus.OK);
     }
     
