@@ -1,6 +1,7 @@
 package com.pastime.players;
 
 import static org.springframework.dao.support.DataAccessUtils.singleResult;
+import static org.springframework.jdbc.core.SqlStatements.use;
 
 import java.net.URI;
 import java.sql.ResultSet;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlStatements;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +31,10 @@ import com.pastime.prelaunch.ReferralCodeGenerator;
 @Controller
 public class SecurityController {
 
-    private ReferralCodeGenerator referralCodeGenerator = new DefaultReferralCodeGenerator();
-
     private JdbcTemplate jdbcTemplate;
     
+    private ReferralCodeGenerator referralCodeGenerator = new DefaultReferralCodeGenerator();
+
     private StringCookieGenerator cookieGenerator = new StringCookieGenerator("auth_token");
     
     public SecurityController(JdbcTemplate jdbcTemplate) {
@@ -95,7 +95,7 @@ public class SecurityController {
         String referralCode = generateUniqueReferralCode();
         ReferredBy referredBy = findReferredBy(signupForm.getR());
         Date created = new Date();        
-        Integer playerId = SqlStatements.use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
+        Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
                 signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
         Player player = new Player(playerId);

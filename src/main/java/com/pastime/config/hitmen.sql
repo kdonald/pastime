@@ -1,3 +1,5 @@
+INSERT INTO sports (name) VALUES ('Flag Football');
+
 INSERT INTO players (email, first_name, last_name, birthdate, number, nickname, referral_code, referred_by) values ('keith@pastimebrevard.com', 'Keith', 'Donald', '12/29/1977', 9, null, 'jnhyy5', null);
 INSERT INTO players (email, first_name, last_name, birthdate, number, nickname, referral_code, referred_by) values ('alexander.weaver@gmail.com', 'Alexander', 'Weaver', '05/20/1977', 37, 'OG Hitman', '96dvlb', 1);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('coolhandluke2222@gmail.com', 'Brian', 'Fisher', 26, 'Fish', 'mvwkdw', null);

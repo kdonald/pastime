@@ -16,6 +16,9 @@ public class SqlStatements {
 
     public static SqlExecutor use(final JdbcTemplate jdbcTemplate) {
         return new SqlExecutor() {
+            public Number insert(String sql, Object... args) {
+                return insert(sql, "id", Number.class, args);
+            }
             @SuppressWarnings("unchecked")
             public <K> K insert(String sql, String keyColumn, Class<K> keyType, Object... args) {
                 GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -27,9 +30,11 @@ public class SqlStatements {
     }
     
     public interface SqlExecutor {
+
+        Number insert(String sql, Object... args);
         
         <K> K insert(String sql, String keyColumn, Class<K> keyType, Object... args);
-        
+
     }
     
 }

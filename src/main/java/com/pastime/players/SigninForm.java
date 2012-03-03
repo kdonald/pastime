@@ -16,7 +16,7 @@ public class SigninForm {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim().toLowerCase();
     }
     
     public boolean isEmail() {

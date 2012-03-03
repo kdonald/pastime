@@ -13,7 +13,10 @@ DROP TABLE leagues;
 DROP TABLE sponsors;
 DROP TABLE venues;
 DROP TABLE organizations;
+DROP TABLE team_player_positions;
 DROP TABLE team_players;
+DROP TABLE team_coaches;
+DROP TABLE team_admins;
 DROP TABLE teams;
 DROP TABLE player_children;
 DROP TABLE player_sports;
@@ -53,33 +56,38 @@ CREATE TABLE format_rules (sport varchar(64),
 CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
   first_name varchar(64) NOT NULL,
   last_name varchar(64) NOT NULL,
-  password varchar(16) NOT NULL,
+  picture varchar(256),  
+  gender char(1) NOT NULL, -- (m)ale, (f)emale  
   birthday date NOT NULL,
   minor boolean,
-  gender char(1) NOT NULL, -- (m)ale, (f)emale
+  height real,
+  weight real,
   street_address varchar(128),
   city varchar(64),
   state char(2),  
   zip_code char(5) NOT NULL,
+  current_city varchar(128),
   latitude real,
   longitude real,
+  hometown varchar(128),
+  school varchar(128),
   number smallint,
   nickname varchar(16),
-  picture varchar(256),
   emergency_contact_name varchar(128),
   emergency_contact_phone char(16),
   vegetarian boolean,
+  password varchar(16) NOT NULL,  
   referral_code char(6) NOT NULL UNIQUE,
   referred_by integer, 
   created timestamp NOT NULL CONSTRAINT df_players_created DEFAULT now(),
-  deleted boolean,  
+  deactivated boolean CONSTRAINT df_players_deactivated DEFAULT false,
   CONSTRAINT fk_players_referred_by FOREIGN KEY (referred_by) REFERENCES players(id)  
 );
 
 -- Player email addresses e.g. Keith Donald home, Keith Donald work
 CREATE TABLE player_emails (email varchar(320),
   label varchar(64) NOT NULL, -- home, work, facebook, etc.
-  primary_email boolean,
+  primary_email boolean NOT NULL CONSTRAINT df_primary_email DEFAULT false,
   player integer,
   CONSTRAINT pk_player_emails PRIMARY KEY (email),
   CONSTRAINT fk_player_emails_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
@@ -88,7 +96,7 @@ CREATE TABLE player_emails (email varchar(320),
 -- Player phone numbers e.g. Keith Donald home, Keith Donald mobile
 CREATE TABLE player_phones (number varchar(16),
   label varchar(64) NOT NULL, -- home, work, mobile, etc.
-  primary_phone boolean,
+  primary_phone boolean NOT NULL CONSTRAINT df_primary_phone DEFAULT false,
   player integer,  
   CONSTRAINT pk_player_phones PRIMARY KEY (number),
   CONSTRAINT fk_player_phones_player FOREIGN KEY (player) REFERENCES players(id) ON DELETE CASCADE
@@ -132,17 +140,36 @@ CREATE TABLE player_children (player integer,
 -- Pastime Franchises e.g. Hitmen
 CREATE TABLE teams (id serial CONSTRAINT pk_teams PRIMARY KEY,
   name varchar(64) NOT NULL,
-  sport varchar(64) NOT NULL,    
+  sport varchar(64) NOT NULL,
   founded date,
-  founded_by integer,
+  founder integer,
   logo varchar(256),
-  captain integer NOT NULL,
   created timestamp NOT NULL CONSTRAINT df_teams_created DEFAULT now(),
-  created_by integer NOT NULL,
-  CONSTRAINT fk_teams_sport FOREIGN KEY (sport) REFERENCES sports(name),  
-  CONSTRAINT fk_teams_founded_by FOREIGN KEY (founded_by) REFERENCES players(id),
-  CONSTRAINT fk_teams_captain FOREIGN KEY (captain) REFERENCES players(id),
-  CONSTRAINT fk_teams_created_by FOREIGN KEY (created_by) REFERENCES players(id)  
+  CONSTRAINT fk_teams_sport FOREIGN KEY (sport) REFERENCES sports(name),
+  CONSTRAINT fk_teams_founder FOREIGN KEY (founder) REFERENCES players(id)
+);
+
+-- Pastime Franchise "Admins" that can administer the master record of the team e.g. Hitmen Keith Donald, Brian Fisher
+CREATE TABLE team_admins (team integer,
+  player integer,
+  created timestamp NOT NULL CONSTRAINT df_team_admins_removed DEFAULT now(),
+  removed boolean CONSTRAINT df_team_admins_removed DEFAULT false,  
+  CONSTRAINT pk_team_front_office PRIMARY KEY (team, player),    
+  CONSTRAINT fk_team_front_office_team FOREIGN KEY (team) REFERENCES teams(id),
+  CONSTRAINT fk_team_front_office_player FOREIGN KEY (player) REFERENCES players(id)  
+);
+
+-- Pastime Franchise Coaches e.g. Hitmen Brian Fisher
+CREATE TABLE team_coaches (team integer,
+  player integer,
+  role varchar(64), -- Head Coach, Assistant Coach, etc.
+  picture varchar(256),  
+  became date,
+  status char(1) NOT NULL CONSTRAINT df_team_players_status DEFAULT 'a', -- (a)ctive, (r)etired  
+  retired date,
+  CONSTRAINT pk_team_coaches PRIMARY KEY (team, player, role),    
+  CONSTRAINT fk_team_coaches_team FOREIGN KEY (team) REFERENCES teams(id),
+  CONSTRAINT fk_team_coaches_player FOREIGN KEY (player) REFERENCES players(id)  
 );
 
 -- Pastime "Franchise" Players e.g. Hitmen Keith Donald, Alexander Weaver, Brian Fisher, etc.
@@ -151,7 +178,9 @@ CREATE TABLE team_players (team integer,
   number smallint,
   nickname varchar(16),
   picture varchar(256),
-  status char(1), -- (a)ctive, (i)njured, on (l)eave, (r)etired
+  captain boolean NOT NULL CONSTRAINT df_team_players_captain DEFAULT false,
+  captain_of varchar(64), -- Defense, Offense, Special Teams, etc.
+  status char(1) NOT NULL CONSTRAINT df_team_players_status DEFAULT 'a', -- (a)ctive, (i)njured, on (l)eave, (r)etired
   joined date,
   retired date,
   CONSTRAINT pk_team_players PRIMARY KEY (team, player),  
@@ -159,6 +188,17 @@ CREATE TABLE team_players (team integer,
   CONSTRAINT fk_team_players_player FOREIGN KEY (player) REFERENCES players(id),
   CONSTRAINT uq_team_players_number UNIQUE (team, number),
   CONSTRAINT uq_team_players_nickname UNIQUE (team, nickname)  
+);
+
+-- Pastime "Franchise" Player Positions
+CREATE TABLE team_player_positions (team integer,
+  player integer,
+  position varchar(16), -- 'QB', 'RB', 'WR', 'S', 'LB', 'CB', 'C', 'R', etc.
+  rank smallint NOT NULL, -- determines order positions are listed for players who play multiple
+  depth smallint, -- basis for positional depth chart e.g. 1 for WR1, 2 for WR2, etc.
+  CONSTRAINT pk_team_player_positions PRIMARY KEY (team, player, position),  
+  CONSTRAINT fk_team_player_positions_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
+  CONSTRAINT fk_team_player_positions_player FOREIGN KEY (player) REFERENCES players(id) 
 );
 
 -- Pastime Organizations e.g. Brevard County Parks and Recreation, Sandox Volleyball
@@ -216,8 +256,7 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
 -- League staff e.g. Commissioner
 CREATE TABLE league_staff (league integer,
   player integer,
-  role varchar(64) NOT NULL, -- Commissioner, Assistant, Referee
-  admin boolean, -- league site admin?
+  role varchar(64) NOT NULL, -- Commissioner, Assistant, Referee, Admin
   picture varchar(256),
   status char(1), -- (a)ctive, (r)etired
   joined date,
@@ -278,8 +317,9 @@ CREATE TABLE player_pool (league integer,
 CREATE TABLE registered_teams (league integer,
   season integer,
   team integer,
-  name varchar(64) NOT NULL, -- for history since team name can change
-  captain integer NOT NULL,
+  team_name varchar(64) NOT NULL, -- for history since team name can change
+  team_logo varchar(256), -- for history since team logo can change
+  team_captain integer NOT NULL, -- for history since team captain can change,
   status char(1) NOT NULL, -- registration (c)onfirmed, (n)eeds players, (p)ending payment
   created timestamp NOT NULL CONSTRAINT df_registered_team_created DEFAULT now(),  
   confirmed timestamp,  
@@ -287,8 +327,8 @@ CREATE TABLE registered_teams (league integer,
   CONSTRAINT pk_registered_teams PRIMARY KEY (league, season, team),
   CONSTRAINT fk_registered_teams_season FOREIGN KEY (league, season) REFERENCES seasons(league, number),  
   CONSTRAINT fk_registered_teams_team FOREIGN KEY (team) REFERENCES teams(id),
-  CONSTRAINT fk_registered_teams_captain FOREIGN KEY (captain) REFERENCES players(id),
-  CONSTRAINT uq_registered_teams_team_name UNIQUE (league, season, name)
+  CONSTRAINT fk_registered_teams_captain FOREIGN KEY (team_captain) REFERENCES players(id),
+  CONSTRAINT uq_registered_teams_team_name UNIQUE (league, season, team_name)
 );
 
 -- Pastime Team Registration Payments Due e.g. Brian Fisher $480.00; Brian Fisher $25.00, Keith Donald $25.00, etc.
@@ -310,15 +350,16 @@ CREATE TABLE registered_players (league integer,
   season integer,
   team integer,  
   player integer,
-  number smallint NOT NULL, -- for history since number can change
-  nickname varchar(16), -- for history since nickname can change
+  team_player_number smallint NOT NULL, -- for history since number can change
+  team_player_nickname varchar(16), -- for history since nickname can change
+  team_player_picture varchar(256), -- for history since picture can change
   sub boolean,
   created timestamp NOT NULL CONSTRAINT df_registered_player_created DEFAULT now(),
   CONSTRAINT pk_registered_players PRIMARY KEY (league, season, team, player),
   CONSTRAINT fk_registered_players_registered_team FOREIGN KEY (league, season, team) REFERENCES registered_teams(league, season, team),
   CONSTRAINT fk_registered_players_player FOREIGN KEY (player) REFERENCES players(id),
-  CONSTRAINT uq_registered_players_team_number UNIQUE (league, season, team, number),
-  CONSTRAINT uq_registered_players_team_nickname UNIQUE (league, season, team, nickname)  
+  CONSTRAINT uq_registered_players_team_number UNIQUE (league, season, team, team_player_number),
+  CONSTRAINT uq_registered_players_team_nickname UNIQUE (league, season, team, team_player_nickname)  
 );
 
 -- Pastime Team Sponsorship e.g. Fired Up Pizza Hitmen $250.00
