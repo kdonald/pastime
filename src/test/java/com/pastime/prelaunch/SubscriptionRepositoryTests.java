@@ -272,7 +272,7 @@ public class SubscriptionRepositoryTests {
     @Test
     public void subscribeDuplicateReferralCode() {
         assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith.donald@gmail.com')", Boolean.class));
-        assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastimebrevard.com')", Boolean.class));        
+        assertFalse(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastime.com')", Boolean.class));        
         SubscribeForm form = new SubscribeForm();
         form.setFirstName("Keith");
         form.setLastName("Donald");
@@ -280,13 +280,13 @@ public class SubscriptionRepositoryTests {
         Subscription subscription = controller.subscribe(form);
         Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith.donald@gmail.com", new Name("Keith", "Donald"), "123456", null, new Date()));
         assertEquals("http://pastime.com/?r=123456", subscription.getReferralLink());
-        form.setEmail("keith@pastimebrevard.com");
+        form.setEmail("keith@pastime.com");
         controller.setReferralCodeGenerator(new DuplicateReturningReferralCodeGenerator());
         subscription = controller.subscribe(form);
-        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith@pastimebrevard.com", new Name("Keith", "Donald"), "234567", null, new Date()));        
+        Mockito.verify(subscriberListener).subscriberAdded(new Subscriber("keith@pastime.com", new Name("Keith", "Donald"), "234567", null, new Date()));        
         assertNotNull(subscription.getReferralLink());
         assertEquals("http://pastime.com/?r=234567", subscription.getReferralLink());
-        assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastimebrevard.com')", Boolean.class));
+        assertTrue(jdbcTemplate.queryForObject("select exists(select 1 from prelaunch.subscriptions where email = 'keith@pastime.com')", Boolean.class));
     }
 
     @Test

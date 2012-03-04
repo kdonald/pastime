@@ -38,7 +38,7 @@ public class WelcomeMailerTests {
         Message message = Mailbox.get("keith.donald@gmail.com").get(0);
         assertEquals("Welcome to Pastime", message.getSubject());
         assertEquals("Keith Donald", ((InternetAddress) message.getFrom()[0]).getPersonal());        
-        assertEquals("keith@pastimebrevard.com", ((InternetAddress) message.getFrom()[0]).getAddress());
+        assertEquals("keith@pastime.com", ((InternetAddress) message.getFrom()[0]).getAddress());
         assertEquals("Keith Donald", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getPersonal());        
         assertEquals("keith.donald@gmail.com", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getAddress());
         assertTrue(((String) message.getContent()).contains("Keith"));        
@@ -49,7 +49,7 @@ public class WelcomeMailerTests {
         assertEquals(1, Mailbox.get("keridonald@gmail.com").getNewMessageCount());
         Message message2 = Mailbox.get("keridonald@gmail.com").get(0);
         assertEquals("Keith Donald", ((InternetAddress) message2.getFrom()[0]).getPersonal());        
-        assertEquals("keith@pastimebrevard.com", ((InternetAddress) message2.getFrom()[0]).getAddress());
+        assertEquals("keith@pastime.com", ((InternetAddress) message2.getFrom()[0]).getAddress());
         assertEquals("Welcome to Pastime", message.getSubject());
         assertEquals("Keri Donald", ((InternetAddress) message2.getRecipients(RecipientType.TO)[0]).getPersonal());        
         assertEquals("keridonald@gmail.com", ((InternetAddress) message2.getRecipients(RecipientType.TO)[0]).getAddress());

@@ -30,7 +30,7 @@ public class WelcomeMailer implements SubscriberListener {
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper welcome = new MimeMessageHelper(message);
-               welcome.setFrom(new InternetAddress("keith@pastimebrevard.com", "Keith Donald"));
+               welcome.setFrom(new InternetAddress("keith@pastime.com", "Keith Donald"));
                welcome.setTo(new InternetAddress(subscriber.getEmail(), subscriber.getName().toString()));
                welcome.setSubject("Welcome to Pastime");
                Map<String, Object> model = new HashMap<String, Object>(2, 1);
