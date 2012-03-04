@@ -58,6 +58,7 @@ public class TeamsController {
         if (notFound(team, response)) {
             return null;
         }
+        model.addAttribute("id", team.getString("id"));
         model.addAttribute("name", team.getString("name"));
         model.addAttribute("sport", team.getString("sport"));
         model.addAttribute("url", url(team));
@@ -65,6 +66,14 @@ public class TeamsController {
         addPlayers(id, model);
         addAdmin(id, model);
         return "teams/team";
+    }
+    
+    @RequestMapping(value="/teams/{team}/players", method=RequestMethod.POST)
+    @Transactional    
+    public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer team, @Valid PlayerForm form) {
+        Integer player = jdbcTemplate.queryForInt("SELECT player FROM player_emails WHERE email = ?", form.getEmail());
+        jdbcTemplate.update("INSERT INTO team_players (team, player) VALUES (?, ?)", team, player);        
+        return new ResponseEntity<String>((String) null, HttpStatus.NO_CONTENT);
     }
 
     private boolean notFound(SqlRowSet row, HttpServletResponse response) throws IOException {

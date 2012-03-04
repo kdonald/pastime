@@ -32,7 +32,7 @@ public class WebConfig extends BaseWebConfig {
     @Bean
     public ViewResolver viewResolver(ResourceLoader resourceLoader) {
         JMustacheViewResolver resolver = new JMustacheViewResolver(resourceLoader);
-        // resolver.setCache(false); // development only
+        resolver.setCache(false); // development only
         return resolver;
     }
     

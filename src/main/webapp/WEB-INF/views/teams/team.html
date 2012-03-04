@@ -57,11 +57,11 @@
     </ul>
     {{/players?}}        
     {{#admin}}
-    <form id="addPlayers" action="/teams/{{name}}/players" method="post">
+    <form id="addPlayers" action="/teams/{{id}}/players" method="post">
       <h3>Add a Player</h3>
       <label>
         <strong>Email</strong>
-        <input type="text" name="name" required />    
+        <input type="text" name="email" required />    
       </label>
       <button>Add</button>
     </form>
