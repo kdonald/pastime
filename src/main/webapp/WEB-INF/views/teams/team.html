@@ -1,37 +1,23 @@
 <!DOCTYPE html>
 <html xmlns:fb="http://ogp.me/ns/fb#" class="no-js" lang="en">
 <head>
-<title>Pastime - Create a Team</title>
+<title>{{name}}</title>
 <meta charset="utf-8" />
-<meta name="description" content="Create a new team." />
-<meta name="keywords" content="pastime, create team, new team" />
+<meta name="description" content="The home of the {{name}}." />
+<meta name="keywords" content="{{name}}, {{name}} {{sport}}" />
 <meta name="viewport" content="width=device-width">
 <meta property="fb:app_id" content="212373618850030" />
 <meta property="fb:admins" content="1255689239" />
-<meta property="og:title" content="Pastime - Create a Team" />
-<meta property="og:description" content="Create a new team" />
-<meta property="og:url" content="http://pastime.com/teams/create" />
-<meta property="og:image" content="http://pastime.com/static/app/0.1.2/images/p-icon.png" />
+<meta property="og:title" content="{{name}}" />
+<meta property="og:description" content="The home of the {{name}}." />
+<meta property="og:url" content="{{url}}" />
+<meta property="og:image" content="{{logo}}" />
 <meta property="og:site_name" content="Pastime" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:type" content="website" />
 <link rel="stylesheet" href="/static/app/0.1.2/signup.css" />
 <script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
 <script src="/static/modernizr-2.5.2.js"></script>
-<script src="/static/require-1.0.4.js"></script>
-<script>
-  require.config({
-    baseUrl : "/static/app/0.1.2",
-    paths : {
-      "handlebars" : "../../libs/handlebars/1.0.0.beta6/handlebars",
-      "jquery" : "../../libs/jquery/1.7.1/jquery",
-      "text" : "../../libs/requirejs-text/1.0.2/text",
-      "textselect" : "../../libs/textselect/1.0.0/textselect",
-      "polyfiller" : "../../libs/webshims/1.8.7/polyfiller"
-    },
-    priority : [ "common", "prelaunch/index" ]
-  });
-</script>
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push([ '_setAccount', 'UA-28760845-1' ]);
@@ -61,13 +47,17 @@
     </div>
   </header>
   <div id="main" class="pagecontent">
-    <h1>Hitmen</h1>
-    <h2>Players</h2>
+    <h1>{{name}}</h1>
+    {{#players?}}
+    <h2>Players</h2>    
     <ul>
-      <li>Alexander Weaver</li>
-      <li>Keith Donald</li>
+    {{#players}}
+      <li><a href="{{url}}">{{fullName}}</a></li>
+    {{/players}}
     </ul>
-    <form id="addPlayers" action="/teams/{{team}}/players" method="post">
+    {{/players?}}        
+    {{#admin}}
+    <form id="addPlayers" action="/teams/{{name}}/players" method="post">
       <h3>Add a Player</h3>
       <label>
         <strong>Email</strong>
@@ -75,6 +65,7 @@
       </label>
       <button>Add</button>
     </form>
+    {{/admin}}
   </div>  
   <footer>
     <div class="pagecontent">

@@ -49,8 +49,6 @@ public class WebConfig extends BaseWebConfig {
         registry.addViewController("/errors/resource-not-found");
         registry.addViewController("/errors/internal-error");    
         // TODO split into module once large enough
-        registry.addViewController("/teams/create");
-        registry.addViewController("/teams/team");
         registry.addViewController("/teams/player");
         registry.addViewController("/leagues/preview");
         super.addViewControllers(registry);

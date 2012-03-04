@@ -54,17 +54,11 @@ public class SecurityController {
             if (!rs.last()) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("email not on file"), HttpStatus.BAD_REQUEST);               
             }
-            if (rs.getRow() != 1) {
-                throw new IllegalStateException("Not a unique email address - should never happen");
-            }
         } else {
             rs = jdbcTemplate.queryForRowSet("select username_type, player, team, league FROM usernames where username = ?", form.getName());
             if (!rs.last()) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("username not on file"), HttpStatus.BAD_REQUEST);               
             }
-            if (rs.getRow() != 1) {
-                throw new IllegalStateException("Not a unique username - should never happen");
-            }            
             String type = rs.getString("username_type");
             if ("p".equals(type)) {
                 rs = jdbcTemplate.queryForRowSet("select p.id, p.password FROM player p where p.id = ?", rs.getInt("player"));

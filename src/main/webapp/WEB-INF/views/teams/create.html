@@ -18,20 +18,6 @@
 <link rel="stylesheet" href="/static/app/0.1.2/signup.css" />
 <script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
 <script src="/static/modernizr-2.5.2.js"></script>
-<script src="/static/require-1.0.4.js"></script>
-<script>
-  require.config({
-    baseUrl : "/static/app/0.1.2",
-    paths : {
-      "handlebars" : "../../libs/handlebars/1.0.0.beta6/handlebars",
-      "jquery" : "../../libs/jquery/1.7.1/jquery",
-      "text" : "../../libs/requirejs-text/1.0.2/text",
-      "textselect" : "../../libs/textselect/1.0.0/textselect",
-      "polyfiller" : "../../libs/webshims/1.8.7/polyfiller"
-    },
-    priority : [ "common", "prelaunch/index" ]
-  });
-</script>
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push([ '_setAccount', 'UA-28760845-1' ]);
@@ -70,10 +56,9 @@
       <label>
         <strong>Sport</strong>
         <select name="sport">
-          <option value="Flag Football">Flag Football</option>
-          <option value="Softball">Softball</option>
-          <option value="Volleyball">Volleyball</option>
-          <option value="Ultimate Frisbee">Ultimate Frisbee</option>          
+        {{#sports}} 
+          <option value="{{this}}">{{this}}</option>     
+        {{/sports}}          
         </select>
       </label>
       <button>Create</button>
