@@ -10,7 +10,7 @@ import org.springframework.templating.StringTemplateLoader;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.pastime.players.SecurityController;
+import com.pastime.players.AccountController;
 import com.pastime.players.SigninInterceptor;
 import com.pastime.players.TeamsController;
 
@@ -32,8 +32,8 @@ public class PlayersConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public SecurityController signupController() {
-        return new SecurityController(jdbcTemplate);
+    public AccountController signupController() {
+        return new AccountController(jdbcTemplate);
     }
     
     @Bean

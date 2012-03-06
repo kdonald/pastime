@@ -16,7 +16,7 @@ public final class SecurityContext {
         currentPlayer.set(player);
     }
 
-    public static boolean userSignedIn() {
+    public static boolean playerSignedIn() {
         return currentPlayer.get() != null;
     }
 

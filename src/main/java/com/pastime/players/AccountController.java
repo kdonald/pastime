@@ -29,7 +29,7 @@ import com.pastime.prelaunch.DefaultReferralCodeGenerator;
 import com.pastime.prelaunch.ReferralCodeGenerator;
 
 @Controller
-public class SecurityController {
+public class AccountController {
 
     private JdbcTemplate jdbcTemplate;
     
@@ -37,7 +37,7 @@ public class SecurityController {
 
     private StringCookieGenerator cookieGenerator = new StringCookieGenerator("auth_token");
     
-    public SecurityController(JdbcTemplate jdbcTemplate) {
+    public AccountController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -88,9 +88,10 @@ public class SecurityController {
         }
         String referralCode = generateUniqueReferralCode();
         ReferredBy referredBy = findReferredBy(signupForm.getR());
-        Date created = new Date();        
-        Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
-                signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
+        Date created = new Date();
+        String picture = "http://pastime.com/static/images/default-profile-pic.png";
+        Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, picture, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
+                signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), picture, signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
         Player player = new Player(playerId);
         URI url = UriComponentsBuilder.fromHttpUrl("http://pastime.com/players/{id}").buildAndExpand(player.getId()).toUri();
@@ -132,5 +133,5 @@ public class SecurityController {
     }
     
     // cglib ceremony
-    public SecurityController() {}
+    public AccountController() {}
 }

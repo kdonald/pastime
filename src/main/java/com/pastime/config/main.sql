@@ -56,7 +56,7 @@ CREATE TABLE format_rules (sport varchar(64),
 CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
   first_name varchar(64) NOT NULL,
   last_name varchar(64) NOT NULL,
-  picture varchar(256),  
+  picture varchar(256) NOT NULL,  
   gender char(1) NOT NULL, -- (m)ale, (f)emale  
   birthday date NOT NULL,
   minor boolean,
