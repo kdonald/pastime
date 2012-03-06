@@ -17,6 +17,7 @@ class GlobalExceptionHandling {
     
     @ExceptionHandler(value = IllegalArgumentException.class)
     public void handle(IllegalArgumentException e, HttpServletResponse response) throws IOException {
+        System.err.print(e);
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
     }
 

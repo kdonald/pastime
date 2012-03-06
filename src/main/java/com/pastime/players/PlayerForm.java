@@ -1,11 +1,18 @@
 package com.pastime.players;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 public class PlayerForm {
 
-    @NotEmpty
+    private Integer id;
+    
     private String email;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getEmail() {
         return email;
@@ -14,5 +21,5 @@ public class PlayerForm {
     public void setEmail(String email) {
         this.email = email.trim().toLowerCase();
     }
-        
+
 }

@@ -1,6 +1,5 @@
 package com.pastime.players;
 
-import org.springframework.util.SlugUtils;
 
 public class TeamPlayer {
 
@@ -14,8 +13,8 @@ public class TeamPlayer {
     
     private String nickname;
 
-    public TeamPlayer(String teamUrl, String firstName, String lastName, String picture, Integer number, String nickname) {
-        this.url = teamUrl + "/" + SlugUtils.toSlug(nickname);
+    public TeamPlayer(String teamUrl, Integer id, String firstName, String lastName, String picture, Integer number, String nickname) {
+        this.url = playerUrl(teamUrl, id, nickname);
         this.name = new Name(firstName, lastName);
         this.picture = picture;
         this.number = number;
@@ -41,5 +40,13 @@ public class TeamPlayer {
     public String getNickname() {
         return nickname;
     }    
-    
+
+    private String playerUrl(String teamUrl, Integer id, String nickname) {
+        if (nickname != null) {
+            return teamUrl + "/" + nickname;
+        } else {
+            return teamUrl + "/" + id;
+        }
+    }
+
 }

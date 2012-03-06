@@ -14,9 +14,8 @@ DROP TABLE sponsors;
 DROP TABLE venues;
 DROP TABLE organizations;
 DROP TABLE team_player_positions;
-DROP TABLE team_players;
-DROP TABLE team_coaches;
-DROP TABLE team_admins;
+DROP TABLE team_member_roles;
+DROP TABLE team_members;
 DROP TABLE teams;
 DROP TABLE player_children;
 DROP TABLE player_sports;
@@ -144,50 +143,55 @@ CREATE TABLE teams (id serial CONSTRAINT pk_teams PRIMARY KEY,
   founded date,
   founder integer,
   logo varchar(256),
+  gender char(1), -- (m)ale only, (f)emale only, (c)o-ed, null (not specified, accepts either male or female)
+  age_min smallint,
   created timestamp NOT NULL CONSTRAINT df_teams_created DEFAULT now(),
   CONSTRAINT fk_teams_sport FOREIGN KEY (sport) REFERENCES sports(name),
   CONSTRAINT fk_teams_founder FOREIGN KEY (founder) REFERENCES players(id)
 );
 
--- Pastime Franchise "Admins" that can administer the master record of the team e.g. Hitmen Keith Donald, Brian Fisher
-CREATE TABLE team_admins (team integer,
-  player integer,
-  created timestamp NOT NULL CONSTRAINT df_team_admins_removed DEFAULT now(),
-  removed boolean CONSTRAINT df_team_admins_removed DEFAULT false,  
-  CONSTRAINT pk_team_front_office PRIMARY KEY (team, player),    
-  CONSTRAINT fk_team_front_office_team FOREIGN KEY (team) REFERENCES teams(id),
-  CONSTRAINT fk_team_front_office_player FOREIGN KEY (player) REFERENCES players(id)  
-);
-
--- Pastime Franchise Coaches e.g. Hitmen Brian Fisher
-CREATE TABLE team_coaches (team integer,
-  player integer,
-  role varchar(64), -- Head Coach, Assistant Coach, etc.
-  picture varchar(256),  
-  became date,
-  status char(1) NOT NULL CONSTRAINT df_team_players_status DEFAULT 'a', -- (a)ctive, (r)etired  
-  retired date,
-  CONSTRAINT pk_team_coaches PRIMARY KEY (team, player, role),    
-  CONSTRAINT fk_team_coaches_team FOREIGN KEY (team) REFERENCES teams(id),
-  CONSTRAINT fk_team_coaches_player FOREIGN KEY (player) REFERENCES players(id)  
-);
-
--- Pastime "Franchise" Players e.g. Hitmen Keith Donald, Alexander Weaver, Brian Fisher, etc.
-CREATE TABLE team_players (team integer,
+-- Pastime "Franchise" Members e.g. Hitmen Keith Donald, Alexander Weaver, Brian Fisher, etc.
+CREATE TABLE team_members (team integer,
   player integer,
   number smallint,
   nickname varchar(16),
   picture varchar(256),
-  captain boolean NOT NULL CONSTRAINT df_team_players_captain DEFAULT false,
-  captain_of varchar(64), -- Defense, Offense, Special Teams, etc.
-  status char(1) NOT NULL CONSTRAINT df_team_players_status DEFAULT 'a', -- (a)ctive, (i)njured, on (l)eave, (r)etired
   joined date,
   retired date,
-  CONSTRAINT pk_team_players PRIMARY KEY (team, player),  
-  CONSTRAINT fk_team_players_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
-  CONSTRAINT fk_team_players_player FOREIGN KEY (player) REFERENCES players(id),
-  CONSTRAINT uq_team_players_number UNIQUE (team, number),
-  CONSTRAINT uq_team_players_nickname UNIQUE (team, nickname)  
+  CONSTRAINT pk_team_members PRIMARY KEY (team, player),  
+  CONSTRAINT fk_team_members_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
+  CONSTRAINT fk_team_members_player FOREIGN KEY (player) REFERENCES players(id)
+);
+
+-- Pastime "Franchise" Member Roles e.g. Keith Donald (Admin, Player); Brian Fisher (Head Coach, Admin, Player).
+CREATE TABLE team_member_roles (team integer,
+  player integer,
+  role varchar(64), -- Admin, Head Coach, Player, Assistant Coach, etc.
+  became date,
+  retired date,
+  head_coach_wins smallint,
+  head_coach_losses smallint,
+  player_captain boolean,
+  player_captain_of varchar(64), -- Defense, Offense, Special Teams, etc.
+  player_status varchar(1), -- (a)ctive (default), on (l)eave, (i)njured  
+  CONSTRAINT pk_team_member_roles PRIMARY KEY (team, player, role),    
+  CONSTRAINT fk_team_member_roles_team_player FOREIGN KEY (team, player) REFERENCES team_members(team, player) ON DELETE CASCADE
+);
+
+-- Pastime "Franchise" Member Invites e.g. Invite for keith.donald@gmail.com to join team 'Hitmen'.
+CREATE TABLE team_member_invites (team integer,
+  email varchar(320),
+  role varchar(64),  
+  code varchar(6) NOT NULL UNIQUE,
+  sent timestamp NOT NULL CONSTRAINT df_team_member_invites_sent DEFAULT now(),
+  sent_by integer NOT NULL,
+  accepted timestamp,
+  declined timestamp,
+  player integer,
+  CONSTRAINT pk_team_member_invites PRIMARY KEY (team, email, role),
+  CONSTRAINT fk_team_member_invites_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
+  CONSTRAINT fk_team_member_invites_team_sent_by FOREIGN KEY (team, sent_by) REFERENCES team_members(team, player),
+  CONSTRAINT fk_team_member_invites_player FOREIGN KEY (player) REFERENCES players(id)  
 );
 
 -- Pastime "Franchise" Player Positions
