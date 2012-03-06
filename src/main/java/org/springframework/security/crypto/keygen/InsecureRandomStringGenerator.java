@@ -33,4 +33,17 @@ public class InsecureRandomStringGenerator implements StringKeyGenerator {
         return new String(buf);
     }
 
+    public boolean meetsSyntax(String string) {
+        if (string.length() != buf.length) {
+            return false;
+        }
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (!(Character.getType(c) == Character.LOWERCASE_LETTER || Character.isDigit(c))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
 }

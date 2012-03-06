@@ -23,6 +23,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.security.crypto.keygen.InsecureRandomStringGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.templating.StringTemplateLoader;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,8 @@ public class TeamsController {
 
     private StringTemplateLoader templateLoader;
 
+    private InsecureRandomStringGenerator inviteGenerator = new InsecureRandomStringGenerator(6);
+    
     public TeamsController(JdbcTemplate jdbcTemplate, JavaMailSender mailSender, StringTemplateLoader templateLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.mailSender = mailSender;
@@ -59,7 +62,8 @@ public class TeamsController {
     public ResponseEntity<? extends Object> createTeam(@Valid TeamForm teamForm) {
         Integer teamId = (Integer) use(jdbcTemplate).insert("INSERT INTO teams (name, sport) VALUES (?, ?)", teamForm.getName(), teamForm.getSport());
         Player player = SecurityContext.getCurrentPlayer();
-        jdbcTemplate.update("INSERT INTO team_admins (team, player) VALUES (?, ?)", teamId, player.getId());
+        jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, player.getId());
+        jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role) VALUES (?, ?, ?)", teamId, player.getId(), TeamRoles.ADMIN);
         Team team = new Team(teamId);        
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(UriComponentsBuilder.fromHttpUrl("http://pastime.com/teams/{id}").buildAndExpand(team.getId()).toUri());
@@ -144,7 +148,9 @@ public class TeamsController {
 
     private void addPlayers(Integer team, Model model) {
         final String teamUrl = (String) model.asMap().get("url");
-        List<TeamPlayer> players = jdbcTemplate.query("SELECT p.id, p.first_name, p.last_name, p.picture, t.picture as picture_for_team, t.number, t.nickname, t.captain FROM team_players t INNER JOIN players p on t.player = p.id WHERE team = ? ORDER BY p.last_name", new RowMapper<TeamPlayer>() {
+        String sql = "SELECT p.id, p.first_name, p.last_name, p.picture, t.picture as picture_for_team, t.number, t.nickname, t.username, r.player_status, r.player_captain, r.player_captain_of FROM team_members t " + 
+                "INNER JOIN team_member_roles r ON t.team = ? AND t.player = r.player INNER JOIN players p on t.player = p.id WHERE t.team = ? AND r.role = 'Player' ORDER BY p.last_name";
+        List<TeamPlayer> players = jdbcTemplate.query(sql, new RowMapper<TeamPlayer>() {
             public TeamPlayer mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new TeamPlayer(teamUrl, rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), getPicture(rs), rs.getInt("number"), rs.getString("nickname"));
             }
@@ -155,7 +161,7 @@ public class TeamsController {
                 }
                 return picture;
             }
-        }, team);
+        }, team, team);
         model.addAttribute("players?", !players.isEmpty());
         model.addAttribute("players", players);        
     }
@@ -167,10 +173,18 @@ public class TeamsController {
         }        
     }
     private boolean isAdmin(Integer team, Integer player) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_admins WHERE team = ? and player = ?)", Boolean.class, team, player);
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members t INNER JOIN team_member_roles r ON t.team = r.team and t.player = r.player and r.role = 'Admin' WHERE t.team = ? and t.player = ?)", Boolean.class, team, player);
     }
 
     private void sendPlayerInvite(final SqlRowSet team, final SqlRowSet player) {
+        final SqlRowSet admin = jdbcTemplate.queryForRowSet("select p.id, p.first_name, p.last_name, t.nickname, t.username FROM team_members t INNER JOIN players p ON t.player = p.id WHERE t.team = ? and t.player = ?",
+                team.getInt("id"), SecurityContext.getCurrentPlayer().getId());
+        if (!admin.last()) {
+            throw new IllegalStateException("Should not happen");
+        }
+        final String code = inviteGenerator.generateKey();        
+        jdbcTemplate.update("INSERT INTO team_member_invites (team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?)",
+                team.getInt("id"), TeamRoles.PLAYER, player.getString("email"), code, admin.getInt("id"), player.getInt("id"));
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
@@ -179,12 +193,12 @@ public class TeamsController {
                invite.setSubject("Confirm your " + team.getString("name") + " team membership.");
                Map<String, Object> model = new HashMap<String, Object>(3, 1);
                model.put("name", player.getString("first_name"));
-               model.put("adminUrl", "http://pastime.com/team/2/fish");               
-               model.put("admin", "Brian Fisher");
+               model.put("adminUrl", url(team) + playerPath(admin));               
+               model.put("admin", new Name(admin.getString("first_name"), admin.getString("last_name")).toString());
                model.put("sport", team.getString("sport"));               
                model.put("teamUrl", url(team));
-               model.put("team", team.getString("name"));               
-               model.put("code", "123456");
+               model.put("team", team.getString("name"));
+               model.put("code", code);
                invite.setText(templateLoader.getTemplate("teams/mail/player-invite").render(model), true);
             }
          };
@@ -210,6 +224,15 @@ public class TeamsController {
             }
          };
          mailSender.send(preparator);
+    }
+    
+    private String playerPath(SqlRowSet player) {
+        String username = player.getString("username");
+        if (username != null) {
+            return "/" + username;
+        } else {
+            return "/" + player.getInt("id");
+        }
     }
 
     // cglib ceremony

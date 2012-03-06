@@ -15,6 +15,7 @@ DROP TABLE venues;
 DROP TABLE organizations;
 DROP TABLE team_player_positions;
 DROP TABLE team_member_roles;
+DROP TABLE team_member_invites;
 DROP TABLE team_members;
 DROP TABLE teams;
 DROP TABLE player_children;
@@ -156,8 +157,9 @@ CREATE TABLE team_members (team integer,
   number smallint,
   nickname varchar(16),
   picture varchar(256),
-  joined date,
+  joined date NOT NULL CONSTRAINT df_teams_joined DEFAULT now(),
   retired date,
+  username varchar(16) UNIQUE,  
   CONSTRAINT pk_team_members PRIMARY KEY (team, player),  
   CONSTRAINT fk_team_members_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
   CONSTRAINT fk_team_members_player FOREIGN KEY (player) REFERENCES players(id)
@@ -167,7 +169,7 @@ CREATE TABLE team_members (team integer,
 CREATE TABLE team_member_roles (team integer,
   player integer,
   role varchar(64), -- Admin, Head Coach, Player, Assistant Coach, etc.
-  became date,
+  became date NOT NULL CONSTRAINT df_team_member_roles_became DEFAULT now(),
   retired date,
   head_coach_wins smallint,
   head_coach_losses smallint,
