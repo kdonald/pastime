@@ -148,14 +148,19 @@ public class TeamsController {
         if (a.equals("accept")) {
             Integer playerId = invite.getInt("player");
             if (invite.wasNull()) {
+                // no pastime user associated with email address
+                // TODO--this needs to be revisited... we should probably render a view here that:
+                // a. if no user is signed in, allows the user to sign-up if they are new 
+                // b. if no user is signed in, allows the user to sign-in if they already have an account (the email the invite was sent to can then be added to this account)
+                // c. if a user is signed in, allows them to add this email to that account or sign-in to another account, or create a new account
                 Player currentPlayer = SecurityContext.getCurrentPlayer();
                 if (currentPlayer == null) {
-                    // nobody is signed-in and the invite wasn't for an existing user
+                    // nobody is signed-in, assume a completely new user
                     return "redirect:/signup?email=" + invite.getString("email");
                 }
                 playerId = currentPlayer.getId();
                 if (!emailOnFile(invite.getString("email"), playerId)) {
-                  // somebody else is signed-in
+                  // somebody else is signed-in, assume a existing user under a different address
                   return "redirect:/signin?email=" + invite.getString("email");
                 }
             }
