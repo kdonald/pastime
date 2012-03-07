@@ -159,10 +159,11 @@ CREATE TABLE team_members (team integer,
   picture varchar(256),
   joined date NOT NULL CONSTRAINT df_teams_joined DEFAULT now(),
   retired date,
-  username varchar(16) UNIQUE,  
+  username varchar(16),  
   CONSTRAINT pk_team_members PRIMARY KEY (team, player),  
   CONSTRAINT fk_team_members_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
-  CONSTRAINT fk_team_members_player FOREIGN KEY (player) REFERENCES players(id)
+  CONSTRAINT fk_team_members_player FOREIGN KEY (player) REFERENCES players(id),
+  CONSTRAINT uq_team_members_username UNIQUE (team, username)
 );
 
 -- Pastime "Franchise" Member Roles e.g. Keith Donald (Admin, Player); Brian Fisher (Head Coach, Admin, Player).
@@ -187,13 +188,15 @@ CREATE TABLE team_member_invites (team integer,
   code varchar(6) NOT NULL UNIQUE,
   sent timestamp NOT NULL CONSTRAINT df_team_member_invites_sent DEFAULT now(),
   sent_by integer NOT NULL,
+  player integer,  
   accepted boolean,
-  answered_on timestamp,
-  player integer,
+  accepted_player integer,
+  answered_on timestamp
   CONSTRAINT pk_team_member_invites PRIMARY KEY (team, email, role),
   CONSTRAINT fk_team_member_invites_team FOREIGN KEY (team) REFERENCES teams(id) ON DELETE CASCADE,
   CONSTRAINT fk_team_member_invites_team_sent_by FOREIGN KEY (team, sent_by) REFERENCES team_members(team, player),
-  CONSTRAINT fk_team_member_invites_player FOREIGN KEY (player) REFERENCES players(id)  
+  CONSTRAINT fk_team_member_invites_player FOREIGN KEY (player) REFERENCES players(id),
+  CONSTRAINT fk_team_member_invites_accepted_player FOREIGN KEY (accepted_player) REFERENCES players(id)  
 );
 
 -- Pastime "Franchise" Player Positions

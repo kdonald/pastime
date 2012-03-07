@@ -91,16 +91,16 @@ public class TeamsController {
         return "teams/team";
     }
     
-    @RequestMapping(value="/teams/{id}/players", method=RequestMethod.POST, produces="application/json")
+    @RequestMapping(value="/teams/{teamId}/players", method=RequestMethod.POST, produces="application/json")
     @Transactional    
-    public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer id, final PlayerForm form) {
+    public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer teamId, PlayerForm form) {
         if (!SecurityContext.playerSignedIn()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }
         if (form.getId() != null && form.getEmail() == null || form.getEmail().length() == 0) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("no player id or email address provided"), HttpStatus.BAD_REQUEST);            
         }
-        SqlRowSet team = findTeam(id);
+        SqlRowSet team = findTeam(teamId);
         if (!team.last()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid team id"), HttpStatus.BAD_REQUEST);                        
         }        
@@ -111,21 +111,22 @@ public class TeamsController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
         }        
         if (form.getEmail() != null) {
-            if (inviteAlreadySent(team.getInt("id"), form.getEmail())) {
-                return new ResponseEntity<ErrorBody>(new ErrorBody("player invite already sent: POST to " + url(team) + "/invites/{code} if you wish to resend"), HttpStatus.CONFLICT);                    
-            }            
-            PlayerInvite invite = sendInvite(team, admin, form.getEmail());
-            return new ResponseEntity<PlayerInvite>(invite, HttpStatus.CREATED);            
+            SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, p.picture, e.email, u.username FROM player_emails e " + 
+                    "INNER JOIN players p ON e.player = p.id LEFT OUTER JOIN usernames u ON p.id = u.player WHERE e.email = ?", form.getEmail());
+            if (player.last()) {
+                return addOrInvite(team, admin, player, form.getEmail());
+            } else {
+                return invite(team, admin, player, form.getEmail());                
+            }
         } else {
             SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, e.email FROM players p INNER JOIN player_emails e ON p.id = e.player WHERE p.id = ? AND e.primary_email = true", form.getEmail());
             if (!player.last()) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid player id"), HttpStatus.BAD_REQUEST);                
             }
-            PlayerInvite invite = sendPlayerInvite(team, admin, player);
-            return new ResponseEntity<PlayerInvite>(invite, HttpStatus.CREATED);            
+            return addOrInvite(team, admin, player, form.getEmail());            
         }
     }
-    
+
     @RequestMapping(value="/teams/{teamId}/invites/{code}", method=RequestMethod.GET)
     @Transactional
     public String answerInvite(@PathVariable Integer teamId, @PathVariable String code, @RequestParam String a, Model model, HttpServletResponse response) throws IOException {
@@ -134,15 +135,19 @@ public class TeamsController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-        SqlRowSet invite = jdbcTemplate.queryForRowSet("SELECT email, role, accepted, player FROM team_member_invites WHERE team = ? AND code = ?", teamId, code);
+        SqlRowSet invite = jdbcTemplate.queryForRowSet("SELECT email, role, player, accepted, accepted_player FROM team_member_invites WHERE team = ? AND code = ?", teamId, code);
         if (!invite.last()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
         Boolean accepted = invite.getBoolean("accepted");
         if (!invite.wasNull()) {
-            model.addAttribute("answer", accepted);
-            return "teams/invite-already-answered";
+            if (accepted) {
+                return "redirect:/teams/" + teamId + "/" + invite.getInt("accepted_player");
+            } else {
+                model.addAttribute("answer", accepted);
+                return "teams/invite-already-answered";                
+            }
         }
         a = a.toLowerCase();
         if (a.equals("accept")) {
@@ -164,15 +169,11 @@ public class TeamsController {
                   return "redirect:/signin?email=" + invite.getString("email");
                 }
             }
-            Date answered = new Date();
-            jdbcTemplate.update("UPDATE team_member_invites set accepted = true, answered_on = ? where team = ? and code = ?", answered, teamId, code);
             String role = invite.getString("role");
             if (role.equals(TeamRoles.PLAYER)) {
-                if (!teamMember(teamId, playerId)) {
-                    // the player isn't already a team member, make him or her one
-                    jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, playerId);                    
-                }
-                jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role, player_status) VALUES (?, ?, 'Player', 'a')", teamId, playerId);
+                addPlayer(teamId, playerId);
+                Date answered = new Date();
+                jdbcTemplate.update("UPDATE team_member_invites set accepted = true, accepted_player = ?, answered_on = ? where team = ? and code = ?", playerId, answered, teamId, code);
                 return "redirect:/teams/" + teamId + "/" + playerId;
             } else {
                 throw new UnsupportedOperationException("Only player invites are supported at the moment");
@@ -183,6 +184,14 @@ public class TeamsController {
         } else {
             throw new IllegalArgumentException("Not a valid answer");            
         }
+    }
+
+    private void addPlayer(Integer teamId, Integer playerId) {
+        if (!teamMember(teamId, playerId)) {
+            // the player isn't already a team member, make him or her one
+            jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, playerId);                    
+        }
+        jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role, player_status) VALUES (?, ?, 'Player', 'a')", teamId, playerId);
     }
 
     @RequestMapping(value="/teams/{teamId}/invites/{code}", method={ RequestMethod.POST, RequestMethod.DELETE })
@@ -199,6 +208,53 @@ public class TeamsController {
         jdbcTemplate.update("UPDATE team_member_invites set accepted = false, answered_on = ? where team = ? and code = ?", new Date(), teamId, code);        
         return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(value="/teams/{teamId}/{memberKey}", method=RequestMethod.GET)
+    public String member(@PathVariable Integer teamId, @PathVariable String memberKey, Model model, HttpServletResponse response) throws IOException {
+        Integer memberId = parseInteger(memberKey);
+        SqlRowSet member;
+        if (memberId != null) {
+            member = jdbcTemplate.queryForRowSet("SELECT number, nickname FROM team_members WHERE team = ? AND player = ?", teamId, memberId);
+        } else {
+            member = jdbcTemplate.queryForRowSet("SELECT number, nickname FROM team_members WHERE team = ? AND username = ?", teamId, memberKey);
+        }
+        if (!member.last()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+        model.addAttribute("number", member.getObject("number"));
+        model.addAttribute("nickname", member.getString("nickname"));        
+        return "teams/player";
+    }
+
+    @RequestMapping(value="/teams/{teamId}/{memberKey}", method=RequestMethod.POST)
+    @Transactional
+    public ResponseEntity<? extends Object> member(@PathVariable Integer teamId, @PathVariable String memberKey, @Valid TeamMemberForm form, Model model) {
+        Player currentPlayer = SecurityContext.getCurrentPlayer();
+        if (currentPlayer == null) {
+            return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);            
+        }
+        Integer memberId = parseInteger(memberKey);
+        if (memberId != null) {
+            if (!teamMember(teamId, memberId)) {
+                return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);                
+            }            
+        } else {
+            String username = memberKey;
+            SqlRowSet member = jdbcTemplate.queryForRowSet("SELECT player FROM team_members WHERE team = ? AND username = ?", teamId, username);
+            if (!member.last()) {
+                return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);                
+            }
+            memberId = member.getInt("player");
+        }
+        if (!currentPlayer.getId().equals(memberId)) {
+            return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);                
+        }
+        jdbcTemplate.update("UPDATE team_members SET number = ?, nickname = ? WHERE team = ? AND player = ?", form.getNumber(), form.getNickname(), teamId, memberId);        
+        return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+    }
+    
+    // internal helpers
     
     private SqlRowSet findTeam(Integer id) {
         return jdbcTemplate.queryForRowSet("SELECT t.id, t.name, t.sport, t.logo, u.username FROM teams t LEFT OUTER JOIN usernames u on t.id = u.team WHERE t.id = ?", id);        
@@ -263,14 +319,27 @@ public class TeamsController {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_invites WHERE team = ? AND email = ? AND role = 'Player')", Boolean.class, team, email);
     }
 
-    private PlayerInvite sendInvite(SqlRowSet team, SqlRowSet admin, String email) {
-        SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, p.picture, e.email, u.username FROM player_emails e " + 
-                "INNER JOIN players p ON e.player = p.id LEFT OUTER JOIN usernames u ON p.id = u.player WHERE e.email = ?", email);
-        if (player.last()) {
-            return sendPlayerInvite(team, admin, player);                 
+    private ResponseEntity<? extends Object> addOrInvite(SqlRowSet team, SqlRowSet admin, SqlRowSet player, String email) {
+        if (player.getInt("id") == admin.getInt("id")) {
+            // no invite needed for adding yourself
+            addPlayer(team.getInt("id"), player.getInt("id"));
+            return new ResponseEntity<Object>(HttpStatus.CREATED);
         } else {
-            return sendPersonInvite(team, admin, email);
-        }        
+            return invite(team, admin, player, email);
+        }
+    }
+
+    private ResponseEntity<? extends Object> invite(SqlRowSet team, SqlRowSet admin, SqlRowSet player, String email) {
+        if (inviteAlreadySent(team.getInt("id"), email)) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("player invite already sent: POST to " + url(team) + "/invites/{code} if you wish to resend"), HttpStatus.CONFLICT);                    
+        }
+        PlayerInvite invite;
+        if (player.last()) {
+            invite = sendPlayerInvite(team, admin, player);
+        } else {
+            invite = sendPersonInvite(team, admin, email);
+        }
+        return new ResponseEntity<PlayerInvite>(invite, HttpStatus.CREATED);        
     }
     
     private PlayerInvite sendPlayerInvite(final SqlRowSet team, final SqlRowSet admin, final SqlRowSet player) {
@@ -338,6 +407,14 @@ public class TeamsController {
     
     private Boolean emailOnFile(String email, Integer player) {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM player_emails where player = ? and email = ?)", Boolean.class, player, email);
+    }
+    
+    private static Integer parseInteger(String string) {
+        try { 
+            return Integer.valueOf(string);
+        } catch (NumberFormatException e) {
+            return null;
+        }        
     }
     
     // cglib ceremony

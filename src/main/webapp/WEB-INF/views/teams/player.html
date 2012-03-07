@@ -47,27 +47,18 @@
     </div>
   </header>
   <div id="main" class="pagecontent">
-    <h1>Confirm team membership</h1>
-    <p>Brian Fisher (Fish) added you as a player on his flag football team. Please confirm your membership:</p>
-    <form>
-      <label>
-        <strong>Team</strong>
-        <input type="text" disabled="disabled" value="Hitmen" />
-      </label>
-      <button>Yes, I play on this team</button>    
-    </form>
     <p>Please complete your player profile:</p>
-    <form id="completePlayer" action="/teams/{{team}}/players/{{player}}" method="post">
+    <form action="/teams/{{teamId}}/{{memberKey}}" method="post">
        <h2>Player profile</h2>
        <label>
         <strong>Number</strong>
-        <input type="text" name="number" placeholder="The number you want on this team" />            
+        <input type="text" name="number" placeholder="The number you want to be identified by" value="{{number}}" />            
       </label>     
       <label>
         <strong>Nickname</strong>
-        <input type="text" name="nickname" placeholder="What you want your team mates to call you" />
+        <input type="text" name="nickname" placeholder="What you want your team mates to call you" value="{{nickname}}" />
       </label>
-      <button>Confirm</button>      
+      <button>Save</button>      
     </form>
   </div>  
   <footer>
