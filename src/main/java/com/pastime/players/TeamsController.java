@@ -152,7 +152,7 @@ public class TeamsController {
                 // TODO--this needs to be revisited... we should probably render a view here that:
                 // a. if no user is signed in, allows the user to sign-up if they are new 
                 // b. if no user is signed in, allows the user to sign-in if they already have an account (the email the invite was sent to can then be added to this account)
-                // c. if a user is signed in, allows them to add this email to that account or sign-in to another account, or create a new account
+                // c. if a user is signed in, allows them to add this email to that account, sign-out & sign-in to another account, or sign-out & create a new account
                 Player currentPlayer = SecurityContext.getCurrentPlayer();
                 if (currentPlayer == null) {
                     // nobody is signed-in, assume a completely new user
