@@ -146,29 +146,29 @@ public class TeamsController {
         }
         a = a.toLowerCase();
         if (a.equals("accept")) {
+            Integer playerId = invite.getInt("player");
+            if (invite.wasNull()) {
+                Player currentPlayer = SecurityContext.getCurrentPlayer();
+                if (currentPlayer == null) {
+                    // nobody is signed-in and the invite wasn't for an existing user
+                    return "redirect:/signup?email=" + invite.getString("email");
+                }
+                playerId = currentPlayer.getId();
+                if (!emailOnFile(invite.getString("email"), playerId)) {
+                  // somebody else is signed-in
+                  return "redirect:/signin?email=" + invite.getString("email");
+                }
+            }
             Date answered = new Date();
             jdbcTemplate.update("UPDATE team_member_invites set accepted = true, answered_on = ? where team = ? and code = ?", answered, teamId, code);
             String role = invite.getString("role");
             if (role.equals(TeamRoles.PLAYER)) {
-                Integer playerId = invite.getInt("player");
-                if (invite.wasNull()) {
-                    Player currentPlayer = SecurityContext.getCurrentPlayer();
-                    if (currentPlayer == null) {
-                        // nobody is signed-in and the invite wasn't for an existing user
-                        return "players/signup";
-                    }
-                    playerId = currentPlayer.getId();
-                    if (!emailOnFile(invite.getString("email"), playerId)) {
-                      // somebody else is signed-in
-                      return "players/signin";
-                    }
-                }
                 if (!teamMember(teamId, playerId)) {
                     // the player isn't already a team member, make him or her one
                     jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, playerId);                    
                 }
                 jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role, player_status) VALUES (?, ?, 'Player', 'a')", teamId, playerId);
-                return "redirect:/teams/" + teamId + "/" + playerId + "/?source=invite_accepted";
+                return "redirect:/teams/" + teamId + "/" + playerId;
             } else {
                 throw new UnsupportedOperationException("Only player invites are supported at the moment");
             }
