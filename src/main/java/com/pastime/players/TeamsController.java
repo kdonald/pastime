@@ -151,21 +151,21 @@ public class TeamsController {
             String role = invite.getString("role");
             if (role.equals(TeamRoles.PLAYER)) {
                 Integer playerId = invite.getInt("player");
-                if (playerId == null) {
+                if (invite.wasNull()) {
                     Player currentPlayer = SecurityContext.getCurrentPlayer();
                     if (currentPlayer == null) {
                         // nobody is signed-in and the invite wasn't for an existing user
-                        return "signup";
+                        return "players/signup";
                     }
                     playerId = currentPlayer.getId();
                     if (!emailOnFile(invite.getString("email"), playerId)) {
                       // somebody else is signed-in
-                      return "signin";
+                      return "players/signin";
                     }
                 }
                 if (!teamMember(teamId, playerId)) {
                     // the player isn't already a team member, make him or her one
-                    jdbcTemplate.update("INSERT INTO team_member (team, player) VALUES (?, ?)", teamId, playerId);                    
+                    jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, playerId);                    
                 }
                 jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role, player_status) VALUES (?, ?, 'Player', 'a')", teamId, playerId);
                 return "redirect:/teams/" + teamId + "/" + playerId + "/?source=invite_accepted";
@@ -278,7 +278,7 @@ public class TeamsController {
                invite.setFrom(new InternetAddress("invites@pastime.com", "Pastime Invites"));
                invite.setTo(new InternetAddress(player.getString("email"), player.getString("first_name") + " " + player.getString("last_name")));
                invite.setSubject("Confirm your " + team.getString("name") + " team membership.");
-               Map<String, Object> model = new HashMap<String, Object>(3, 1);
+               Map<String, Object> model = new HashMap<String, Object>(7, 1);
                model.put("name", player.getString("first_name"));
                model.put("adminUrl", url(team) + playerPath(admin));               
                model.put("admin", new Name(admin.getString("first_name"), admin.getString("last_name")).toString());
@@ -294,17 +294,19 @@ public class TeamsController {
     }
 
     private PlayerInvite sendPersonInvite(final SqlRowSet team, final SqlRowSet admin, final String email) {
-        final String code = inviteGenerator.generateKey();        
+        final String code = inviteGenerator.generateKey();
+        jdbcTemplate.update("INSERT INTO team_member_invites (team, email, role, code, sent_by) VALUES (?, ?, ?, ?, ?)",
+                team.getInt("id"), email, TeamRoles.PLAYER, code, admin.getInt("id"));        
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
                invite.setFrom(new InternetAddress("invites@pastime.com", "Pastime Invites"));
                invite.setTo(new InternetAddress(email));
                invite.setSubject("Confirm your " + team.getString("name") + " team membership.");
-               Map<String, Object> model = new HashMap<String, Object>(3, 1);
+               Map<String, Object> model = new HashMap<String, Object>(7, 1);
                model.put("name", "Hello");
-               model.put("adminUrl", "http://pastime.com/team/2/fish");
-               model.put("admin", "Brian Fisher");
+               model.put("adminUrl", url(team) + playerPath(admin));               
+               model.put("admin", new Name(admin.getString("first_name"), admin.getString("last_name")).toString());
                model.put("sport", team.getString("sport"));
                model.put("teamUrl", url(team));
                model.put("team", team.getString("name"));               
