@@ -288,7 +288,7 @@ public class TeamsController {
     private void addPlayers(Integer team, Model model) {
         final String teamUrl = (String) model.asMap().get("url");
         String sql = "SELECT p.id, p.first_name, p.last_name, p.picture, t.picture as picture_for_team, t.number, t.nickname, t.slug, r.player_status, r.player_captain, r.player_captain_of FROM franchise_members t " + 
-                "INNER JOIN franchise_member_roles r ON t.franchise = ? AND t.player = r.player INNER JOIN players p on t.player = p.id WHERE r.franchise = ? AND r.role = 'Player' ORDER BY p.last_name";
+                "INNER JOIN franchise_member_roles r ON t.franchise = r.franchise AND t.player = r.player INNER JOIN players p on t.player = p.id WHERE r.franchise = ? AND r.role = 'Player' ORDER BY p.last_name";
         List<TeamPlayer> players = jdbcTemplate.query(sql, new RowMapper<TeamPlayer>() {
             public TeamPlayer mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new TeamPlayer(teamUrl, rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), getPicture(rs), rs.getInt("number"), rs.getString("nickname"));
