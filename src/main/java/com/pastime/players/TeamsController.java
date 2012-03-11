@@ -65,10 +65,10 @@ public class TeamsController {
         if (!SecurityContext.playerSignedIn()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }        
-        Integer teamId = (Integer) use(jdbcTemplate).insert("INSERT INTO teams (name, sport) VALUES (?, ?)", teamForm.getName(), teamForm.getSport());
+        Integer teamId = (Integer) use(jdbcTemplate).insert("INSERT INTO franchises (name, sport) VALUES (?, ?)", teamForm.getName(), teamForm.getSport());
         Player player = SecurityContext.getCurrentPlayer();
-        jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, player.getId());
-        jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role) VALUES (?, ?, ?)", teamId, player.getId(), TeamRoles.ADMIN);
+        jdbcTemplate.update("INSERT INTO franchise_members (franchise, player) VALUES (?, ?)", teamId, player.getId());
+        jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (?, ?, ?)", teamId, player.getId(), TeamRoles.ADMIN);
         Team team = new Team(teamId);        
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(UriComponentsBuilder.fromHttpUrl("http://pastime.com/teams/{id}").buildAndExpand(team.getId()).toUri());
@@ -104,8 +104,8 @@ public class TeamsController {
         if (!team.last()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid team id"), HttpStatus.BAD_REQUEST);                        
         }        
-        SqlRowSet admin = jdbcTemplate.queryForRowSet("select p.id, p.first_name, p.last_name, t.nickname, t.username FROM team_member_roles r " + 
-                "INNER JOIN team_members t ON r.team = t.team AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.team = ? and r.player = ? AND r.role = 'Admin'",
+        SqlRowSet admin = jdbcTemplate.queryForRowSet("select p.id, p.first_name, p.last_name, t.nickname, t.slug FROM franchise_member_roles r " + 
+                "INNER JOIN franchise_members t ON r.franchise = t.franchise AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.franchise = ? and r.player = ? AND r.role = 'Admin'",
                 team.getInt("id"), SecurityContext.getCurrentPlayer().getId());
         if (!admin.last()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
@@ -135,7 +135,7 @@ public class TeamsController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-        SqlRowSet invite = jdbcTemplate.queryForRowSet("SELECT email, role, player, accepted, accepted_player FROM team_member_invites WHERE team = ? AND code = ?", teamId, code);
+        SqlRowSet invite = jdbcTemplate.queryForRowSet("SELECT email, role, player, accepted, accepted_player FROM franchise_member_invites WHERE franchise = ? AND code = ?", teamId, code);
         if (!invite.last()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -173,7 +173,7 @@ public class TeamsController {
             if (role.equals(TeamRoles.PLAYER)) {
                 addPlayer(teamId, playerId);
                 Date answered = new Date();
-                jdbcTemplate.update("UPDATE team_member_invites set accepted = true, accepted_player = ?, answered_on = ? where team = ? and code = ?", playerId, answered, teamId, code);
+                jdbcTemplate.update("UPDATE franchise_member_invites set accepted = true, accepted_player = ?, answered_on = ? where franchise = ? and code = ?", playerId, answered, teamId, code);
                 return "redirect:/teams/" + teamId + "/" + playerId;
             } else {
                 throw new UnsupportedOperationException("Only player invites are supported at the moment");
@@ -189,15 +189,15 @@ public class TeamsController {
     private void addPlayer(Integer teamId, Integer playerId) {
         if (!teamMember(teamId, playerId)) {
             // the player isn't already a team member, make him or her one
-            jdbcTemplate.update("INSERT INTO team_members (team, player) VALUES (?, ?)", teamId, playerId);                    
+            jdbcTemplate.update("INSERT INTO franchise_members (franchise, player) VALUES (?, ?)", teamId, playerId);                    
         }
-        jdbcTemplate.update("INSERT INTO team_member_roles (team, player, role, player_status) VALUES (?, ?, 'Player', 'a')", teamId, playerId);
+        jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role, player_status) VALUES (?, ?, 'Player', 'a')", teamId, playerId);
     }
 
     @RequestMapping(value="/teams/{teamId}/invites/{code}", method={ RequestMethod.POST, RequestMethod.DELETE })
     @Transactional
     public ResponseEntity<? extends Object> declineInvite(@PathVariable Integer teamId, @PathVariable String code) {
-        SqlRowSet invite = jdbcTemplate.queryForRowSet("SELECT accepted FROM team_member_invites WHERE team = ? AND code = ?", teamId, code);
+        SqlRowSet invite = jdbcTemplate.queryForRowSet("SELECT accepted FROM franchise_member_invites WHERE franchise = ? AND code = ?", teamId, code);
         if (!invite.last()) {
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         }
@@ -205,7 +205,7 @@ public class TeamsController {
         if (!invite.wasNull()) {
             return new ResponseEntity<String>("Invite already answered", HttpStatus.CONFLICT);
         }        
-        jdbcTemplate.update("UPDATE team_member_invites set accepted = false, answered_on = ? where team = ? and code = ?", new Date(), teamId, code);        
+        jdbcTemplate.update("UPDATE franchise_member_invites set accepted = false, answered_on = ? where franchise = ? and code = ?", new Date(), teamId, code);        
         return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
 
@@ -214,9 +214,9 @@ public class TeamsController {
         Integer memberId = parseInteger(memberKey);
         SqlRowSet member;
         if (memberId != null) {
-            member = jdbcTemplate.queryForRowSet("SELECT number, nickname FROM team_members WHERE team = ? AND player = ?", teamId, memberId);
+            member = jdbcTemplate.queryForRowSet("SELECT number, nickname FROM franchise_members WHERE franchise = ? AND player = ?", teamId, memberId);
         } else {
-            member = jdbcTemplate.queryForRowSet("SELECT number, nickname FROM team_members WHERE team = ? AND username = ?", teamId, memberKey);
+            member = jdbcTemplate.queryForRowSet("SELECT number, nickname FROM franchise_members WHERE franchise = ? AND slug = ?", teamId, memberKey);
         }
         if (!member.last()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -241,7 +241,7 @@ public class TeamsController {
             }            
         } else {
             String username = memberKey;
-            SqlRowSet member = jdbcTemplate.queryForRowSet("SELECT player FROM team_members WHERE team = ? AND username = ?", teamId, username);
+            SqlRowSet member = jdbcTemplate.queryForRowSet("SELECT player FROM franchise_members WHERE franchise = ? AND slug = ?", teamId, username);
             if (!member.last()) {
                 return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);                
             }
@@ -250,14 +250,14 @@ public class TeamsController {
         if (!currentPlayer.getId().equals(memberId)) {
             return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);                
         }
-        jdbcTemplate.update("UPDATE team_members SET number = ?, nickname = ? WHERE team = ? AND player = ?", form.getNumber(), form.getNickname(), teamId, memberId);        
+        jdbcTemplate.update("UPDATE franchise_members SET number = ?, nickname = ? WHERE franchise = ? AND player = ?", form.getNumber(), form.getNickname(), teamId, memberId);        
         return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
     }
     
     // internal helpers
     
     private SqlRowSet findTeam(Integer id) {
-        return jdbcTemplate.queryForRowSet("SELECT t.id, t.name, t.sport, t.logo, u.username FROM teams t LEFT OUTER JOIN usernames u on t.id = u.team WHERE t.id = ?", id);        
+        return jdbcTemplate.queryForRowSet("SELECT t.id, t.name, t.sport, t.logo, u.username FROM franchises t LEFT OUTER JOIN usernames u on t.id = u.franchise WHERE t.id = ?", id);        
     }
     
     private boolean notFound(SqlRowSet row, HttpServletResponse response) throws IOException {
@@ -287,8 +287,8 @@ public class TeamsController {
 
     private void addPlayers(Integer team, Model model) {
         final String teamUrl = (String) model.asMap().get("url");
-        String sql = "SELECT p.id, p.first_name, p.last_name, p.picture, t.picture as picture_for_team, t.number, t.nickname, t.username, r.player_status, r.player_captain, r.player_captain_of FROM team_members t " + 
-                "INNER JOIN team_member_roles r ON t.team = ? AND t.player = r.player INNER JOIN players p on t.player = p.id WHERE r.team = ? AND r.role = 'Player' ORDER BY p.last_name";
+        String sql = "SELECT p.id, p.first_name, p.last_name, p.picture, t.picture as picture_for_team, t.number, t.nickname, t.slug, r.player_status, r.player_captain, r.player_captain_of FROM franchise_members t " + 
+                "INNER JOIN franchise_member_roles r ON t.franchise = ? AND t.player = r.player INNER JOIN players p on t.player = p.id WHERE r.franchise = ? AND r.role = 'Player' ORDER BY p.last_name";
         List<TeamPlayer> players = jdbcTemplate.query(sql, new RowMapper<TeamPlayer>() {
             public TeamPlayer mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new TeamPlayer(teamUrl, rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), getPicture(rs), rs.getInt("number"), rs.getString("nickname"));
@@ -312,11 +312,11 @@ public class TeamsController {
         }        
     }
     private boolean isAdmin(Integer team, Integer player) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members t INNER JOIN team_member_roles r ON t.team = r.team AND t.player = r.player AND r.role = 'Admin' WHERE t.team = ? and t.player = ?)", Boolean.class, team, player);
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM franchise_members t INNER JOIN franchise_member_roles r ON t.franchise = r.franchise AND t.player = r.player AND r.role = 'Admin' WHERE t.franchise = ? and t.player = ?)", Boolean.class, team, player);
     }
 
     private boolean inviteAlreadySent(Integer team, String email) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_invites WHERE team = ? AND email = ? AND role = 'Player')", Boolean.class, team, email);
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM franchise_member_invites WHERE franchise = ? AND email = ? AND role = 'Player')", Boolean.class, team, email);
     }
 
     private ResponseEntity<? extends Object> addOrInvite(SqlRowSet team, SqlRowSet admin, SqlRowSet player, String email) {
@@ -344,7 +344,7 @@ public class TeamsController {
     
     private PlayerInvite sendPlayerInvite(final SqlRowSet team, final SqlRowSet admin, final SqlRowSet player) {
         final String code = inviteGenerator.generateKey();        
-        jdbcTemplate.update("INSERT INTO team_member_invites (team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO franchise_member_invites (franchise, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?)",
                 team.getInt("id"), player.getString("email"), TeamRoles.PLAYER, code, admin.getInt("id"), player.getInt("id"));
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
@@ -369,7 +369,7 @@ public class TeamsController {
 
     private PlayerInvite sendPersonInvite(final SqlRowSet team, final SqlRowSet admin, final String email) {
         final String code = inviteGenerator.generateKey();
-        jdbcTemplate.update("INSERT INTO team_member_invites (team, email, role, code, sent_by) VALUES (?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO franchise_member_invites (franchise, email, role, code, sent_by) VALUES (?, ?, ?, ?, ?)",
                 team.getInt("id"), email, TeamRoles.PLAYER, code, admin.getInt("id"));        
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
@@ -393,7 +393,7 @@ public class TeamsController {
     }
     
     private String playerPath(SqlRowSet player) {
-        String username = player.getString("username");
+        String username = player.getString("slug");
         if (username != null) {
             return "/" + username;
         } else {
@@ -402,7 +402,7 @@ public class TeamsController {
     }
 
     private Boolean teamMember(Integer team, Integer player) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members where team = ? AND player = ?)", Boolean.class, team, player);
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM franchise_members where franchise = ? AND player = ?)", Boolean.class, team, player);
     }
     
     private Boolean emailOnFile(String email, Integer player) {
