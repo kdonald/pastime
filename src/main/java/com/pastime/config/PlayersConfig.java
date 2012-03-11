@@ -44,7 +44,7 @@ public class PlayersConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     public LeaguesController leaguesController() {
-        return new LeaguesController();
+        return new LeaguesController(jdbcTemplate);
     }
     
 }

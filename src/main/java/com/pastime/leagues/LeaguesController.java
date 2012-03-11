@@ -2,18 +2,27 @@ package com.pastime.leagues;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,12 +33,18 @@ import com.pastime.util.Location;
 @Controller
 public class LeaguesController {
 
+    private RestTemplate client;
+
     private ObjectMapper mapper;
     
-    private RestTemplate client;
+    private JdbcTemplate jdbcTemplate;
     
-    public LeaguesController() {
+    private String upcomingSql;
+    
+    public LeaguesController(JdbcTemplate jdbcTemplate) {
         initHttpClient();
+        this.jdbcTemplate = jdbcTemplate;
+        this.upcomingSql = SqlUtils.sql(new ClassPathResource("upcoming-leagues.sql", getClass()));
     }
     
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.GET, produces="application/json")
@@ -40,6 +55,45 @@ public class LeaguesController {
         ObjectNode upcoming = mapper.createObjectNode();
         upcoming.put("upcomingSeasons", docs);
         return new ResponseEntity<JsonNode>(upcoming, HttpStatus.ACCEPTED);
+    }
+    
+    @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")
+    public ResponseEntity<? extends Object> postUpcoming() throws URISyntaxException {
+        final ArrayNode docs = mapper.createArrayNode(); 
+        jdbcTemplate.query(upcomingSql, new RowCallbackHandler() {
+            public void processRow(ResultSet rs) throws SQLException {
+                ObjectNode doc = mapper.createObjectNode();
+                Integer organizationId = rs.getInt("organization_id");
+                doc.put("organization_id", organizationId);                
+                doc.put("organization_name", rs.getString("organization_name"));
+                String organizationUrl = organizationUrl(organizationId, rs.getString("organization_username"));
+                doc.put("organization_url", organizationUrl);
+                doc.put("organization_logo", rs.getString("organization_logo"));
+                doc.put("league_id", rs.getInt("league_id"));
+                doc.put("league_sport", rs.getString("league_sport"));
+                doc.put("league_format", rs.getString("league_format"));
+                doc.put("league_nature", rs.getString("league_nature"));
+                doc.put("season_number", rs.getInt("season_number"));
+                doc.put("season_name", rs.getString("season_name"));
+                doc.put("season_url", organizationUrl + "/" + rs.getString("league_slug") + "/" + rs.getInt("season_number"));                
+                doc.put("season_picture", rs.getString("season_picture"));
+                doc.put("season_start_date", new DateTime(rs.getLong("season_start_date"), DateTimeZone.UTC).toString());
+                doc.put("venue_id", rs.getInt("venue_id"));
+                doc.put("venue_name", rs.getInt("venue_name"));
+                doc.put("venue_location", new Location(rs.getDouble("venue_latitude"), rs.getDouble("venue_longitude")).toString());
+                docs.add(doc);
+            }
+            private String organizationUrl(Integer id, String name) {
+                // TODO: we could just always send to /organizations/id and rely on redirect if username is set...
+                if (name != null) {
+                    return "http://localhost:8080/" + name;
+                } else {
+                    return "http://localhost:8080/organizations/" + id;
+                }
+            }            
+        });
+        System.out.println(docs);
+        return new ResponseEntity<JsonNode>(HttpStatus.CREATED);
     }
     
     // internal helpers
@@ -62,5 +116,5 @@ public class LeaguesController {
         converters.add(converter);        
         client.setMessageConverters(converters);        
     }
-
+    
 }
