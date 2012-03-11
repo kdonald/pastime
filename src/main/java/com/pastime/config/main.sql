@@ -363,9 +363,9 @@ CREATE TABLE team_members (league integer,
   team integer,  
   player integer,
   slug varchar(16) NOT NULL,  
-  number smallint NOT NULL, -- for history since franchise number can change
-  nickname varchar(16) NOT NULL, -- name on jersey; for history since franchise nickname can change
-  picture varchar(256) NOT NULL, -- for history since franchise picture can change
+  number smallint NOT NULL,
+  nickname varchar(16) NOT NULL, -- name on jersey
+  picture varchar(256) NOT NULL,
   created timestamp NOT NULL CONSTRAINT df_team_members_created DEFAULT now(),
   CONSTRAINT pk_team_members PRIMARY KEY (league, season, team, player),
   CONSTRAINT fk_team_members_team FOREIGN KEY (league, season, team) REFERENCES teams(league, season, team),
