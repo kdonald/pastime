@@ -10,6 +10,7 @@ import org.springframework.templating.StringTemplateLoader;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.pastime.leagues.LeaguesController;
 import com.pastime.players.AccountController;
 import com.pastime.players.SigninInterceptor;
 import com.pastime.players.TeamsController;
@@ -32,13 +33,18 @@ public class PlayersConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public AccountController signupController() {
+    public AccountController accountController() {
         return new AccountController(jdbcTemplate);
     }
     
     @Bean
     public TeamsController teamsController() {
         return new TeamsController(jdbcTemplate, mailSender, templateLoader);
+    }
+    
+    @Bean
+    public LeaguesController leaguesController() {
+        return new LeaguesController();
     }
     
 }
