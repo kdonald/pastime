@@ -53,9 +53,7 @@ public class LeaguesController {
         JsonNode json = client.getForObject(new URI("http://localhost:8983/solr/select?wt=json&fl=organization_name,organization_url,organization_logo,league_sport,league_format,league_nature," + 
                 "season_name,season_url,season_picture,venue_name&q=*:*&fq=%7B!geofilt%7D&sfield=venue_location&pt=" + location + "&d=25"), JsonNode.class);
         JsonNode docs = json.get("response").get("docs");
-        ObjectNode upcoming = mapper.createObjectNode();
-        upcoming.put("upcomingSeasons", docs);
-        return new ResponseEntity<JsonNode>(upcoming, HttpStatus.ACCEPTED);
+        return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
     }
     
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")
