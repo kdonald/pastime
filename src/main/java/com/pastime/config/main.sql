@@ -254,7 +254,7 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
   roster_min_female smallint,
   skill_level_min smallint,
   skill_level_max smallint,
-  registration_type char(1), -- (t)eam, (i)ndividual
+  registration_type char(1) NOT NULL CONSTRAINT df_leagues_registration_type DEFAULT 't', -- (t)eam, (i)ndividual
   registration_fee money,
   registration_fee_earlybird money,  
   organization integer NOT NULL,
@@ -296,7 +296,7 @@ CREATE TABLE seasons (league integer,
   start_date date,
   registration_opens date,
   registration_closes date,
-  status char(1) NOT NULL, -- (n)ew, registration (o)pen, registration (c)losed, (r)unning, (x) over
+  status char(1) NOT NULL CONSTRAINT df_seasons_status DEFAULT 'n', -- (n)ew, registration (o)pen, registration (c)losed, (r)unning, (x) over
   created timestamp NOT NULL CONSTRAINT df_seasons_created DEFAULT now(),  
   CONSTRAINT pk_seasons PRIMARY KEY (league, number),  
   CONSTRAINT fk_seasons_league FOREIGN KEY (league) REFERENCES leagues(id)

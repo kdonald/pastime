@@ -1,5 +1,22 @@
 INSERT INTO sports (name) VALUES ('Flag Football');
+INSERT INTO formats (name, sport) VALUES ('7 on 7', 'Flag Football');
 
+INSERT INTO organizations (name, logo, founded, website) VALUES ('Brevard County Parks and Recreation', 'http://localhost:8080/static/images/brevardparks.png', null, 'http://www.brevardparks.com');
+INSERT INTO usernames (username, username_type, organization) VALUES ('brevardparks', 'o');
+
+INSERT INTO venues (name, street_address, city, state, zip_code, latitude, longitude)
+  VALUES ('Palm Bay Regional Park', '951 Malabar Rd. NW', 'Palm Bay', 'FL', '32908', 28.005094974728667, -80.73124302540815);
+
+INSERT INTO league_venues (league, venue, primary_venue) VALUES (1, 1, true);
+
+INSERT INTO leagues (name, slug, sport, picture, format, nature, gender, age_min, age_max,
+  roster_min, roster_healthy, roster_max, roster_min_female, skill_level_min, skill_level_max, registration_type, registration_fee, registration_fee_earlybird, organization)
+    VALUES ('South Brevard Adult Flag Football', 'south-flag', 'Flag Football', 'http://localhost:8080/static/images/brevardparks/south-flag.png',
+            '7 on 7', null, null, 17, null, 7, 10, 20, null, null, null, 't', '$480.00', null, 1);
+            
+INSERT INTO seasons (league, number, name, picture, start_date, registration_opens, registration_closes, status)
+  VALUES (1, 1, 'South Brevard Adult Flag Football', 'http://localhost:8080/static/images/brevardparks/south-flag/1.png', '2012-04-18', null, null, 'o');
+ 
 INSERT INTO players (email, first_name, last_name, birthdate, number, nickname, referral_code, referred_by) values ('keith@pastimebrevard.com', 'Keith', 'Donald', '12/29/1977', 9, null, 'jnhyy5', null);
 INSERT INTO players (email, first_name, last_name, birthdate, number, nickname, referral_code, referred_by) values ('alexander.weaver@gmail.com', 'Alexander', 'Weaver', '05/20/1977', 37, 'OG Hitman', '96dvlb', 1);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('coolhandluke2222@gmail.com', 'Brian', 'Fisher', 26, 'Fish', 'mvwkdw', null);

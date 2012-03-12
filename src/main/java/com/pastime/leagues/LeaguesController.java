@@ -64,6 +64,7 @@ public class LeaguesController {
             public void processRow(ResultSet rs) throws SQLException {
                 ObjectNode doc = mapper.createObjectNode();
                 Integer organizationId = rs.getInt("organization_id");
+                doc.put("id", "upcoming_seasons:" + rs.getInt("league_id") + ":" + rs.getInt("season_number"));
                 doc.put("organization_id", organizationId);                
                 doc.put("organization_name", rs.getString("organization_name"));
                 String organizationUrl = organizationUrl(organizationId, rs.getString("organization_username"));
@@ -77,9 +78,9 @@ public class LeaguesController {
                 doc.put("season_name", rs.getString("season_name"));
                 doc.put("season_url", organizationUrl + "/" + rs.getString("league_slug") + "/" + rs.getInt("season_number"));                
                 doc.put("season_picture", rs.getString("season_picture"));
-                doc.put("season_start_date", new DateTime(rs.getLong("season_start_date"), DateTimeZone.UTC).toString());
+                doc.put("season_start_date", new DateTime(rs.getDate("season_start_date"), DateTimeZone.UTC).toString());
                 doc.put("venue_id", rs.getInt("venue_id"));
-                doc.put("venue_name", rs.getInt("venue_name"));
+                doc.put("venue_name", rs.getString("venue_name"));
                 doc.put("venue_location", new Location(rs.getDouble("venue_latitude"), rs.getDouble("venue_longitude")).toString());
                 docs.add(doc);
             }
@@ -92,7 +93,7 @@ public class LeaguesController {
                 }
             }            
         });
-        System.out.println(docs);
+        client.postForLocation("http://localhost:8983/solr/update/json?commit=true", docs);
         return new ResponseEntity<JsonNode>(HttpStatus.CREATED);
     }
     
