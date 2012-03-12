@@ -84,7 +84,7 @@ public class LeaguesController {
             public void processRow(ResultSet rs) throws SQLException {
                 ObjectNode doc = mapper.createObjectNode();
                 Integer organizationId = rs.getInt("organization_id");
-                doc.put("id", "upcomingSeasons:" + rs.getInt("league_id") + ":" + rs.getInt("season_number"));
+                doc.put("id", "upcoming_seasons:" + rs.getInt("league_id") + ":" + rs.getInt("season_number"));
                 doc.put("organization_id", organizationId);                
                 doc.put("organization_name", rs.getString("organization_name"));
                 String organizationUrl = organizationUrl(organizationId, rs.getString("organization_username"));
