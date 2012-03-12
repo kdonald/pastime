@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
@@ -41,10 +42,13 @@ public class LeaguesController {
     
     private String upcomingSql;
     
+    private String playersSql;
+    
     public LeaguesController(JdbcTemplate jdbcTemplate) {
         initHttpClient();
         this.jdbcTemplate = jdbcTemplate;
         this.upcomingSql = SqlUtils.sql(new ClassPathResource("upcoming-leagues.sql", getClass()));
+        this.playersSql = SqlUtils.sql(new ClassPathResource("players.sql", getClass()));
     }
     
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.GET, produces="application/json")
@@ -56,9 +60,26 @@ public class LeaguesController {
         return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
     }
     
+    @RequestMapping(value="/{username}/{league}/{season}/players", method=RequestMethod.GET, produces="application/json")
+    public ResponseEntity<JsonNode> players(@PathVariable String username, @PathVariable String league, @PathVariable Integer season) {
+        final ArrayNode docs = mapper.createArrayNode();
+        jdbcTemplate.query(playersSql, new RowCallbackHandler() {
+            public void processRow(ResultSet rs) throws SQLException {
+                ObjectNode doc = mapper.createObjectNode();
+                doc.put("id", rs.getInt("id"));
+                doc.put("slug", rs.getString("slug"));
+                doc.put("picture", rs.getString("picture"));
+                doc.put("number", rs.getInt("number"));
+                doc.put("nickname", rs.getString("nickname"));
+                docs.add(doc);
+            }
+        });        
+        return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
+    }
+    
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")
     public ResponseEntity<? extends Object> postUpcoming() throws URISyntaxException {
-        final ArrayNode docs = mapper.createArrayNode(); 
+        final ArrayNode docs = mapper.createArrayNode();
         jdbcTemplate.query(upcomingSql, new RowCallbackHandler() {
             public void processRow(ResultSet rs) throws SQLException {
                 ObjectNode doc = mapper.createObjectNode();

@@ -57,7 +57,7 @@ CREATE TABLE format_rules (sport varchar(64),
 CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
   first_name varchar(64) NOT NULL,
   last_name varchar(64) NOT NULL,
-  picture varchar(256) NOT NULL,  
+  picture varchar(256), 
   gender char(1) NOT NULL, -- (m)ale, (f)emale  
   birthday date NOT NULL,
   minor boolean,
@@ -87,7 +87,7 @@ CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
 
 -- Player email addresses e.g. Keith Donald home, Keith Donald work
 CREATE TABLE player_emails (email varchar(320),
-  label varchar(64) NOT NULL, -- home, work, facebook, etc.
+  label varchar(64) NOT NULL CONSTRAINT df_player_emails_label DEFAULT 'home', -- home, work, facebook, etc.
   primary_email boolean NOT NULL CONSTRAINT df_primary_email DEFAULT false,
   player integer,
   CONSTRAINT pk_player_emails PRIMARY KEY (email),
@@ -96,7 +96,7 @@ CREATE TABLE player_emails (email varchar(320),
 
 -- Player phone numbers e.g. Keith Donald home, Keith Donald mobile
 CREATE TABLE player_phones (number varchar(16),
-  label varchar(64) NOT NULL, -- home, work, mobile, etc.
+  label varchar(64) NOT NULL CONSTRAINT df_player_phones_label DEFAULT 'home', -- home, work, mobile, etc.
   primary_phone boolean NOT NULL CONSTRAINT df_primary_phone DEFAULT false,
   player integer,  
   CONSTRAINT pk_player_phones PRIMARY KEY (number),
@@ -242,7 +242,7 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
   name varchar(128) NOT NULL,
   slug varchar(16) NOT NULL,  
   sport varchar(64) NOT NULL,
-  picture varchar(64) NOT NULL,
+  picture varchar(64),
   format varchar(64) NOT NULL,
   nature char(1), -- (c)ompetitive, (r)ecreational
   gender char(1), -- (m)ale only, (f)emale only, (c)o-ed, null (not specified, accepts either male or female)
@@ -292,7 +292,7 @@ CREATE TABLE league_venues (league integer,
 CREATE TABLE seasons (league integer,
   number integer,
   name varchar(64) NOT NULL, -- for history since league name can change
-  picture varchar(256) NOT NULL, -- for history since league picture can change
+  picture varchar(256), -- for history since league picture can change
   start_date date,
   registration_opens date,
   registration_closes date,
@@ -365,7 +365,7 @@ CREATE TABLE team_members (league integer,
   slug varchar(16) NOT NULL,  
   number smallint NOT NULL,
   nickname varchar(16) NOT NULL, -- name on jersey
-  picture varchar(256) NOT NULL,
+  picture varchar(256),
   created timestamp NOT NULL CONSTRAINT df_team_members_created DEFAULT now(),
   CONSTRAINT pk_team_members PRIMARY KEY (league, season, team, player),
   CONSTRAINT fk_team_members_team FOREIGN KEY (league, season, team) REFERENCES teams(league, season, team),

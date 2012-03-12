@@ -1,7 +1,7 @@
 INSERT INTO sports (name) VALUES ('Flag Football');
 INSERT INTO formats (name, sport) VALUES ('7 on 7', 'Flag Football');
 
-INSERT INTO organizations (name, logo, founded, website) VALUES ('Brevard County Parks and Recreation', 'http://localhost:8080/static/images/brevardparks.png', null, 'http://www.brevardparks.com');
+INSERT INTO organizations (name, logo, founded, website) VALUES ('Brevard County Parks and Recreation', 'http://localhost:8080/static/images/organizations/1.png', null, 'http://www.brevardparks.com');
 INSERT INTO usernames (username, username_type, organization) VALUES ('brevardparks', 'o');
 
 INSERT INTO venues (name, street_address, city, state, zip_code, latitude, longitude)
@@ -11,15 +11,40 @@ INSERT INTO league_venues (league, venue, primary_venue) VALUES (1, 1, true);
 
 INSERT INTO leagues (name, slug, sport, picture, format, nature, gender, age_min, age_max,
   roster_min, roster_healthy, roster_max, roster_min_female, skill_level_min, skill_level_max, registration_type, registration_fee, registration_fee_earlybird, organization)
-    VALUES ('South Brevard Adult Flag Football', 'south-flag', 'Flag Football', 'http://localhost:8080/static/images/brevardparks/south-flag.png',
+    VALUES ('South Brevard Adult Flag Football', 'south-flag', 'Flag Football', 'http://localhost:8080/static/images/leagues/1.png',
             '7 on 7', null, null, 17, null, 7, 10, 20, null, null, null, 't', '$480.00', null, 1);
             
 INSERT INTO seasons (league, number, name, picture, start_date, registration_opens, registration_closes, status)
-  VALUES (1, 1, 'South Brevard Adult Flag Football', 'http://localhost:8080/static/images/brevardparks/south-flag/1.png', '2012-04-18', null, null, 'o');
+  VALUES (1, 1, 'South Brevard Adult Flag Football', 'http://localhost:8080/static/images/leagues/1/1.png', '2012-04-18', null, null, 'o');
  
-INSERT INTO players (email, first_name, last_name, birthdate, number, nickname, referral_code, referred_by) values ('keith@pastimebrevard.com', 'Keith', 'Donald', '12/29/1977', 9, null, 'jnhyy5', null);
-INSERT INTO players (email, first_name, last_name, birthdate, number, nickname, referral_code, referred_by) values ('alexander.weaver@gmail.com', 'Alexander', 'Weaver', '05/20/1977', 37, 'OG Hitman', '96dvlb', 1);
-INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('coolhandluke2222@gmail.com', 'Brian', 'Fisher', 26, 'Fish', 'mvwkdw', null);
+INSERT INTO players (first_name, last_name, picture, gender, birthday, zip_code, number, nickname, password, referral_code, referred_by)
+  VALUES ('Keith', 'Donald', 'http://localhost:8080/static/images/players/1.png', 'm', '1977-12-29', '32904', 9, 'Donald', 'whippet', 'jnhyy5', null);
+INSERT INTO player_emails (player, email, primary_email) VALUES (1, 'keith.donald@gmail.com', true);
+
+INSERT INTO players (first_name, last_name, picture, gender, birthday, zip_code, number, nickname, password, referral_code, referred_by)
+  VALUES ('Alexander', 'Weaver', 'http://localhost:8080/static/images/players/2.png', 'm', '1978-05-20', '32905', 37, 'OG Hitman', 'whippet', '96dvlb', null);
+INSERT INTO player_emails (player, email, primary_email) VALUES (2, 'alexander.weaver@gmail.com', true);
+
+INSERT INTO players (first_name, last_name, picture, gender, birthday, zip_code, number, nickname, password, referral_code, referred_by)
+  VALUES ('Brian', 'Fisher', null, 'm', '1970-10-20', '32904', 26, 'Fish', 'whippet', 'mvwkdw', null);
+INSERT INTO player_emails (player, email, primary_email) VALUES (3, 'coolhandluke2222@gmail.com', true);
+
+INSERT INTO teams (league, season, team, name, logo, status) VALUES (1, 1, 1, 'Hitmen', null, 'n');
+
+INSERT INTO team_members (league, season, team, player, slug, number, nickname, picture)
+  VALUES (1, 1, 1, 1, 'donald', 9, 'Donald', 'http://localhost:8080/static/images/leagues/1/1/1/donald.png');
+INSERT INTO team_member_roles (league, season, team, player, role, player_captain, player_sub, player_status) VALUES (1, 1, 1, 1, 'Player', false, false, 'a');
+  
+INSERT INTO team_members (league, season, team, player, slug, number, nickname, picture)
+  VALUES (1, 1, 1, 2, 'og-hitman', 37, 'OG Hitman', 'http://localhost:8080/static/images/leagues/1/1/1/og-hitman.png');
+INSERT INTO team_member_roles (league, season, team, player, role, player_captain, player_captain_of, player_sub, player_status) VALUES (1, 1, 1, 2, 'Player', true, 'Defense', false, 'a');
+
+INSERT INTO team_members (league, season, team, player, slug, number, nickname, picture)
+  VALUES (1, 1, 1, 3, 'fish', 26, 'Fish', null);
+INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 3, 'Head Coach');  
+INSERT INTO team_member_roles (league, season, team, player, role, player_captain, player_sub, player_status) VALUES (1, 1, 1, 3, 'Player', false, false, 'i');
+
+
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('gabebarfield@gmail.com', 'Gabe', 'Barfield', 87, 'Barefoot', 'kt8mpd', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('tiny28270@gmail.com', 'Marc', 'Szczesny-Pumarada', 21, 'Puma', 'p8cpd9', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('aumematt@gmail.com', 'Matt', 'Wade', 15, 'Dubya', 'in3jrb', null);
