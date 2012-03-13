@@ -1,19 +1,27 @@
 INSERT INTO sports (name) VALUES ('Flag Football');
 INSERT INTO formats (name, sport) VALUES ('7 on 7', 'Flag Football');
 
+INSERT INTO sports (name) VALUES ('Volleyball');
+INSERT INTO formats (name, sport) VALUES ('6 on 6', 'Volleyball');
+
 INSERT INTO organizations (name, logo, founded, website) VALUES ('Brevard County Parks and Recreation', 'http://localhost:8080/static/images/organizations/1.png', null, 'http://www.brevardparks.com');
-INSERT INTO usernames (username, username_type, organization) VALUES ('brevardparks', 'o');
+INSERT INTO usernames (username, username_type, organization) VALUES ('brevardparks', 'o', 1);
 
 INSERT INTO venues (name, street_address, city, state, zip_code, latitude, longitude)
   VALUES ('Palm Bay Regional Park', '951 Malabar Rd. NW', 'Palm Bay', 'FL', '32908', 28.005094974728667, -80.73124302540815);
 
-INSERT INTO league_venues (league, venue, primary_venue) VALUES (1, 1, true);
+INSERT INTO venues (name, street_address, city, state, zip_code, latitude, longitude)
+  VALUES ('Max Rodes Park', '3410 Flanagan Avenue', 'West Melbourne', 'FL', '32904', 28.05723, -80.680772);
+
+-- Flag Football
 
 INSERT INTO leagues (name, slug, sport, picture, format, nature, gender, age_min, age_max,
   roster_min, roster_healthy, roster_max, roster_min_female, skill_level_min, skill_level_max, registration_type, registration_fee, registration_fee_earlybird, organization)
     VALUES ('South Brevard Adult Flag Football', 'south-flag', 'Flag Football', 'http://localhost:8080/static/images/leagues/1.png',
             '7 on 7', null, null, 17, null, 7, 10, 20, null, null, null, 't', '$480.00', null, 1);
-            
+
+INSERT INTO league_venues (league, venue, primary_venue) VALUES (1, 1, true);
+
 INSERT INTO seasons (league, number, name, picture, start_date, registration_opens, registration_closes, status)
   VALUES (1, 1, 'South Brevard Adult Flag Football', 'http://localhost:8080/static/images/leagues/1/1.png', '2012-04-18', null, null, 'o');
  
@@ -44,6 +52,17 @@ INSERT INTO team_members (league, season, team, player, slug, number, nickname, 
 INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 3, 'Head Coach');  
 INSERT INTO team_member_roles (league, season, team, player, role, player_captain, player_sub, player_status) VALUES (1, 1, 1, 3, 'Player', false, false, 'i');
 
+-- Volleyball
+
+INSERT INTO leagues (name, slug, sport, picture, format, nature, gender, age_min, age_max,
+  roster_min, roster_healthy, roster_max, roster_min_female, skill_level_min, skill_level_max, registration_type, registration_fee, registration_fee_earlybird, organization)
+    VALUES ('Max Rodes Indoor Volleyball', 'south-indoor', 'Volleyball', 'http://localhost:8080/static/images/leagues/2.png',
+            '6 on 6', null, 'c', 17, null, 6, 6, 20, 2, null, null, 't', '$500.00', null, 1);
+
+INSERT INTO league_venues (league, venue, primary_venue) VALUES (2, 2, true);
+
+INSERT INTO seasons (league, number, name, picture, start_date, registration_opens, registration_closes, status)
+  VALUES (2, 1, 'Max Rodes Indoor Volleyball', 'http://localhost:8080/static/images/leagues/2/1.png', '2012-05-01', null, null, 'o');
 
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('gabebarfield@gmail.com', 'Gabe', 'Barfield', 87, 'Barefoot', 'kt8mpd', null);
 INSERT INTO players (email, first_name, last_name, number, nickname, referral_code, referred_by) values ('tiny28270@gmail.com', 'Marc', 'Szczesny-Pumarada', 21, 'Puma', 'p8cpd9', null);

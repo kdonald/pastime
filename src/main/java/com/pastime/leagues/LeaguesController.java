@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,11 +52,16 @@ public class LeaguesController {
         this.playersSql = SqlUtils.sql(new ClassPathResource("players.sql", getClass()));
     }
     
+    @RequestMapping(value="/", method=RequestMethod.GET)
+    public String home(Model model) {
+        return "home/home";
+    }
+    
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.GET, produces="application/json")
     public ResponseEntity<JsonNode> upcoming() throws URISyntaxException {
         Location location = new Location(28.0674,-80.5595);
         JsonNode json = client.getForObject(new URI("http://localhost:8983/solr/select?wt=json&fl=organization_name,organization_url,organization_logo,league_sport,league_format,league_nature," + 
-                "season_name,season_url,season_picture,venue_name&q=*:*&fq=%7B!geofilt%7D&sfield=venue_location&pt=" + location + "&d=25"), JsonNode.class);
+                "season_name,season_url,season_start_date,season_picture,venue_name&q=*:*&fq=%7B!geofilt%7D&sfield=venue_location&pt=" + location + "&d=25"), JsonNode.class);
         JsonNode docs = json.get("response").get("docs");
         return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
     }

@@ -27,6 +27,10 @@ public class WebConfig extends BaseWebConfig {
         registry.addResourceHandler("/static/app/0.1.2/**").addResourceLocations("/static/app/").setCachePeriod(31556926);
         registry.addResourceHandler("/static/libs/**").addResourceLocations("/static/libs/").setCachePeriod(31556926); // dev only
         registry.addResourceHandler("/static/*").addResourceLocations("/static/").setCachePeriod(31556926);
+
+        // this is temporary until i do stored images right
+        registry.addResourceHandler("/static/images/**").addResourceLocations("/static/images/").setCachePeriod(0);        
+
     }
 
     @Bean

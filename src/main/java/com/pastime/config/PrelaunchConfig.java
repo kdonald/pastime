@@ -3,7 +3,6 @@ package com.pastime.config;
 import javax.inject.Inject;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,7 +20,6 @@ import com.pastime.prelaunch.admin.ReferralsAdminController;
 import com.pastime.prelaunch.referrals.ReferralProgram;
 import com.pastime.prelaunch.referrals.ReferralsController;
 
-@Configuration
 public class PrelaunchConfig extends WebMvcConfigurerAdapter {
 
     @Inject

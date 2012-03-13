@@ -1,3 +1,3 @@
-define(["jquery", "polyfiller", "text", "handlebars"], function() {
+define(["jquery", "text", "handlebars", "es5-shim", "dateformat"], function() {
   
 });

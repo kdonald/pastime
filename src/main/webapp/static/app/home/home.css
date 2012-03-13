@@ -1,0 +1,64 @@
+/* carousel */
+.rs-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.rs-carousel .rs-carousel-mask {
+  position: relative;
+  overflow: hidden;
+}
+
+.rs-carousel .rs-carousel-runner {
+  position: absolute;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.no-js .rs-carousel .rs-carousel-runner {
+  position: static;
+}
+
+/* leagues carousel */
+
+#leagues a[href='#prev'] {
+  float: left;
+  padding-top: 60px;
+  padding-right: 10px;
+  height: 90px;
+}
+
+#leagues a[href='#next'] {
+  float: left;
+  padding-top: 60px;
+  padding-left: 10px;
+  height: 90px;
+}
+
+/** horizontal **/
+#leagues .rs-carousel-mask {
+  float: left;
+  height: 150px;
+  width: 470px;
+  margin: 0;
+}
+
+#leagues .rs-carousel-item {
+  float: left;
+  height: 150px;
+  width: 470px;
+  margin: 0;
+}
+
+#leagues h2 {
+  font-size: 1.2em;
+}
+
+#leagues img {
+  float: left;
+  height: 128px;
+  width: 128px;
+  margin-right: 10px;
+}
