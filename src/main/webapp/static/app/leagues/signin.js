@@ -43,8 +43,27 @@ define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC) {
           template: "signup-type",
           events: {
             "click button[name='facebook']": function() {
+              var container = this.$("#signupContent");              
               FB.login(function(response) {
                 if (response.authResponse) {
+                  FB.api("/me", function(response) {
+                    FB.api("/me/picture", function(pictureResponse) {
+                      var facebookSignup = mvc.view({
+                        model: { 
+                          picture: pictureResponse,
+                          name: response.name,
+                          gender: response.gender === "male" ? "Male" : "Female",
+                          birthday: response.birthday,
+                          location: typeof response.location === "undefined" ? null : response.location.name,
+                          email: response.email
+                        },
+                        template: "signup-facebook",
+                      });
+                      facebookSignup.render(function(root) {
+                        container.html(root);
+                      });                      
+                    });
+                  });
                   console.log('User signed into Pastime using Facebook...');
                 } else {
                   console.log('User cancelled login or did not fully authorize.');

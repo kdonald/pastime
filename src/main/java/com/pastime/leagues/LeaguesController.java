@@ -118,9 +118,9 @@ public class LeaguesController {
             private String organizationUrl(Integer id, String name) {
                 // TODO: we could just always send to /organizations/id and rely on redirect if username is set...
                 if (name != null) {
-                    return "http://localhost:8080/" + name;
+                    return "http://pastime.com/" + name;
                 } else {
-                    return "http://localhost:8080/organizations/" + id;
+                    return "http://pastime.com/organizations/" + id;
                 }
             }            
         });
