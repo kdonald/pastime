@@ -1,0 +1,18 @@
+<div id="signup">
+  <h2>Sign Up</h2>
+  <div id="signupContent">
+    {{#signedIntoFacebook}}
+    <p>We see you are currently signed into Facebook.</p>
+    <p>
+      If you like, we can sign you up with Pastime using your Facebook account <strong>(Recommended)</strong>.
+    <p>
+    <button name="facebook">Sounds good, sign me up using Facebook</button>
+    <button name="manual">No thanks</button>
+    {{/signedIntoFacebook}}
+    {{^signedIntoFacebook}}
+    <p>Are you on Facebook? If so, we can sign you up quicker by importing the information we need about you from your Facebook profile.</p>
+    <button name="facebook">Yes, sign me up using Facebook</button>
+    <button name="manual">No, I'm not on Facebook</button>
+    {{/signedIntoFacebook}}
+  </div>
+</div>

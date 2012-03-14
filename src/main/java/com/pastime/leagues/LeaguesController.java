@@ -82,6 +82,11 @@ public class LeaguesController {
         });        
         return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
     }
+
+    @RequestMapping(value="/{username}/{league}/{season}", method=RequestMethod.GET)
+    public String players(@PathVariable String username, @PathVariable String league, @PathVariable Integer season, Model model) {
+        return "leagues/signin";
+    }
     
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")
     public ResponseEntity<? extends Object> postUpcoming() throws URISyntaxException {

@@ -1,0 +1,46 @@
+<form id="signup" action="/signup" method="post">
+  <p>Okay, please complete this Pastime signup form. All fields are required.</p>
+  <fieldset>
+    <legend><strong>Name</strong></legend>
+    <input id="firstname" type="text" name="firstName" placeholder="First" required /><input id="lastname" type="text" name="lastName" placeholder="Last" required class="last" />    
+  </fieldset>
+  <label>
+    <strong>Email</strong>
+    <input type="email" name="email" required placeholder="you@address" />    
+  </label>
+  <label class="password">
+    <strong>Password</strong>
+    <input type="password" name="password" required placeholder="at least 6 characters" />    
+  </label>
+  <fieldset>
+    <legend>
+      <strong>Birthday</strong> <a href="#why-birthday">Why?</a>
+    </legend>
+    <select id="month" name="month">
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select><input id="day" type="text" name="day" placeholder="Day" required pattern="[0-9][0-9]" title="two digit day" required size="2" /><input id="year" type="text" name="year" placeholder="Year" required pattern="[0-9][0-9][0-9][0-9]" title="four digit year" size="4" class="last" />          
+  </fieldset>
+  <label>
+    <strong>Gender</strong> <a href="#why-gender">Why?</a>
+    <select name="gender">
+      <option value="m">Male</option>
+      <option value="f">Female</option>            
+    </select>
+  </label>
+  <label>
+    <strong>ZIP Code</strong> <a href="#why-zipcode">Why?</a>
+    <input type="text" name="zipCode" placeholder="5 digits" required pattern="[0-9]{5}" title="five digit ZIP code" size="5" />        
+  </label>
+  <button>Sign Up</button>
+</form>  

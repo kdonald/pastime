@@ -29,7 +29,7 @@ define(["jquery", "handlebars",
         },        
         insertNextAction: function() {
           return $(this).find("a[href='#next']");
-        }        
+        }
       });      
     });
   });

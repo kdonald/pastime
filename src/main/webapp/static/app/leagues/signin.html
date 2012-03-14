@@ -1,0 +1,39 @@
+<h2>Sign In</h2>
+
+{{#signedIntoFacebook}}}
+<form id="signin-facebook">
+  <button>Sign In with Facebook</button>
+</form>
+
+<p>or enter your</p>
+
+<form id="signin" action="/signin" method="post">
+  <label>
+    <strong>Username or Email</strong>
+    <input type="text" name="name" required />   
+  </label>
+  <label class="password">
+    <strong>Password</strong>
+    <input type="password" name="password" required />    
+  </label>
+  <button>Sign In</button>
+</form>
+{{/signedIntoFacebook}}
+
+{{^signedIntoFacebook}}}
+<form id="signin" action="/signin" method="post">
+  <label>
+    <strong>Username or Email</strong>
+    <input type="text" name="name" required />   
+  </label>
+  <label class="password">
+    <strong>Password</strong>
+    <input type="password" name="password" required />    
+  </label>
+  <button>Sign In</button>
+</form>
+<p>
+<form id="signin-facebook">
+  <button>Sign In with Facebook</button>
+</form>
+{{/signedIntoFacebook}}
