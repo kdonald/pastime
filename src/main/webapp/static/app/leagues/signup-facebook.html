@@ -1,30 +1,24 @@
 <form id="signup" action="/signup" method="post">
-  <img src="{{picture}}" alt="Profile Picture" />
+  <img src="{{picture_url}}" alt="Profile Picture" />
   <dl>
     <dt>Name</dt>
-    <dd>{{name}}</dd>
-    <dt>Gender  <a href="#why-gender">Why?</a></dt>
+    <dd>{{first_name}} {{last_name}}</dd>
+    <dt>Gender <a href="#why-gender">Why?</a></dt>
     <dd>{{gender}}</dd>
     <dt>Birthday <a href="#why-birthdate">Why?</a></dt>
     <dd>{{birthday}}</dd>
-    {{#location}}
-    <dt>Location <a href="#why-location">Why?</a></dt> 
-    <dd>{{this}}</dd>    
-    {{/location}}
   </dl>
   <dl>
     <dt>Primary Email</dt>
     <dd>{{email}}</dd>
   </dl>
-  {{^location}}
-  <label>
-    <strong>ZIP Code</strong> <a href="#why-zipcode">Why?</a>
-    <input type="text" name="zipCode" placeholder="5 digits" required pattern="[0-9]{5}" title="five digit ZIP code" size="5" />        
-  </label>
-  {{/location}}
   <label class="password">
     <strong>Choose a password</strong>
-    <input type="password" name="password" required placeholder="at least 6 characters" />    
+    <input type="password" name="password" placeholder="at least 6 characters" required pattern="^.{6,16}$" title="between 6 and 16 characters" data-bind="password" />
   </label>
-  <button>Sign Up</button>
+  <label>
+    <strong>ZIP Code</strong> <a href="#why-zipcode">Why?</a>
+    <input type="text" name="zip_code" placeholder="5 digits" required pattern="^[0-9]{5}$" title="five digit ZIP code" size="5" data-bind="zip_code" />
+  </label>  
+  <button type="submit">Sign Up</button>
 </form>  

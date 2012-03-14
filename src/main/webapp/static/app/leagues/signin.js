@@ -1,17 +1,16 @@
-define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC) {
+define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC, facebook) {
 
   var mvc = MVC.create(require);
-  
+
   $(document).ready(function() {
 
     $("form[input:radio[name=account]").on("change", function(event) {
-      evalAccount($(this).val());
+      onAccountSelection($(this).val());
     });
 
-    evalAccount($("form[input:radio[name=account][checked]").val());
+    onAccountSelection($("form[input:radio[name=account][checked]").val());
     
-    function evalAccount(val) {
-      console.log(val);
+    function onAccountSelection(val) {
       if ("existing" === val) {
         signin();
       } else if ("new" === val) {
@@ -20,21 +19,21 @@ define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC) {
     }
 
     function signin() {
-      FB.getLoginStatus(function(response) {
+      var status = facebook.getLoginStatus();
+      status.done(function(response) {
         var signin = mvc.view({
           model: {
             signedIntoFacebook: "connected" === response.status || "not_authorized" === response.status
           },
           template: "signin"
         });
-        signin.render(function(root) {
-          selectionHtml(root);
-        });        
+        signin.html($("#accountSelectionResult"));        
       });
     }
     
     function signup() {
-      FB.getLoginStatus(function(response) {
+      var status = facebook.getLoginStatus();
+      status.done(function(response) {
         var signupType = mvc.view({
           model: {
             signedIntoFacebook: "connected" === response.status || "not_authorized" === response.status,
@@ -43,54 +42,47 @@ define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC) {
           template: "signup-type",
           events: {
             "click button[name='facebook']": function() {
-              var container = this.$("#signupContent");              
-              FB.login(function(response) {
-                if (response.authResponse) {
-                  FB.api("/me", function(response) {
-                    FB.api("/me/picture", function(pictureResponse) {
-                      var facebookSignup = mvc.view({
-                        model: { 
-                          picture: pictureResponse,
-                          name: response.name,
-                          gender: response.gender === "male" ? "Male" : "Female",
-                          birthday: response.birthday,
-                          location: typeof response.location === "undefined" ? null : response.location.name,
-                          email: response.email
-                        },
-                        template: "signup-facebook",
-                      });
-                      facebookSignup.render(function(root) {
-                        container.html(root);
-                      });                      
+              var self = this;
+              var login = facebook.login({ scope: 'email,user_birthday' });
+              login.done(function() {
+                $.when(facebook.api("/me"), facebook.api("/me/picture")).then(function(me, picture) {
+                  var signupForm = { 
+                      picture_url: picture,
+                      first_name: me.first_name,
+                      last_name: me.last_name,
+                      gender: me.gender,
+                      birthday: me.birthday,
+                      email: me.email,
+                      zip_code: null,
+                      password: null,
+                    };
+                    var facebookSignup = mvc.view({
+                      model: signupForm,
+                      template: "signup-facebook",
+                      events: {
+                        "submit": function() {
+                          var xhr = $.post("/signup", signupForm);
+                          console.log(xhr);
+                          return false;
+                        }
+                      }
                     });
-                  });
-                  console.log('User signed into Pastime using Facebook...');
-                } else {
-                  console.log('User cancelled login or did not fully authorize.');
-                }
-              }, { scope: 'email,user_birthday,user_location' });              
+                    facebookSignup.html(self.$("#signupPane"));                  
+                });
+              });              
               return false;
             },
             "click button[name='manual']": function() {
               var signup = mvc.view({ 
                 template: "signup"
               });              
-              var container = this.$("#signupContent");
-              signup.render(function(root) {
-                container.html(root);
-              });
+              signup.html(this.$("#signupPane"));
               return false;
             }            
           }
         });      
-        signupType.render(function(root) {
-          selectionHtml(root);
-        });        
+        signupType.html($("#accountSelectionResult"));        
       });      
-    }
-    
-    function selectionHtml(root) {
-      $("#selectionContent").html(root);      
     }
     
   });

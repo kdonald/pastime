@@ -155,6 +155,12 @@ define(["jquery", "handlebars"], function($, handlebars) {
             }
           }
           
+          function html(element) {
+            this.render(function(root) {
+              element.html(root);
+            });            
+          }
+          
           function renderDeferred(anchor) {
             var self = this;
             var thisRendered = $.Deferred();
@@ -292,6 +298,7 @@ define(["jquery", "handlebars"], function($, handlebars) {
             bind: bind,
             trigger: trigger,
             render: render,
+            html: html,
             renderDeferred: renderDeferred,            
             $: find,
             reset: reset,

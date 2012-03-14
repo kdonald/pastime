@@ -10,6 +10,40 @@ define("facebook", ["jquery", "https://connect.facebook.net/en_US/all.js"], func
     xfbml : false // parse XFBML
   });
   
+  function getLoginStatus() {
+    var deferred = $.Deferred();
+    FB.getLoginStatus(function(response) {
+      deferred.resolve(response);
+    });
+    return deferred.promise();    
+  }
+  
+  function login(permissions) {
+    var deferred = $.Deferred();
+    FB.login(function(response) {
+      if (response.authResponse) {
+        deferred.resolve(response);        
+      } else {
+        deferred.reject();
+      }
+    });
+    return deferred.promise();
+  }
+  
+  function api(resource) {
+    var deferred = $.Deferred();    
+    FB.api(resource, function(response) {
+      deferred.resolve(response); 
+    });
+    return deferred.promise();    
+  }
+  
+  return {
+    getLoginStatus: getLoginStatus,
+    login: login,
+    api: api
+  };
+  
 });
 
 
