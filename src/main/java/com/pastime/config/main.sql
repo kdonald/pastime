@@ -31,9 +31,7 @@ DROP TABLE formats;
 DROP TABLE sports;
 
 -- Pastime Sports e.g. Flag Football
-CREATE TABLE sports (name varchar(64) CONSTRAINT pk_sports PRIMARY KEY,
-  logo varchar(256)
-);
+CREATE TABLE sports (name varchar(64) CONSTRAINT pk_sports PRIMARY KEY);
 
 -- Pastime Sport Formats e.g. 7 on 7 Flag Football
 CREATE TABLE formats (sport varchar(64),
@@ -57,7 +55,6 @@ CREATE TABLE format_rules (sport varchar(64),
 CREATE TABLE players (id serial CONSTRAINT pk_players PRIMARY KEY,
   first_name varchar(64) NOT NULL,
   last_name varchar(64) NOT NULL,
-  picture varchar(256), 
   gender char(1) NOT NULL, -- (m)ale, (f)emale  
   birthday date NOT NULL,
   minor boolean,
@@ -144,7 +141,6 @@ CREATE TABLE franchises (id serial CONSTRAINT pk_franchises PRIMARY KEY,
   sport varchar(64) NOT NULL,
   founded date,
   founder integer,
-  logo varchar(256),
   gender char(1), -- (m)ale only, (f)emale only, (c)o-ed, null (not specified, accepts either male or female)
   age_min smallint, -- used to help in adding players (exclude by name search results for people not meeting gender or age_min)
   created timestamp NOT NULL CONSTRAINT df_franchises_created DEFAULT now(),
@@ -158,7 +154,6 @@ CREATE TABLE franchise_members (franchise integer,
   slug varchar(16) NOT NULL,    
   number smallint,
   nickname varchar(16),
-  picture varchar(256),
   joined date NOT NULL CONSTRAINT df_franchises_joined DEFAULT now(),
   retired date,
   CONSTRAINT pk_franchise_members PRIMARY KEY (franchise, player),  
@@ -214,7 +209,6 @@ CREATE TABLE franchise_player_positions (franchise integer,
 -- Pastime Organizations e.g. Brevard County Parks and Recreation, Sandox Volleyball
 CREATE TABLE organizations (id serial CONSTRAINT pk_organizations PRIMARY KEY,
   name varchar(128) NOT NULL,
-  logo varchar(256),
   founded date,  
   website varchar(256)
 );
@@ -233,7 +227,6 @@ CREATE TABLE venues (id serial CONSTRAINT pk_venues PRIMARY KEY,
 -- Pastime Sponsors e.g. Fired Up Pizza
 CREATE TABLE sponsors (id serial CONSTRAINT pk_sponsor PRIMARY KEY,
   name varchar(128) NOT NULL,
-  logo varchar(256),
   website varchar(256)
 );
 
@@ -242,7 +235,6 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
   name varchar(128) NOT NULL,
   slug varchar(16) NOT NULL,  
   sport varchar(64) NOT NULL,
-  picture varchar(64),
   format varchar(64) NOT NULL,
   nature char(1), -- (c)ompetitive, (r)ecreational
   gender char(1), -- (m)ale only, (f)emale only, (c)o-ed, null (not specified, accepts either male or female)
@@ -270,7 +262,6 @@ CREATE TABLE leagues (id serial CONSTRAINT pk_leagues PRIMARY KEY,
 CREATE TABLE league_staff (league integer,
   player integer,
   role varchar(64) NOT NULL, -- Commissioner, Assistant, Referee, Admin
-  picture varchar(256),
   status char(1), -- (a)ctive, (r)etired
   joined date,
   retired date,
@@ -292,7 +283,6 @@ CREATE TABLE league_venues (league integer,
 CREATE TABLE seasons (league integer,
   number integer,
   name varchar(64) NOT NULL, -- for history since league name can change
-  picture varchar(256), -- for history since league picture can change
   start_date date,
   registration_opens date,
   registration_closes date,
@@ -331,7 +321,6 @@ CREATE TABLE teams (league integer,
   season integer,
   team integer,
   name varchar(64) NOT NULL,
-  logo varchar(256),
   status char(1) NOT NULL, -- registration (c)onfirmed, (n)eeds players, (p)ending payment
   confirmed timestamp,
   created timestamp NOT NULL CONSTRAINT df_teams_created DEFAULT now(),  
@@ -365,7 +354,6 @@ CREATE TABLE team_members (league integer,
   slug varchar(16) NOT NULL,  
   number smallint NOT NULL,
   nickname varchar(16) NOT NULL, -- name on jersey
-  picture varchar(256),
   created timestamp NOT NULL CONSTRAINT df_team_members_created DEFAULT now(),
   CONSTRAINT pk_team_members PRIMARY KEY (league, season, team, player),
   CONSTRAINT fk_team_members_team FOREIGN KEY (league, season, team) REFERENCES teams(league, season, team),

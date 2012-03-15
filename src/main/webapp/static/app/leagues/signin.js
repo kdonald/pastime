@@ -43,18 +43,26 @@ define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC, faceb
           events: {
             "click button[name='facebook']": function() {
               var self = this;
-              var login = facebook.login({ scope: 'email,user_birthday' });
-              login.done(function() {
+              var facebookScope = "email,user_birthday";
+              var login = facebook.login({ scope: facebookScope });
+              login.done(function(authResponse) {
                 $.when(facebook.api("/me"), facebook.api("/me/picture")).then(function(me, picture) {
                   var signupForm = { 
                       picture_url: picture,
                       first_name: me.first_name,
                       last_name: me.last_name,
-                      gender: me.gender,
+                      gender: me.gender === "male" ? "Male" : "Female",
                       birthday: me.birthday,
                       email: me.email,
                       zip_code: null,
                       password: null,
+                      connection: {
+                        provider: "facebook",
+                        user_id: authResponse.userID,
+                        access_token: authResponse.accessToken,
+                        scope: facebookScope,
+                        expires_in: authResponse.expiresIn,
+                      },
                     };
                     var facebookSignup = mvc.view({
                       model: signupForm,
@@ -62,7 +70,9 @@ define(["require", "jquery", "mvc", "facebook"], function(require, $, MVC, faceb
                       events: {
                         "submit": function() {
                           var xhr = $.post("/signup", signupForm);
-                          console.log(xhr);
+                          xhr.done(function(id) {
+                            // successful sign up
+                          });
                           return false;
                         }
                       }

@@ -6,7 +6,6 @@ import static org.springframework.jdbc.core.SqlStatements.use;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -79,7 +78,7 @@ public class AccountController {
     public String signup() {
         return "players/signup";
     }
-    
+
     @RequestMapping(value="/signup", method=RequestMethod.POST, produces="application/json")
     @Transactional
     public ResponseEntity<? extends Object> signup(@Valid SignupForm signupForm, HttpServletResponse response) {
@@ -87,11 +86,9 @@ public class AccountController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("email already exists"), HttpStatus.BAD_REQUEST);
         }
         String referralCode = generateUniqueReferralCode();
-        ReferredBy referredBy = findReferredBy(signupForm.getR());
-        Date created = new Date();
-        String picture = "http://pastime.com/static/images/default-profile-pic.png";
-        Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, picture, birthday, gender, zip_code, referral_code, referred_by, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
-                signupForm.getFirstName(), signupForm.getLastName(), signupForm.getPassword(), picture, signupForm.getBirthday(), signupForm.getGender().name(), signupForm.getZipCode(), referralCode, referredBy != null ? referredBy.getId() : null, created);
+        ReferredBy referredBy = findReferredBy(signupForm.getReferral_code());
+        Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
+                signupForm.getFirst_name(), signupForm.getLast_name(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().getCode(), signupForm.getZip_code(), referralCode, referredBy != null ? referredBy.getId() : null);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
         Player player = new Player(playerId);
         URI url = UriComponentsBuilder.fromHttpUrl("http://pastime.com/players/{id}").buildAndExpand(player.getId()).toUri();
@@ -100,7 +97,7 @@ public class AccountController {
         signinSession(player, response);
         return new ResponseEntity<Player>(player, headers, HttpStatus.CREATED);
     }
-
+    
     private void signinSession(Player player, HttpServletResponse response) {
         SecurityContext.setCurrentPlayer(player);
         cookieGenerator.addCookie(player.getId().toString(), response);        

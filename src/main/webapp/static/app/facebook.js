@@ -19,12 +19,19 @@ define("facebook", ["jquery", "https://connect.facebook.net/en_US/all.js"], func
   }
   
   function login(permissions) {
-    var deferred = $.Deferred();
-    FB.login(function(response) {
+    var deferred = $.Deferred();    
+    var status = getLoginStatus();
+    status.done(function(response) {
       if (response.authResponse) {
-        deferred.resolve(response);        
+        deferred.resolve(response.authResponse);
       } else {
-        deferred.reject();
+        FB.login(function(response) {
+          if (response.authResponse) {
+            deferred.resolve(response.authResponse);        
+          } else {
+            deferred.reject();
+          }
+        }, permissions);        
       }
     });
     return deferred.promise();
