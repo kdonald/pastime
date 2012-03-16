@@ -5,10 +5,10 @@ define(["jquery", "handlebars"], function($, handlebars) {
     function get(key) {
       if (!this.data.hasOwnProperty(key)) {
         this.data[key] = this.newValue();
-      }
+      }        
       return this.data[key];
     }
-    
+
     return {
       get: get
     };
@@ -126,13 +126,12 @@ define(["jquery", "handlebars"], function($, handlebars) {
         
         var viewPrototype = (function() {
           
-          function bind(event, listener) {
+          function on(event, listener) {
             this.listeners.get(event).push(listener);
           }
           
           function trigger(event, args) {
-            var listeners = this.listeners.get(event);
-            listeners.forEach(function(listener) {
+            this.listeners.get(event).forEach(function(listener) {
               listener(args);
             });
           }
@@ -295,8 +294,9 @@ define(["jquery", "handlebars"], function($, handlebars) {
           }
           
           return {
-            bind: bind,
+            on: on,
             trigger: trigger,
+            on: on,
             render: render,
             html: html,
             renderDeferred: renderDeferred,            

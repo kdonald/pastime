@@ -1,6 +1,8 @@
 package com.pastime.players;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -40,6 +42,8 @@ public class SignupForm {
 
     private String referral_code;
 
+    private Map<String, String> connection = new HashMap<String, String>();
+    
     public String getPicture_url() {
         return picture_url;
     }
@@ -111,5 +115,14 @@ public class SignupForm {
     public void setReferral_code(String referral_code) {
         this.referral_code = referral_code.trim().toLowerCase();
     }
+
+    public Map<String, String> getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Map<String, String> connection) {
+        this.connection = connection;
+    }
+    
 
 }

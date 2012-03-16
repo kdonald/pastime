@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
+import com.pastime.players.SecurityContext;
 import com.pastime.util.Location;
 
 @Controller
@@ -85,7 +86,7 @@ public class LeaguesController {
 
     @RequestMapping(value="/{username}/{league}/{season}", method=RequestMethod.GET)
     public String players(@PathVariable String username, @PathVariable String league, @PathVariable Integer season, Model model) {
-        return "leagues/signin";
+        return "leagues/join";
     }
     
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")

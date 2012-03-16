@@ -15,7 +15,6 @@
 <meta property="og:site_name" content="Pastime" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:type" content="website" />
-<link rel="stylesheet" href="/static/app/0.1.2/leagues/signin.css" />
 <script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
 <script src="/static/modernizr-2.5.2.js"></script>
 <script src="/static/require-1.0.4.js"></script>
@@ -32,7 +31,7 @@
       "textselect" : "../../libs/textselect/1.0.0/textselect",
       "polyfiller" : "../../libs/webshims/1.8.7/polyfiller"
     },
-    priority : [ "common", "leagues/signin" ]
+    priority : [ "common", "leagues/join" ]
   });
 </script>
 <script type="text/javascript">
@@ -64,20 +63,7 @@
     </div>
   </header>
   <div id="main" class="pagecontent">
-    <form>
-      <h2>We need to know who you are</h2>
-      <label>      
-        <strong>I already have a Pastime account</strong>      
-        <input name="account" type="radio" value="existing">
-      </label>
-      <label>
-        <strong>I don't have a Pastime account</strong>      
-        <input name="account" type="radio" value="new" />
-      </label>
-    </form>
-    <div id="accountSelectionResult">
-      <!-- Content dynamically inserted -->
-    </div>
+    <!-- Content inserted dynamically -->
   </div>  
   <footer>
     <div class="pagecontent">
