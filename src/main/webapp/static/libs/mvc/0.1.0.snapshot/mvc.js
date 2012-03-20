@@ -154,7 +154,7 @@ define(["jquery", "handlebars"], function($, handlebars) {
             }
           }
           
-          function html(element) {
+          function renderAt(element) {
             this.render(function(root) {
               element.html(root);
             });            
@@ -298,7 +298,7 @@ define(["jquery", "handlebars"], function($, handlebars) {
             trigger: trigger,
             on: on,
             render: render,
-            html: html,
+            renderAt: renderAt,
             renderDeferred: renderDeferred,            
             $: find,
             reset: reset,

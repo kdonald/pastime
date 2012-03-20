@@ -21,7 +21,7 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
             },
             template: "signin"
           });
-          signin.html($("#account-selection-result"));        
+          signin.renderAt($("#account-selection-result"));        
         });
       };
       this.signup = function() {
@@ -70,7 +70,7 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
                           }
                         }
                       });
-                      facebookSignup.html(self.$("#signup-pane"));                  
+                      facebookSignup.renderAt(self.$("#signup-pane"));                  
                   });
                 });              
                 return false;
@@ -79,12 +79,12 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
                 var signup = mvc.view({ 
                   template: "signup"
                 });              
-                signup.html(this.$("#signup-pane"));
+                signup.renderAt(this.$("#signup-pane"));
                 return false;
               }            
             }
           });      
-          signupType.html($("#account-selection-result"));        
+          signupType.renderAt($("#account-selection-result"));        
         });      
       };      
       this.handleSelectedAccount(this.$("form[input:radio[name=account][checked]").val());      

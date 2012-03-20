@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -51,12 +52,15 @@ public class LeaguesController {
     
     private String qualifyingFranchisesSql;
     
+    private String leagueSql;
+    
     public LeaguesController(JdbcTemplate jdbcTemplate) {
         initHttpClient();
         this.jdbcTemplate = jdbcTemplate;
         this.upcomingSql = SqlUtils.sql(new ClassPathResource("upcoming-leagues.sql", getClass()));
         this.playersSql = SqlUtils.sql(new ClassPathResource("players.sql", getClass()));
         this.qualifyingFranchisesSql = SqlUtils.sql(new ClassPathResource("qualifying-franchises.sql", getClass()));
+        this.leagueSql = SqlUtils.sql(new ClassPathResource("league.sql", getClass()));
     }
     
     @RequestMapping(value="/", method=RequestMethod.GET)
@@ -90,9 +94,15 @@ public class LeaguesController {
         return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value="/{username}/{league}/{season}", method=RequestMethod.GET)
-    public String players(@PathVariable String username, @PathVariable String league, @PathVariable Integer season, Model model) {
+    @RequestMapping(value="/{organization}/{league}/{season}", method=RequestMethod.GET)
+    public String join(@PathVariable String organization, @PathVariable String league, @PathVariable Integer season, Model model) {
         return "leagues/join";
+    }
+    
+    @RequestMapping(value="/{organization}/{league}/{season}", method=RequestMethod.GET, produces="application/json")
+    public ResponseEntity<? extends Object> league(@PathVariable String organization, @PathVariable String league, @PathVariable Integer season) {
+        Map<String, Object> json = jdbcTemplate.queryForMap(leagueSql, organization, league, season);
+        return new ResponseEntity<Map<String, Object>>(json, HttpStatus.ACCEPTED);
     }
     
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")
