@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +16,13 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -46,10 +49,16 @@ public class TeamsController {
 
     private InsecureRandomStringGenerator inviteGenerator = new InsecureRandomStringGenerator(6);
     
+    private String franchiseSql;
+    
+    private String activeFranchisePlayersSql;
+    
     public TeamsController(JdbcTemplate jdbcTemplate, JavaMailSender mailSender, StringTemplateLoader templateLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.mailSender = mailSender;
         this.templateLoader = templateLoader;
+        this.franchiseSql = SqlUtils.sql(new ClassPathResource("franchise.sql", getClass()));
+        this.activeFranchisePlayersSql = SqlUtils.sql(new ClassPathResource("franchise-players-active.sql", getClass()));
     }
 
     @RequestMapping(value="/teams/create", method=RequestMethod.GET)
@@ -91,6 +100,27 @@ public class TeamsController {
         return "teams/team";
     }
     
+    @RequestMapping(value="/franchises/{id}", method=RequestMethod.GET, produces="application/json")
+    @Transactional
+    public ResponseEntity<? extends Object> teamData(@PathVariable Integer id) {
+        Map<String, Object> franchise = jdbcTemplate.queryForMap(franchiseSql, id);
+        String founderUsername = (String) franchise.get("franchise_username");
+        if (founderUsername != null) {
+            franchise.put("founder_link", "http://pastime.com/" + founderUsername);
+        } else if (franchise.get("founder_id") != null) {
+            franchise.put("founder_link", "http:/pastime.com/players/" + franchise.get("founder_id"));
+        }
+        franchise.put("founder", extract("founder_", franchise));
+        if (franchise.get("username") != null) {
+            franchise.put("link", "http://pastime.com/" + franchise.get("username"));
+        } else {
+            franchise.put("link", "http://pastime.com/franchises/" + franchise.get("id"));
+        }
+        List<Map<String, Object>> players = jdbcTemplate.queryForList(activeFranchisePlayersSql, id);
+        franchise.put("players", players);
+        return new ResponseEntity<Map<String, Object>>(franchise, HttpStatus.OK);
+    }
+    
     @RequestMapping(value="/teams/{teamId}/players", method=RequestMethod.POST, produces="application/json")
     @Transactional    
     public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer teamId, PlayerForm form) {
@@ -111,7 +141,7 @@ public class TeamsController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
         }        
         if (form.getEmail() != null) {
-            SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, p.picture, e.email, u.username FROM player_emails e " + 
+            SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, e.email, u.username FROM player_emails e " + 
                     "INNER JOIN players p ON e.player = p.id LEFT OUTER JOIN usernames u ON p.id = u.player WHERE e.email = ?", form.getEmail());
             if (player.last()) {
                 return addOrInvite(team, admin, player, form.getEmail());
@@ -257,7 +287,7 @@ public class TeamsController {
     // internal helpers
     
     private SqlRowSet findTeam(Integer id) {
-        return jdbcTemplate.queryForRowSet("SELECT t.id, t.name, t.sport, t.logo, u.username FROM franchises t LEFT OUTER JOIN usernames u on t.id = u.franchise WHERE t.id = ?", id);        
+        return jdbcTemplate.queryForRowSet("SELECT t.id, t.name, t.sport, u.username FROM franchises t LEFT OUTER JOIN usernames u on t.id = u.franchise WHERE t.id = ?", id);        
     }
     
     private boolean notFound(SqlRowSet row, HttpServletResponse response) throws IOException {
@@ -278,29 +308,21 @@ public class TeamsController {
     }
     
     private String logo(SqlRowSet row) {
-        String logo = row.getString("logo");
-        if (logo == null) {
-            logo = "http://pastime.com/static/images/default-team-logo.png";
-        }
-        return logo;
+        return "http://pastime.com/static/images/default-team-logo.png";
     }
 
     private void addPlayers(Integer team, Model model) {
         final String teamUrl = (String) model.asMap().get("url");
-        String sql = "SELECT p.id, p.first_name, p.last_name, p.picture, t.picture as picture_for_team, t.number, t.nickname, t.slug, r.player_status, r.player_captain, r.player_captain_of FROM franchise_members t " + 
+        String sql = "SELECT p.id, p.first_name, p.last_name, t.number, t.nickname, t.slug, r.player_status, r.player_captain, r.player_captain_of FROM franchise_members t " + 
                 "INNER JOIN franchise_member_roles r ON t.franchise = r.franchise AND t.player = r.player INNER JOIN players p on t.player = p.id WHERE r.franchise = ? AND r.role = 'Player' ORDER BY p.last_name";
         List<TeamPlayer> players = jdbcTemplate.query(sql, new RowMapper<TeamPlayer>() {
             public TeamPlayer mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new TeamPlayer(teamUrl, rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), getPicture(rs), rs.getInt("number"), rs.getString("nickname"));
             }
             private String getPicture(ResultSet rs) throws SQLException {
-                String picture = rs.getString("picture_for_team");
-                if (picture == null) {
-                    picture = rs.getString("picture");
-                }
-                return picture;
+                return null;
             }
-        }, team, team);
+        }, team);
         model.addAttribute("players?", !players.isEmpty());
         model.addAttribute("players", players);        
     }
@@ -364,7 +386,7 @@ public class TeamsController {
             }
          };
          mailSender.send(preparator);
-         return new PlayerInvite(code, player.getInt("id"), player.getString("first_name"), player.getString("last_name"), player.getString("picture"), player.getString("username"));
+         return new PlayerInvite(code, player.getInt("id"), player.getString("first_name"), player.getString("last_name"), null, player.getString("username"));
     }
 
     private PlayerInvite sendPersonInvite(final SqlRowSet team, final SqlRowSet admin, final String email) {
@@ -415,6 +437,26 @@ public class TeamsController {
         } catch (NumberFormatException e) {
             return null;
         }        
+    }
+
+    private Map<String, Object> extract(String prefix, Map<String, Object> map) {
+        Map<String, Object> extracted = new HashMap<String, Object>();
+        Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+        boolean notNull = false;
+        while (it.hasNext()) {
+            Map.Entry<String, Object> entry = it.next();
+            String key = entry.getKey();
+            int index = key.indexOf(prefix);
+            if (index != -1) {
+                Object value = entry.getValue();
+                if (value != null) {
+                    notNull = true;
+                }
+                extracted.put(key.substring(index + prefix.length()), value);
+                it.remove();                
+            }
+        }
+        return notNull ? extracted : null;
     }
     
     // cglib ceremony
