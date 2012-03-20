@@ -151,7 +151,7 @@ CREATE TABLE franchises (id serial CONSTRAINT pk_franchises PRIMARY KEY,
 -- Pastime "Franchise" Members e.g. Hitmen Keith Donald, Alexander Weaver, Brian Fisher, etc.
 CREATE TABLE franchise_members (franchise integer,
   player integer,
-  slug varchar(16) NOT NULL,    
+  slug varchar(16),    
   number smallint,
   nickname varchar(16),
   joined date NOT NULL CONSTRAINT df_franchises_joined DEFAULT now(),
@@ -202,8 +202,7 @@ CREATE TABLE franchise_player_positions (franchise integer,
   rank smallint NOT NULL, -- determines order positions are listed for players who play multiple
   depth smallint, -- basis for positional depth chart e.g. 1 for WR1, 2 for WR2, etc.
   CONSTRAINT pk_franchise_player_positions PRIMARY KEY (franchise, player, position),  
-  CONSTRAINT fk_franchise_player_positions_franchise FOREIGN KEY (franchise) REFERENCES franchises(id) ON DELETE CASCADE,
-  CONSTRAINT fk_franchise_player_positions_player FOREIGN KEY (player) REFERENCES players(id) 
+  CONSTRAINT fk_franchise_player_positions FOREIGN KEY (franchise, player) REFERENCES franchise_members(franchise, player) ON DELETE CASCADE
 );
 
 -- Pastime Organizations e.g. Brevard County Parks and Recreation, Sandox Volleyball

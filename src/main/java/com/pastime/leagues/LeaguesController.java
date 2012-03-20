@@ -22,14 +22,17 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import com.pastime.players.ErrorBody;
 import com.pastime.players.SecurityContext;
 import com.pastime.util.Location;
 
@@ -46,11 +49,14 @@ public class LeaguesController {
     
     private String playersSql;
     
+    private String qualifyingFranchisesSql;
+    
     public LeaguesController(JdbcTemplate jdbcTemplate) {
         initHttpClient();
         this.jdbcTemplate = jdbcTemplate;
         this.upcomingSql = SqlUtils.sql(new ClassPathResource("upcoming-leagues.sql", getClass()));
         this.playersSql = SqlUtils.sql(new ClassPathResource("players.sql", getClass()));
+        this.qualifyingFranchisesSql = SqlUtils.sql(new ClassPathResource("qualifying-franchises.sql", getClass()));
     }
     
     @RequestMapping(value="/", method=RequestMethod.GET)
@@ -127,6 +133,23 @@ public class LeaguesController {
         });
         client.postForLocation("http://localhost:8983/solr/update/json?commit=true", docs);
         return new ResponseEntity<JsonNode>(HttpStatus.CREATED);
+    }
+    
+    @RequestMapping(value="/me/franchises", method=RequestMethod.GET, params="league", produces="application/json")
+    public ResponseEntity<? extends Object> qualifyingFranchises(@RequestParam Integer league) {
+        if (!SecurityContext.playerSignedIn()) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
+        }
+        List<JsonNode> franchises = jdbcTemplate.query(qualifyingFranchisesSql, new RowMapper<JsonNode>() {
+            @Override
+            public JsonNode mapRow(ResultSet rs, int rowNum) throws SQLException {
+                ObjectNode franchise = mapper.createObjectNode();
+                franchise.put("id", rs.getInt("id"));
+                franchise.put("name", rs.getString("name"));                
+                return franchise;
+            }
+        }, SecurityContext.getCurrentPlayer().getId(), league);
+        return new ResponseEntity<List<JsonNode>>(franchises, HttpStatus.ACCEPTED);
     }
     
     // internal helpers

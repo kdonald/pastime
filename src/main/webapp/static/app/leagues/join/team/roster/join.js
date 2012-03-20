@@ -1,4 +1,4 @@
-define(["require", "./roster", "mvc", "api", "listselect"], function(require, Roster, MVC, api) {
+define(["require", "./roster", "mvc", "./api", "./listselect"], function(require, Roster, MVC, api) {
   var mvc = MVC.create(require);
   
   var join = function(season, callback) {  

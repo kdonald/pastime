@@ -1,7 +1,5 @@
-define(["require", "jquery", "mvc"], function(require, $, MVC) {
+define(["require", "jquery"], function(require, $) {
 
-  var mvc = MVC.create(require);
-  
   function signedIn() {
     return true;
   }
@@ -10,11 +8,13 @@ define(["require", "jquery", "mvc"], function(require, $, MVC) {
     var main = $("#main");
     
     if (!signedIn()) {
-      require(["./signin"], function(account) {
+      require(["./signin/signin"], function(account) {
         account.on("signedin", function(id) {
-          createTeam();
-        });        
-        account.html($("#main"));
+          createTeam(main);
+        });
+        account.render(function(content) {
+          main.html(content);
+        });
       });      
     } else {
       createTeam(main);
@@ -24,13 +24,15 @@ define(["require", "jquery", "mvc"], function(require, $, MVC) {
   function createTeam(main) {
     require(["./join-type"], function(joinType) {
       joinType.on("team", function() {
-        var teamName = mvc.view({
-          template: "team-name"
+        require(["./team/team"], function(team) {
+          main.html(team);
         });
-        teamName.html(main);
       });
       joinType.on("freeagent", function() {
         console.log("freeagent join type");
+      });
+      joinType.render(function(content) {
+        main.html(content);
       });
       joinType.html(main);
     });
