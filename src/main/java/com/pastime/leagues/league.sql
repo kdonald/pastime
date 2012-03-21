@@ -1,5 +1,6 @@
 SELECT o.id as organization_id, o.name as organization_name,
        l.id as league_id, l.sport as league_sport, l.format as league_format, l.nature as league_nature,
+       l.roster_min, l.roster_max,
        s.number as season_number, s.name as season_name, s.start_date as season_start_date,
        v.venue_id, v.venue_name, v.venue_latitude, v.venue_longitude
   FROM seasons s

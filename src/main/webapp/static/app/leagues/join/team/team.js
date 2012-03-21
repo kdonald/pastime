@@ -24,23 +24,23 @@ define(["require", "jquery", "mvc"], function(require, $, MVC) {
     teamName.renderAt(root);
   }
 
-  function roster() {
-    require([ "./roster/join" ], function(roster) {
-      roster(season, function(content) {
+  function roster(league) {
+    require([ "./roster/submit" ], function(roster) {
+      roster(team, league, function(content) {
         root.html(content);
       });
     });
   }
 
   return {
-    options: function(options) {
-      this.options = options || {};
+    args: function(args) {
+      this.args = args || {};
       return this;
     },
     renderAt: function(container) {
-      if (this.options.franchise) {
-        team.franchise = this.options.franchise;
-        roster();
+      if (this.args.franchise) {
+        team.franchise = this.args.franchise;
+        roster(this.args.league);
       } else {
         teamName();
       }

@@ -128,12 +128,14 @@ define(["jquery", "handlebars"], function($, handlebars) {
           
           function on(event, listener) {
             this.listeners.get(event).push(listener);
+            return this;
           }
           
           function trigger(event, args) {
             this.listeners.get(event).forEach(function(listener) {
               listener(args);
             });
+            return this;
           }
           
           function render(callback) {
@@ -198,32 +200,9 @@ define(["jquery", "handlebars"], function($, handlebars) {
             return this.root.find(element);
           }
           
-          function reset() {
-            // TODO
-          }
-          
-          function detach(result) {
-            this.root.detach();
-            this.postDetachListeners.forEach(function(listener) {
-              listener(result);
-            });
-          }
-          
           function destroy(result) {
             this.root.remove();
-            this.postDestroyListeners.forEach(function(listener) {
-              listener(result);
-            });
-          }
-          
-          function postDetach(listener) {
-            this.postDetachListeners.push(listener);
-            return this;
-          }
-          
-          function postDestroy(listener) {
-            this.postDestroyListeners.push(listener);
-            return this;
+            this.trigger("destroy", result);
           }
           
           function toString() {
@@ -301,11 +280,7 @@ define(["jquery", "handlebars"], function($, handlebars) {
             renderAt: renderAt,
             renderDeferred: renderDeferred,            
             $: find,
-            reset: reset,
-            detach: detach,
-            postDetach: postDetach,
             destroy: destroy,
-            postDestroy: postDestroy,
             toString: toString
           };
           
@@ -322,9 +297,7 @@ define(["jquery", "handlebars"], function($, handlebars) {
             template: { value: template(this.require, args.template) },
             events: { value: args.events },
             init: { value: args.init },
-            listeners: { value: listeners },
-            postDetachListeners: { value: [] },      
-            postDestroyListeners: { value: [] }
+            listeners: { value: listeners }
           });
         }
 

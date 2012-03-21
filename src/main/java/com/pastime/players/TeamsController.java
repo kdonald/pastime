@@ -104,23 +104,26 @@ public class TeamsController {
     @Transactional
     public ResponseEntity<? extends Object> teamData(@PathVariable Integer id) {
         Map<String, Object> franchise = jdbcTemplate.queryForMap(franchiseSql, id);
-        String founderUsername = (String) franchise.get("franchise_username");
-        if (founderUsername != null) {
-            franchise.put("founder_link", "http://pastime.com/" + founderUsername);
-        } else if (franchise.get("founder_id") != null) {
-            franchise.put("founder_link", "http:/pastime.com/players/" + franchise.get("founder_id"));
+        String founderLink = link("players", (String) franchise.get("franchise_username"), (Integer) franchise.get("founder_id"));
+        if (founderLink != null) {
+            franchise.put("founder_link", founderLink);
         }
         franchise.put("founder", extract("founder_", franchise));
-        if (franchise.get("username") != null) {
-            franchise.put("link", "http://pastime.com/" + franchise.get("username"));
-        } else {
-            franchise.put("link", "http://pastime.com/franchises/" + franchise.get("id"));
-        }
+        franchise.put("link", link("franchises", (String) franchise.get("username"), (Integer) franchise.get("id")));
         List<Map<String, Object>> players = jdbcTemplate.queryForList(activeFranchisePlayersSql, id);
         franchise.put("players", players);
         return new ResponseEntity<Map<String, Object>>(franchise, HttpStatus.OK);
     }
     
+    private String link(String type, String username, Integer id) {
+        if (username != null) {
+            return "http://pastime.com/" + username;
+        } else if (id != null) {
+            return "http:/pastime.com/" + type + "/" + id;
+        } else {
+            return null;
+        }
+    }
     @RequestMapping(value="/teams/{teamId}/players", method=RequestMethod.POST, produces="application/json")
     @Transactional    
     public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer teamId, PlayerForm form) {

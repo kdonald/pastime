@@ -23,8 +23,6 @@ define([ "require", "jquery", "mvc"], function(require, $, MVC) {
         league: league.league_id
       });
       xhr.done(function(franchises) {
-        console.log(franchises);
-        console.log(franchises.length);
         if (franchises.length > 1) {
           throw Error("not yet implemented");
         } else if (franchises.length == 1) {
@@ -35,22 +33,22 @@ define([ "require", "jquery", "mvc"], function(require, $, MVC) {
               "change form[input:radio[name=franchise]" : function(event) {
                 var val = event.currentTarget.value;
                 if ("yes" === val) {
-                  team({ franchise: franchises[0].id });
+                  team({ league: league, franchise: franchises[0].id });
                 } else if ("no" === val) {
-                  joinType();
+                  joinType(league);
                 }
               }
             }
           }).renderAt(container);
         } else {
-          joinType();
+          joinType(league);
         }
       });
 
-      function joinType() {
+      function joinType(league) {
         require([ "./join-type" ], function(joinType) {
           joinType.on("team", function() {
-            team();
+            team(league);
           });
           joinType.on("freeagent", function() {
             console.log("freeagent join type");
@@ -59,9 +57,9 @@ define([ "require", "jquery", "mvc"], function(require, $, MVC) {
         });
       }
       
-      function team(options) {
+      function team(args) {
         require([ "./team/team" ], function(team) {
-          team.options(options).renderAt(container);
+          team.args(args).renderAt(container);
         });     
       }
       
