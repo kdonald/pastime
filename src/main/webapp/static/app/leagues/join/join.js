@@ -1,26 +1,16 @@
-define([ "require", "jquery", "mvc"], function(require, $, MVC) {
+define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
 
   var mvc = MVC.create(require);
-  
+
   function signedIn() {
     return true;
   }
 
   $(document).ready(function() {
 
-    var container = $("#main");
-
-    // TODO consider replacing this async call to load the league with an initializer that accepts the league
-    function start() {
-      var xhr = $.getJSON(document.URL);
-      xhr.done(function(league) {
-        join(league);
-      });
-    }
-    
-    function join(league) {
+    var join = function(league) {
       var xhr = $.get("/me/franchises", {
-        league: league.league_id
+        league : league.league_id
       });
       xhr.done(function(franchises) {
         if (franchises.length > 1) {
@@ -33,38 +23,47 @@ define([ "require", "jquery", "mvc"], function(require, $, MVC) {
               "change form[input:radio[name=franchise]" : function(event) {
                 var val = event.currentTarget.value;
                 if ("yes" === val) {
-                  team({ league: league, franchise: franchises[0].id });
+                  team(franchises[0].id);
                 } else if ("no" === val) {
-                  joinType(league);
+                  joinType();
                 }
               }
             }
           }).renderAt(container);
         } else {
-          joinType(league);
+          self.joinType();
+        }
+
+        function joinType() {
+          require([ "./join-type" ], function(joinType) {
+            joinType.on("team", function() {
+              team();
+            });
+            joinType.on("freeagent", function() {
+              console.log("freeagent join type");
+            });
+            joinType.renderAt(container);
+          });
+        }
+
+        function team(franchise) {
+          require([ "./team/team" ], function(team) {
+            container.html(team(league, franchise));
+          });
         }
       });
+    };
 
-      function joinType(league) {
-        require([ "./join-type" ], function(joinType) {
-          joinType.on("team", function() {
-            team(league);
-          });
-          joinType.on("freeagent", function() {
-            console.log("freeagent join type");
-          });
-          joinType.renderAt(container);
-        });
-      }
-      
-      function team(args) {
-        require([ "./team/team" ], function(team) {
-          team.args(args).renderAt(container);
-        });     
-      }
-      
+    function start() {
+      // TODO consider passing league in instead of loading here      
+      var xhr = $.getJSON(document.URL);
+      xhr.done(function(league) {
+        join(league);
+      });
     }
-    
+
+    var container = $("#main");
+
     if (!signedIn()) {
       require([ "./signin/signin" ], function(account) {
         account.on("signedin", function(id) {
