@@ -17,9 +17,18 @@ public class SigninInterceptor extends HandlerInterceptorAdapter {
             Integer playerId = Integer.parseInt(value);
             Player player = new Player(playerId);
             SecurityContext.setCurrentPlayer(player);            
+        } else {
+            SecurityContext.setCurrentPlayer(null);
         }
         return true;
     }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        SecurityContext.remove();
+    }
+    
+    
     
     
 }

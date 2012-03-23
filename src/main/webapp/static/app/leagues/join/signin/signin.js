@@ -1,9 +1,8 @@
-define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
-
-  var mvc = MVC.create(require);
+define(["require", "mvc", "text!./account.html", "text!./signin.html", "text!./signup-type.html", "text!./signup-facebook.html", "text!./signup.html", "facebook"],
+    function(require, mvc, accountTemplate, signinTemplate, signupTypeTemplate, signupFacebookTemplate, signupTemplate, facebook) {
 
   var account = mvc.view({
-    template: "account",
+    template: accountTemplate,
     init: function() {
       this.handleSelectedAccount = function(val) {
         if ("existing" === val) {
@@ -19,9 +18,9 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
             model: {
               signedIntoFacebook: "connected" === response.status || "not_authorized" === response.status
             },
-            template: "signin"
+            template: signinTemplate
           });
-          signin.renderAt($("#account-selection-result"));        
+          $("#account-selection-result").html(signin.render());        
         });
       };
       this.signup = function() {
@@ -32,7 +31,7 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
               signedIntoFacebook: "connected" === response.status || "not_authorized" === response.status,
               facebookUser: "Keith Donald"
             },
-            template: "signup-type",
+            template: signupTypeTemplate,
             events: {
               "click button[name='facebook']": function() {
                 var self = this;
@@ -59,7 +58,7 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
                       };
                       var facebookSignup = mvc.view({
                         model: signupForm,
-                        template: "signup-facebook",
+                        template: signupFacebookTemplate,
                         events: {
                           "submit": function() {
                             var xhr = $.post("/signup", signupForm);
@@ -70,21 +69,21 @@ define(["require", "mvc", "facebook"], function(require, MVC, facebook) {
                           }
                         }
                       });
-                      facebookSignup.renderAt(self.$("#signup-pane"));                  
+                      self.$("#signup-pane").html(facebookSignup.render());                  
                   });
                 });              
                 return false;
               },
               "click button[name='manual']": function() {
                 var signup = mvc.view({ 
-                  template: "signup"
+                  template: signupTemplate
                 });              
-                signup.renderAt(this.$("#signup-pane"));
+                this.$("#signup-pane").html(signup.render());
                 return false;
               }            
             }
           });      
-          signupType.renderAt($("#account-selection-result"));        
+          $("#account-selection-result").html(signupType.render());        
         });      
       };      
       this.handleSelectedAccount(this.$("form[input:radio[name=account][checked]").val());      

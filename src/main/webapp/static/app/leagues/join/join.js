@@ -1,7 +1,7 @@
-define([ "require", "jquery", "mvc", "text!./franchise.html" ], function(require, $, mvc, franchise) {
+define([ "require", "jquery", "mvc", "text!./franchise.html", "jquery-cookie"], function(require, $, mvc, franchise) {
 
   function signedIn() {
-    return true;
+    return $.cookie("auth_token") != null;
   }
 
   $(document).ready(function() {
@@ -67,9 +67,7 @@ define([ "require", "jquery", "mvc", "text!./franchise.html" ], function(require
         account.on("signedin", function(id) {
           start();
         });
-        account.render().done(function(content) {
-          container.html(content);
-        });
+        container.html(account.render());
       });
     } else {
       start();

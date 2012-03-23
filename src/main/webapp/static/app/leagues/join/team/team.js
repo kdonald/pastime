@@ -1,4 +1,5 @@
-define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require, $, mvc, teamNameTemplate) {
+define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(
+    require, $, mvc, teamNameTemplate) {
 
   function team(league, franchise) {
 
@@ -27,7 +28,7 @@ define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require
 
     function roster() {
       require([ "./roster/submit" ], function(roster) {
-        container.html(roster(team, league).root);
+        container.html(roster(team, league).render());
       });
     }
 
@@ -36,9 +37,9 @@ define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require
     } else {
       teamName();
     }
-    
+
     return container;
-    
+
   }
 
   return team;
