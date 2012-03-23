@@ -7,6 +7,7 @@ define(["jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html"
       model: { value: "" },
       template: addPlayerTemplate,
       init: function() {
+        var self = this;        
         this.$("input").autocomplete({
           html: true,
           source: function(request, response) {
@@ -15,14 +16,21 @@ define(["jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html"
               franchise: team.franchise
             });
             xhr.done(function(players) {
-              response(players);
+              var items = new Array(players.length);
+              players.forEach(function(player, i) {
+                var fullName = player.first_name + " " + player.last_name;
+                items[i] = {};
+                items[i].value = fullName;
+                items[i].label = "<div class='player'><img src='" + player.link + "/picture'/><strong>" + fullName + "</strong></div>";
+                items[i].player = player;
+              });
+              response(items);
             });
           },
           select: function(event, ui) {
-            console.log(ui.item);
+            self.selectedPlayer = ui.item.player;
           }
         });
-        var self = this;          
         var expanded = mvc.view({
           template: addPlayerFormTemplate,
           events: {
@@ -46,8 +54,12 @@ define(["jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html"
         this.input = this.$("input");          
       },
       events: {
-        "submit form": function() {
-          this.expand({ email: this.model.value });
+        "submit form": function(event) {
+          if (this.selectedPlayer) {
+            this.trigger("player-added", this.selectedPlayer);            
+          } else {
+            this.expand({ email: this.model.value });            
+          }
           return false;
         } 
       }

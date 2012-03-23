@@ -95,6 +95,7 @@ public class LeaguesController {
         return new ResponseEntity<JsonNode>(docs, HttpStatus.ACCEPTED);
     }
 
+    // TODO custom request mapping condition required to confirm {organization} is actually a username that identifies an organization
     @RequestMapping(value="/{organization}/{league}/{season}", method=RequestMethod.GET)
     public String join(@PathVariable String organization, @PathVariable String league, @PathVariable Integer season, Model model) {
         return "leagues/join";
@@ -170,12 +171,19 @@ public class LeaguesController {
         }
         List<Map<String, Object>> players = new ArrayList<Map<String, Object>>();
         Map<String, Object> first = new HashMap<String, Object>();
-        first.put("value", "Alexander Weaver");
-        first.put("label", "<div class='player-thumbnail'><img src='http://pastime.com/static/images/players/18/small.png'><strong>Alexander Weaver</strong></div>");
         first.put("id", 18);
+        first.put("first_name", "Alexander");
+        first.put("last_name", "Weaver");
+        first.put("number", "37");
+        first.put("nickname", "Dream Weaver");
         first.put("link", "http://pastime.com/dream-weaver");
         players.add(first);
         return new ResponseEntity<List<Map<String, Object>>>(players, HttpStatus.ACCEPTED);
+    }
+    
+    @RequestMapping(value="/{username}/picture", method=RequestMethod.GET)
+    public String picture() {
+        return "redirect:/static/images/players/18/small.png";        
     }
     
     // internal helpers

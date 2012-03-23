@@ -74,7 +74,11 @@ define(["jquery", "mvc", "./roster", "text!./submit.html", "text!./franchise-pla
       }      
     });
 
-    createRoster.append(rosterPlayers.render()).append(addPlayer(team).render());
+    var addPlayerView = addPlayer(team);
+    addPlayerView.on("player-added", function(player) {
+      roster.addPlayer(player);
+    });
+    createRoster.append(rosterPlayers.render()).append(addPlayerView.render());
     
     return submitRoster;
     
