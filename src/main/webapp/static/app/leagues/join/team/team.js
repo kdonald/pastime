@@ -1,10 +1,8 @@
-define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
-
-  var mvc = MVC.create(require);
+define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require, $, mvc, teamNameTemplate) {
 
   function team(league, franchise) {
 
-    var root = $("<div></div>", {
+    var container = $("<div></div>", {
       id : "register-team"
     });
 
@@ -16,7 +14,7 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
     function teamName() {
       var teamName = mvc.view({
         model : team,
-        template : "team-name",
+        template : teamNameTemplate,
         events : {
           "submit form" : function() {
             roster();
@@ -24,14 +22,12 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
           }
         }
       });
-      teamName.renderAt(root);
+      container.html(teamName.render());
     }
 
     function roster() {
       require([ "./roster/submit" ], function(roster) {
-        roster(team, league, function(content) {
-          root.html(content);
-        });
+        container.html(roster(team, league).root);
       });
     }
 
@@ -41,7 +37,7 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
       teamName();
     }
     
-    return root;
+    return container;
     
   }
 

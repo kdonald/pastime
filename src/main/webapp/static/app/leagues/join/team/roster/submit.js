@@ -1,14 +1,14 @@
-define(["require", "jquery", "mvc", "./roster", "./listselect"], function(require, $, MVC, Roster) {
+define(["require", "jquery", "mvc", "./roster", "text!./submit.html", "text!./franchise-players.html", "text!./franchise-player.html", 
+        "text!./players.html", "text!./player.html", "text!./add-player.html", "text!./add-player-form.html", "./listselect"],
+    function(require, $, mvc, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate, rosterPlayersTemplate, rosterPlayerTemplate, addPlayerTemplate, addPlayerFormTemplate) {
 
-  var mvc = MVC.create(require);
-  
-  var factory = function(team, season, callback) {    
+  var submit = function(team, season) {    
     
     var roster = Roster(season.roster_min, season.roster_max);
 
     var submitRoster = mvc.view({
       model: { season: season },
-      template: "submit",
+      template: submitTemplate,
       events: {
         "submit form": function() {
           return false;
@@ -16,15 +16,14 @@ define(["require", "jquery", "mvc", "./roster", "./listselect"], function(requir
       }
     });
 
-    var createRoster = submitRoster.renderDeferred("#createRoster");
+    var createRoster = submitRoster.render().find("#createRoster");
     
     if (team.franchise) {
-
       var franchisePlayers = mvc.view({
-        template: "franchise-players",
+        template: franchisePlayersTemplate,
         init: function() {
           var franchisePlayer = mvc.view({
-            template: "franchise-player",
+            template: franchisePlayerTemplate,
             events: {
               "click span.select": function() {
                 roster.addPlayer(this.model);
@@ -35,9 +34,7 @@ define(["require", "jquery", "mvc", "./roster", "./listselect"], function(requir
           var playerList = this.$("ul");
           playerList.listselect();          
           function addPlayer(player) {
-            mvc.extend(franchisePlayer, player).render(function(playerItem) {
-              playerList.append(playerItem);
-            });
+            playerList.append(mvc.extend(franchisePlayer, player).render());
           }
           roster.playerRemove(function(player) {
             addPlayer(player);  
@@ -54,17 +51,15 @@ define(["require", "jquery", "mvc", "./roster", "./listselect"], function(requir
           initModel();
         }
       });
-      
-      createRoster = createRoster.append(franchisePlayers);
-        
+      createRoster.append(franchisePlayers.render());
     }
 
     var rosterPlayers = mvc.view({
       model: roster,
-      template: "players",
+      template: rosterPlayersTemplate,
       init: function() {
         var rosterPlayer = mvc.view({
-          template: "player",
+          template: rosterPlayerTemplate,
           events: {
             "click span.select": function() {
               roster.removePlayer(this.model);
@@ -74,20 +69,18 @@ define(["require", "jquery", "mvc", "./roster", "./listselect"], function(requir
         });
         var playerList = this.$("ul").listselect();
         roster.playerAdd(function(player) {
-          mvc.extend(rosterPlayer, player).render(function(playerItem) {
-            playerList.append(playerItem);
-          });
+          playerList.append(mvc.extend(rosterPlayer, player).render());
         });
       }      
     });
 
     var addPlayer = mvc.view({
       model: { value: "" },
-      template: "add-player",
+      template: addPlayerTemplate,
       init: function() {          
         var self = this;          
         var expanded = mvc.view({
-          template: "add-player-form",
+          template: addPlayerFormTemplate,
           events: {
             "submit": function() {
               return false;
@@ -102,11 +95,9 @@ define(["require", "jquery", "mvc", "./roster", "./listselect"], function(requir
           self.root.append(self.collapsed);            
         });
         this.expand = function(player) {
-          mvc.extend(expanded, player).render(function(expanded) {
-            self.collapsed = self.$("form").detach();
-            self.root.append(expanded);
-            this.$("button[type=submit]").focus();                
-          });
+          self.collapsed = self.$("form").detach();
+          self.root.append(mvc.extend(expanded, player).render());
+          this.$("button[type=submit]").focus();                
         };
         this.input = this.$("input");          
       },
@@ -118,12 +109,12 @@ define(["require", "jquery", "mvc", "./roster", "./listselect"], function(requir
       }
     });
 
-    return createRoster.append(rosterPlayers).append(addPlayer).done(function(content) {
-      callback(content);
-    });
+    createRoster.append(rosterPlayers.render()).append(addPlayer.render());
+    
+    return submitRoster;
     
   };
   
-  return factory;
+  return submit;
   
 });

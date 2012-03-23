@@ -1,9 +1,7 @@
-define(["require", "mvc"], function(require, MVC) {
+define(["require", "mvc", "text!./join-type.html"], function(require, mvc, template) {
 
-  var mvc = MVC.create(require);
-
-  var type = mvc.view({
-    template: "join-type",
+  var joinType = mvc.view({
+    template: template,
     init: function() {
       this.handleSelectedType = function(val) {
         if ("Team" === val) {
@@ -27,6 +25,6 @@ define(["require", "mvc"], function(require, MVC) {
     }
   });
   
-  return type;
+  return joinType;
   
 });

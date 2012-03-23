@@ -1,6 +1,4 @@
-define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
-
-  var mvc = MVC.create(require);
+define([ "require", "jquery", "mvc", "text!./franchise.html" ], function(require, $, mvc, franchise) {
 
   function signedIn() {
     return true;
@@ -16,9 +14,9 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
         if (franchises.length > 1) {
           throw Error("not yet implemented");
         } else if (franchises.length == 1) {
-          mvc.view({
+          container.html(mvc.view({
             model : franchises[0],
-            template : "franchise",
+            template : franchise,
             events : {
               "change form[input:radio[name=franchise]" : function(event) {
                 var val = event.currentTarget.value;
@@ -29,9 +27,9 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
                 }
               }
             }
-          }).renderAt(container);
+          }).render());
         } else {
-          self.joinType();
+          joinType();
         }
 
         function joinType() {
@@ -42,7 +40,7 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
             joinType.on("freeagent", function() {
               console.log("freeagent join type");
             });
-            joinType.renderAt(container);
+            container.html(joinType.render());
           });
         }
 
@@ -69,7 +67,9 @@ define([ "require", "jquery", "mvc" ], function(require, $, MVC) {
         account.on("signedin", function(id) {
           start();
         });
-        account.renderAt(container);
+        account.render().done(function(content) {
+          container.html(content);
+        });
       });
     } else {
       start();
