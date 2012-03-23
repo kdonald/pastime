@@ -1,6 +1,6 @@
-define(["require", "jquery", "mvc", "./roster", "text!./submit.html", "text!./franchise-players.html", "text!./franchise-player.html", 
-        "text!./players.html", "text!./player.html", "text!./add-player.html", "text!./add-player-form.html", "./listselect"],
-    function(require, $, mvc, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate, rosterPlayersTemplate, rosterPlayerTemplate, addPlayerTemplate, addPlayerFormTemplate) {
+define(["jquery", "mvc", "./roster", "text!./submit.html", "text!./franchise-players.html", "text!./franchise-player.html", 
+        "text!./players.html", "text!./player.html", "./add-player", "./listselect"],
+    function($, mvc, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate, rosterPlayersTemplate, rosterPlayerTemplate, addPlayer) {
 
   var submit = function(team, season) {    
     
@@ -74,42 +74,7 @@ define(["require", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
       }      
     });
 
-    var addPlayer = mvc.view({
-      model: { value: "" },
-      template: addPlayerTemplate,
-      init: function() {          
-        var self = this;          
-        var expanded = mvc.view({
-          template: addPlayerFormTemplate,
-          events: {
-            "submit": function() {
-              return false;
-            },
-            "click button.cancel": function() {
-              this.destroy();
-              return false;
-            }
-          }
-        }).on("destroy", function() {
-          self.model.value = "";
-          self.root.append(self.collapsed);            
-        });
-        this.expand = function(player) {
-          self.collapsed = self.$("form").detach();
-          self.root.append(mvc.extend(expanded, player).render());
-          this.$("button[type=submit]").focus();                
-        };
-        this.input = this.$("input");          
-      },
-      events: {
-        "submit form": function() {
-          this.expand({ email: this.model.value });
-          return false;
-        } 
-      }
-    });
-
-    createRoster.append(rosterPlayers.render()).append(addPlayer.render());
+    createRoster.append(rosterPlayers.render()).append(addPlayer(team).render());
     
     return submitRoster;
     

@@ -1,4 +1,4 @@
-define(["require", "mvc", "text!./join-type.html"], function(require, mvc, template) {
+define(["mvc", "text!./join-type.html"], function(mvc, template) {
 
   var joinType = mvc.view({
     template: template,

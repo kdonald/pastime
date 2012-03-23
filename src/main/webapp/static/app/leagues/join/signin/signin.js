@@ -1,5 +1,5 @@
-define(["require", "mvc", "text!./account.html", "text!./signin.html", "text!./signup-type.html", "text!./signup-facebook.html", "text!./signup.html", "facebook"],
-    function(require, mvc, accountTemplate, signinTemplate, signupTypeTemplate, signupFacebookTemplate, signupTemplate, facebook) {
+define(["mvc", "text!./account.html", "text!./signin.html", "text!./signup-type.html", "text!./signup-facebook.html", "text!./signup.html", "facebook"],
+    function(mvc, accountTemplate, signinTemplate, signupTypeTemplate, signupFacebookTemplate, signupTemplate, facebook) {
 
   var account = mvc.view({
     template: accountTemplate,

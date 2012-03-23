@@ -3,6 +3,10 @@ package com.pastime.config;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -15,13 +19,18 @@ import org.springframework.web.servlet.config.annotation.BaseWebConfig;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
 
 @Configuration
 public class WebConfig extends BaseWebConfig {
 
+    @Inject
+    private BeanFactory beanFactory;
+    
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.setOrder(0);
         registry.addResourceHandler("/channel.html").addResourceLocations("/channel.html").setCachePeriod(31556926);        
         registry.addResourceHandler("/favicon.ico").addResourceLocations("/favicon.ico").setCachePeriod(2678400);
         registry.addResourceHandler("/static/app/0.1.2/**").addResourceLocations("/static/app/").setCachePeriod(31556926);
@@ -56,6 +65,12 @@ public class WebConfig extends BaseWebConfig {
         // registry.addViewController("/teams/player");
         // registry.addViewController("/leagues/preview");
         super.addViewControllers(registry);
+    }
+    
+    @PostConstruct
+    public void reorderMappings() {
+        RequestMappingHandlerMapping controllers = beanFactory.getBean(RequestMappingHandlerMapping.class);
+        controllers.setOrder(1);
     }
 
     // temp extension for enabling Global @ExceptionHandlers until Spring MVC supports this by default (likely 3.2)

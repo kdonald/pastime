@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -160,6 +161,21 @@ public class LeaguesController {
             }
         }, SecurityContext.getCurrentPlayer().getId(), league);
         return new ResponseEntity<List<JsonNode>>(franchises, HttpStatus.ACCEPTED);
+    }
+    
+    @RequestMapping(value="/me/players", method=RequestMethod.GET, params="name", produces="application/json")
+    public ResponseEntity<? extends Object> players(@RequestParam String name, @RequestParam Integer franchise) {
+        if (!SecurityContext.playerSignedIn()) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
+        }
+        List<Map<String, Object>> players = new ArrayList<Map<String, Object>>();
+        Map<String, Object> first = new HashMap<String, Object>();
+        first.put("value", "Alexander Weaver");
+        first.put("label", "<div class='player-thumbnail'><img src='http://pastime.com/static/images/players/18/small.png'><strong>Alexander Weaver</strong></div>");
+        first.put("id", 18);
+        first.put("link", "http://pastime.com/dream-weaver");
+        players.add(first);
+        return new ResponseEntity<List<Map<String, Object>>>(players, HttpStatus.ACCEPTED);
     }
     
     // internal helpers

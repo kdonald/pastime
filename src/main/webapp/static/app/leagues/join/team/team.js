@@ -1,5 +1,4 @@
-define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(
-    require, $, mvc, teamNameTemplate) {
+define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require, $, mvc, teamNameTemplate) {
 
   function team(league, franchise) {
 
