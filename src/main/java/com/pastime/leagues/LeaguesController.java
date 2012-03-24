@@ -119,7 +119,7 @@ public class LeaguesController {
                 doc.put("organization_name", rs.getString("organization_name"));
                 String organizationUrl = organizationUrl(organizationId, rs.getString("organization_username"));
                 doc.put("organization_url", organizationUrl);
-                doc.put("organization_logo", rs.getString("organization_logo"));
+                doc.put("organization_logo", "http://pastime.com/static/images/organizations/1.png");
                 doc.put("league_id", rs.getInt("league_id"));
                 doc.put("league_sport", rs.getString("league_sport"));
                 doc.put("league_format", rs.getString("league_format"));
@@ -127,7 +127,7 @@ public class LeaguesController {
                 doc.put("season_number", rs.getInt("season_number"));
                 doc.put("season_name", rs.getString("season_name"));
                 doc.put("season_url", organizationUrl + "/" + rs.getString("league_slug") + "/" + rs.getInt("season_number"));                
-                doc.put("season_picture", rs.getString("season_picture"));
+                doc.put("season_picture", "http://pastime.com/static/images/leagues/1/1.png");
                 doc.put("season_start_date", new DateTime(rs.getDate("season_start_date"), DateTimeZone.UTC).toString());
                 doc.put("venue_id", rs.getInt("venue_id"));
                 doc.put("venue_name", rs.getString("venue_name"));

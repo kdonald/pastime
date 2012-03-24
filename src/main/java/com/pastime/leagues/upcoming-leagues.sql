@@ -1,6 +1,6 @@
-SELECT o.id as organization_id, o.name as organization_name, o.logo as organization_logo, u.username as organization_username,
+SELECT o.id as organization_id, o.name as organization_name, u.username as organization_username,
        l.id as league_id, l.slug as league_slug, l.sport as league_sport, l.format as league_format, l.nature as league_nature,
-       s.number as season_number, s.name as season_name, s.picture as season_picture, s.start_date as season_start_date,
+       s.number as season_number, s.name as season_name, s.start_date as season_start_date,
        v.venue_id, v.venue_name, v.venue_latitude, v.venue_longitude
   FROM seasons s
     INNER JOIN leagues l ON s.league = l.id
