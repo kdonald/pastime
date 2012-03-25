@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -104,9 +105,18 @@ public class LeaguesController {
     @RequestMapping(value="/{organization}/{league}/{season}", method=RequestMethod.GET, produces="application/json")
     public ResponseEntity<? extends Object> league(@PathVariable String organization, @PathVariable String league, @PathVariable Integer season) {
         Map<String, Object> json = jdbcTemplate.queryForMap(leagueSql, organization, league, season);
+        json.put("link", "http://pastime.com/leagues/" + json.get("league_id") + "/" + json.get("season_number"));
         return new ResponseEntity<Map<String, Object>>(json, HttpStatus.ACCEPTED);
     }
-    
+
+    @RequestMapping(value="/leagues/{league}/{season}/teams", method=RequestMethod.POST)
+    @Transactional
+    public ResponseEntity<? extends Object> registerTeam(@PathVariable Integer league, @PathVariable Integer season, @RequestParam Map<String, Object> team) {
+        Integer id = jdbcTemplate.queryForInt("SELECT coalesce(max(team) + 1, 1) as next_id FROM teams WHERE league = ? AND season = ?", league, season); 
+        jdbcTemplate.update("INSERT INTO teams (league, season, team, name) VALUES (?, ?, ?, ?)", league, season, id, team.get("name"));
+        return new ResponseEntity<Integer>(id, HttpStatus.ACCEPTED);
+    }
+
     @RequestMapping(value="/leagues/upcoming", method=RequestMethod.POST, produces="application/json")
     public ResponseEntity<? extends Object> postUpcoming() throws URISyntaxException {
         final ArrayNode docs = mapper.createArrayNode();
@@ -207,4 +217,8 @@ public class LeaguesController {
         client.setMessageConverters(converters);        
     }
     
+    // cglib boilerplate
+    public LeaguesController() {
+        
+    }
 }

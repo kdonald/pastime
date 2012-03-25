@@ -320,7 +320,6 @@ CREATE TABLE teams (league integer,
   season integer,
   team integer,
   name varchar(64) NOT NULL,
-  status char(1) NOT NULL, -- registration (c)onfirmed, (n)eeds players, (p)ending payment
   confirmed timestamp,
   created timestamp NOT NULL CONSTRAINT df_teams_created DEFAULT now(),  
   removed boolean,

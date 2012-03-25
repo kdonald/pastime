@@ -1,6 +1,6 @@
 define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require, $, mvc, teamNameTemplate) {
 
-  function team(league, franchise) {
+  function team(season, franchise) {
 
     var container = $("<div></div>", {
       id : "register-team"
@@ -26,8 +26,13 @@ define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require
     }
 
     function roster() {
-      require([ "./roster/submit" ], function(roster) {
-        container.html(roster(team, league).render());
+      var xhr = $.post(season.link + "/teams", team);
+      xhr.done(function(id) {
+        console.log("new team id:" + id);
+        team.id = id;
+        require([ "./roster/submit" ], function(roster) {
+          container.html(roster(team, season).render());
+        });
       });
     }
 
