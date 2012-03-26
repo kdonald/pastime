@@ -21,7 +21,7 @@ define([ "require", "jquery", "mvc", "text!./franchise.html", "jquery-cookie"], 
               "change form[input:radio[name=franchise]" : function(event) {
                 var val = event.currentTarget.value;
                 if ("yes" === val) {
-                  team(franchises[0].id);
+                  team(franchises[0]);
                 } else if ("no" === val) {
                   joinType();
                 }

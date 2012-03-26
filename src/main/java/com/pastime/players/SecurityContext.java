@@ -2,17 +2,17 @@ package com.pastime.players;
 
 public final class SecurityContext {
 
-    private static final ThreadLocal<Player> currentPlayer = new ThreadLocal<Player>();
+    private static final ThreadLocal<PlayerPrincipal> currentPlayer = new ThreadLocal<PlayerPrincipal>();
 
-    public static Player getCurrentPlayer() {
+    public static PlayerPrincipal getPrincipal() {
         return currentPlayer.get();
     }
 
-    public static void setCurrentPlayer(Player player) {
+    public static void setCurrentPlayer(PlayerPrincipal player) {
         currentPlayer.set(player);
     }
 
-    public static boolean playerSignedIn() {
+    public static boolean signedIn() {
         return currentPlayer.get() != null;
     }
 

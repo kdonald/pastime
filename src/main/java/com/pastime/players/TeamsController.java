@@ -49,16 +49,10 @@ public class TeamsController {
 
     private InsecureRandomStringGenerator inviteGenerator = new InsecureRandomStringGenerator(6);
     
-    private String franchiseSql;
-    
-    private String activeFranchisePlayersSql;
-    
     public TeamsController(JdbcTemplate jdbcTemplate, JavaMailSender mailSender, StringTemplateLoader templateLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.mailSender = mailSender;
         this.templateLoader = templateLoader;
-        this.franchiseSql = SqlUtils.sql(new ClassPathResource("franchise.sql", getClass()));
-        this.activeFranchisePlayersSql = SqlUtils.sql(new ClassPathResource("franchise-players-active.sql", getClass()));
     }
 
     @RequestMapping(value="/teams/create", method=RequestMethod.GET)
@@ -71,11 +65,11 @@ public class TeamsController {
     @RequestMapping(value="/teams", method=RequestMethod.POST)
     @Transactional
     public ResponseEntity<? extends Object> createTeam(@Valid TeamForm teamForm) {
-        if (!SecurityContext.playerSignedIn()) {
+        if (!SecurityContext.signedIn()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }        
         Integer teamId = (Integer) use(jdbcTemplate).insert("INSERT INTO franchises (name, sport) VALUES (?, ?)", teamForm.getName(), teamForm.getSport());
-        Player player = SecurityContext.getCurrentPlayer();
+        PlayerPrincipal player = SecurityContext.getPrincipal();
         jdbcTemplate.update("INSERT INTO franchise_members (franchise, player) VALUES (?, ?)", teamId, player.getId());
         jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (?, ?, ?)", teamId, player.getId(), TeamRoles.ADMIN);
         Team team = new Team(teamId);        
@@ -100,34 +94,10 @@ public class TeamsController {
         return "teams/team";
     }
     
-    @RequestMapping(value="/franchises/{id}", method=RequestMethod.GET, produces="application/json")
-    @Transactional
-    public ResponseEntity<? extends Object> teamData(@PathVariable Integer id) {
-        Map<String, Object> franchise = jdbcTemplate.queryForMap(franchiseSql, id);
-        String founderLink = link("players", (String) franchise.get("franchise_username"), (Integer) franchise.get("founder_id"));
-        if (founderLink != null) {
-            franchise.put("founder_link", founderLink);
-        }
-        franchise.put("founder", extract("founder_", franchise));
-        franchise.put("link", link("franchises", (String) franchise.get("username"), (Integer) franchise.get("id")));
-        List<Map<String, Object>> players = jdbcTemplate.queryForList(activeFranchisePlayersSql, id);
-        franchise.put("players", players);
-        return new ResponseEntity<Map<String, Object>>(franchise, HttpStatus.OK);
-    }
-    
-    private String link(String type, String username, Integer id) {
-        if (username != null) {
-            return "http://pastime.com/" + username;
-        } else if (id != null) {
-            return "http:/pastime.com/" + type + "/" + id;
-        } else {
-            return null;
-        }
-    }
     @RequestMapping(value="/teams/{teamId}/players", method=RequestMethod.POST, produces="application/json")
     @Transactional    
     public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer teamId, PlayerForm form) {
-        if (!SecurityContext.playerSignedIn()) {
+        if (!SecurityContext.signedIn()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }
         if (form.getId() != null && form.getEmail() == null || form.getEmail().length() == 0) {
@@ -139,7 +109,7 @@ public class TeamsController {
         }        
         SqlRowSet admin = jdbcTemplate.queryForRowSet("select p.id, p.first_name, p.last_name, t.nickname, t.slug FROM franchise_member_roles r " + 
                 "INNER JOIN franchise_members t ON r.franchise = t.franchise AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.franchise = ? and r.player = ? AND r.role = 'Admin'",
-                team.getInt("id"), SecurityContext.getCurrentPlayer().getId());
+                team.getInt("id"), SecurityContext.getPrincipal().getId());
         if (!admin.last()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
         }        
@@ -191,7 +161,7 @@ public class TeamsController {
                 // a. if no user is signed in, allows the user to sign-up if they are new 
                 // b. if no user is signed in, allows the user to sign-in if they already have an account (the email the invite was sent to can then be added to this account)
                 // c. if a user is signed in, allows them to add this email to that account, sign-out & sign-in to another account, or sign-out & create a new account
-                Player currentPlayer = SecurityContext.getCurrentPlayer();
+                PlayerPrincipal currentPlayer = SecurityContext.getPrincipal();
                 if (currentPlayer == null) {
                     // nobody is signed-in, assume a completely new user
                     return "redirect:/signup?email=" + invite.getString("email");
@@ -263,7 +233,7 @@ public class TeamsController {
     @RequestMapping(value="/teams/{teamId}/{memberKey}", method=RequestMethod.POST)
     @Transactional
     public ResponseEntity<? extends Object> member(@PathVariable Integer teamId, @PathVariable String memberKey, @Valid TeamMemberForm form, Model model) {
-        Player currentPlayer = SecurityContext.getCurrentPlayer();
+        PlayerPrincipal currentPlayer = SecurityContext.getPrincipal();
         if (currentPlayer == null) {
             return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);            
         }
@@ -331,7 +301,7 @@ public class TeamsController {
     }
 
     private void addAdmin(Integer team, Model model) {
-        Player player = SecurityContext.getCurrentPlayer();
+        PlayerPrincipal player = SecurityContext.getPrincipal();
         if (player != null) {
             model.addAttribute("admin", isAdmin(team, player.getId()));
         }        
@@ -440,26 +410,6 @@ public class TeamsController {
         } catch (NumberFormatException e) {
             return null;
         }        
-    }
-
-    private Map<String, Object> extract(String prefix, Map<String, Object> map) {
-        Map<String, Object> extracted = new HashMap<String, Object>();
-        Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
-        boolean notNull = false;
-        while (it.hasNext()) {
-            Map.Entry<String, Object> entry = it.next();
-            String key = entry.getKey();
-            int index = key.indexOf(prefix);
-            if (index != -1) {
-                Object value = entry.getValue();
-                if (value != null) {
-                    notNull = true;
-                }
-                extracted.put(key.substring(index + prefix.length()), value);
-                it.remove();                
-            }
-        }
-        return notNull ? extracted : null;
     }
     
     // cglib ceremony

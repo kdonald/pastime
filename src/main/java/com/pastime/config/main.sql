@@ -349,12 +349,12 @@ CREATE TABLE team_members (league integer,
   season integer,
   team integer,  
   player integer,
-  slug varchar(16) NOT NULL,  
-  number smallint NOT NULL,
-  nickname varchar(16) NOT NULL, -- name on jersey
+  slug varchar(16),  
+  number smallint,
+  nickname varchar(16), -- name on jersey
   created timestamp NOT NULL CONSTRAINT df_team_members_created DEFAULT now(),
   CONSTRAINT pk_team_members PRIMARY KEY (league, season, team, player),
-  CONSTRAINT fk_team_members_team FOREIGN KEY (league, season, team) REFERENCES teams(league, season, team),
+  CONSTRAINT fk_team_members_team FOREIGN KEY (league, season, team) REFERENCES teams(league, season, team) ON DELETE CASCADE,
   CONSTRAINT fk_team_members_player FOREIGN KEY (player) REFERENCES players(id),
   CONSTRAINT uq_team_members_number UNIQUE (league, season, team, number),
   CONSTRAINT uq_team_members_nickname UNIQUE (league, season, team, nickname)  

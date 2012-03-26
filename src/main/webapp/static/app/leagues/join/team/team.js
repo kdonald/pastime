@@ -7,8 +7,8 @@ define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require
     });
 
     var team = {
-      name : "",
-      franchise : franchise
+      name : franchise ? franchise.name : null,
+      franchise : franchise ? franchise.id : null
     };
 
     function teamName() {
@@ -28,7 +28,6 @@ define([ "require", "jquery", "mvc", "text!./team-name.html" ], function(require
     function roster() {
       var xhr = $.post(season.link + "/teams", team);
       xhr.done(function(id) {
-        console.log("new team id:" + id);
         team.id = id;
         require([ "./roster/submit" ], function(roster) {
           container.html(roster(team, season).render());

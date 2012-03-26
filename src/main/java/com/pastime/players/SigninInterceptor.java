@@ -15,7 +15,7 @@ public class SigninInterceptor extends HandlerInterceptorAdapter {
         String value = cookieGenerator.readCookieValue(request);
         if (value != null && value.length() > 0) {
             Integer playerId = Integer.parseInt(value);
-            Player player = new Player(playerId);
+            PlayerPrincipal player = new PlayerPrincipal(playerId);
             SecurityContext.setCurrentPlayer(player);            
         } else {
             SecurityContext.setCurrentPlayer(null);

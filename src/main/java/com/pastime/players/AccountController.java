@@ -69,7 +69,7 @@ public class AccountController {
         if (!password.equals(form.getPassword())) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("password doesn't match"), HttpStatus.BAD_REQUEST);               
         }
-        Player player = new Player(rs.getInt("id"));
+        PlayerPrincipal player = new PlayerPrincipal(rs.getInt("id"));
         signinSession(player, response);
         return new ResponseEntity<Object>(player, HttpStatus.OK);           
     }
@@ -90,15 +90,15 @@ public class AccountController {
         Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
                 signupForm.getFirst_name(), signupForm.getLast_name(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().getCode(), signupForm.getZip_code(), referralCode, referredBy != null ? referredBy.getId() : null);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
-        Player player = new Player(playerId);
+        PlayerPrincipal player = new PlayerPrincipal(playerId);
         URI url = UriComponentsBuilder.fromHttpUrl("http://pastime.com/players/{id}").buildAndExpand(player.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
         signinSession(player, response);
-        return new ResponseEntity<Player>(player, headers, HttpStatus.CREATED);
+        return new ResponseEntity<PlayerPrincipal>(player, headers, HttpStatus.CREATED);
     }
     
-    private void signinSession(Player player, HttpServletResponse response) {
+    private void signinSession(PlayerPrincipal player, HttpServletResponse response) {
         SecurityContext.setCurrentPlayer(player);
         cookieGenerator.addCookie(player.getId().toString(), response);        
     }
