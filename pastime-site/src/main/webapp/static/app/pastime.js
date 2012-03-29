@@ -11,7 +11,7 @@ define("pastime", ["jquery"], function($) {
       access_token: "123456789"
     },
     links: {
-      leagues: "http://api.pastime.com/leagues",
+      seasons: "http://api.pastime.com/seasons",
       me: "http://api.pastime.com/me",
     },
     get: function(url, params) {

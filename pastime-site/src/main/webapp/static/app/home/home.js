@@ -1,25 +1,25 @@
 define(["pastime", "jquery", "handlebars",
-        "text!./leaguecarousel.html",
-        "text!./leaguepreview.html",
+        "text!./seasonscarousel.html",
+        "text!./season.html",
         "jqueryui-carousel/carousel",
         "jqueryui-carousel/autoscroll",
-        "jqueryui-carousel/continuous"], function(pastime, $, handlebars, leagueCarouselTemplate, leaguePreviewTemplate) {
+        "jqueryui-carousel/continuous"], function(pastime, $, handlebars, seasonsCarouselTemplate, seasonTemplate) {
   
-  leagueCarouselTemplate = handlebars.compile(leagueCarouselTemplate);
+  seasonsCarouselTemplate = handlebars.compile(seasonsCarouselTemplate);
 
-  handlebars.registerPartial("leaguePreview", handlebars.compile(leaguePreviewTemplate));
+  handlebars.registerPartial("season", handlebars.compile(seasonTemplate));
   handlebars.registerHelper("formatDate", function(iso) {
     var date = new Date(iso);
     return date.format("MMMM d''x");
   });
   
   $(document).ready(function() {
-    var xhr = pastime.get(pastime.links["leagues"]);
-    xhr.done(function(leagues) {
-      var carousel = $(leagueCarouselTemplate({
-        leagues: leagues
+    var xhr = pastime.get(pastime.links["seasons"]);
+    xhr.done(function(seasons) {
+      var carousel = $(seasonsCarouselTemplate({
+        seasons: seasons
       }));
-      carousel.insertAfter($("#leaguesNearYou h2"));
+      carousel.insertAfter($("#upcoming-seasons h2"));
       carousel.carousel({
         itemsPerPage: 1,
         autoScroll: true,        

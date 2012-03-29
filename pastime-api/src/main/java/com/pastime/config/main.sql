@@ -289,7 +289,8 @@ CREATE TABLE seasons (league integer,
   status char(1) NOT NULL CONSTRAINT df_seasons_status DEFAULT 'n', -- (n)ew, registration (o)pen, registration (c)losed, (r)unning, (x) over
   created timestamp NOT NULL CONSTRAINT df_seasons_created DEFAULT now(),  
   CONSTRAINT pk_seasons PRIMARY KEY (league, number),  
-  CONSTRAINT fk_seasons_league FOREIGN KEY (league) REFERENCES leagues(id)
+  CONSTRAINT fk_seasons_league FOREIGN KEY (league) REFERENCES leagues(id),
+  CONSTRAINT uq_seasons_league_slug UNIQUE (league, slug)
 );
 
 -- Pastime Free Agents e.g. Efren Blackledge

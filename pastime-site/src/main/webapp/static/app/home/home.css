@@ -21,16 +21,16 @@
   position: static;
 }
 
-/* leagues carousel */
+/* seasons carousel */
 
-#leagues a[href='#prev'] {
+#seasons-carousel a[href='#prev'] {
   float: left;
   padding-top: 60px;
   padding-right: 10px;
   height: 90px;
 }
 
-#leagues a[href='#next'] {
+#seasons-carousel a[href='#next'] {
   float: left;
   padding-top: 60px;
   padding-left: 10px;
@@ -38,25 +38,25 @@
 }
 
 /** horizontal **/
-#leagues .rs-carousel-mask {
+#seasons-carousel .rs-carousel-mask {
   float: left;
   height: 150px;
   width: 470px;
   margin: 0;
 }
 
-#leagues .rs-carousel-item {
+#seasons-carousel .rs-carousel-item {
   float: left;
   height: 150px;
   width: 470px;
   margin: 0;
 }
 
-#leagues h2 {
+#seasons-carousel h2 {
   font-size: 1.2em;
 }
 
-#leagues img {
+#seasons-carousel img {
   float: left;
   height: 128px;
   width: 128px;
