@@ -124,7 +124,7 @@ public class LeaguesController {
             
             upcoming.add(season);
         }
-        return new ResponseEntity<JsonNode>(upcoming, HttpStatus.ACCEPTED);
+        return new ResponseEntity<JsonNode>(upcoming, HttpStatus.OK);
     }
 
     // TODO "/batch/*" is temp & doesn't belong as part of the API
@@ -191,7 +191,7 @@ public class LeaguesController {
                 players.add(player);
             }
         }, league, season);        
-        return new ResponseEntity<JsonNode>(players, HttpStatus.ACCEPTED);
+        return new ResponseEntity<JsonNode>(players, HttpStatus.OK);
     }
 
     @RequestMapping(value="/me/franchises", method=RequestMethod.GET, params="league", produces="application/json")
@@ -208,7 +208,7 @@ public class LeaguesController {
                 return franchise;
             }
         }, SecurityContext.getPrincipal().getId(), league);
-        return new ResponseEntity<List<JsonNode>>(franchises, HttpStatus.ACCEPTED);
+        return new ResponseEntity<List<JsonNode>>(franchises, HttpStatus.OK);
     }
     
     @RequestMapping(value="/leagues/{league}/seasons/{season}/teams", method=RequestMethod.POST)
@@ -269,7 +269,7 @@ public class LeaguesController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
         }
         List<Player> players = jdbcTemplate.query(playerSearchSql, new PlayerMapper(null), name + "%");
-        return new ResponseEntity<List<Player>>(players, HttpStatus.ACCEPTED);
+        return new ResponseEntity<List<Player>>(players, HttpStatus.OK);
     }
     
     @RequestMapping(value="/{username}/picture", method=RequestMethod.GET)
