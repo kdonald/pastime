@@ -4,6 +4,7 @@ define(["pastime", "mvc", "text!./account.html", "text!./signin.html", "text!./s
   var account = mvc.view({
     template: accountTemplate,
     init: function() {
+      var self = this;
       this.handleSelectedAccount = function(val) {
         if ("existing" === val) {
           this.signin();
@@ -21,7 +22,7 @@ define(["pastime", "mvc", "text!./account.html", "text!./signin.html", "text!./s
             template: signinTemplate
             // TODO signin event handling
           });
-          $("#account-selection-result").html(signin.render());        
+          self.$("#account-selection-result").html(signin.render());        
         });
       };
       this.signup = function() {
@@ -88,7 +89,7 @@ define(["pastime", "mvc", "text!./account.html", "text!./signin.html", "text!./s
               }            
             }
           });      
-          $("#account-selection-result").html(signupType.render());        
+          self.$("#account-selection-result").html(signupType.render());        
         });      
       };      
       this.handleSelectedAccount(this.$("form[input:radio[name=account][checked]").val());      

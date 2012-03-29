@@ -43,10 +43,13 @@
   });
   require(["jquery", "leagues/join/join"], function($, join) {
     var season = {
-        name: {{name}},
-        start_date: {{start_date}},
+        name: '{{name}}',
+        start_date: '{{start_date}}',
         roster_min: {{roster_min}},
-        roster_max: {{roster_max}}
+        roster_max: {{roster_max}},
+        links: {
+        	teams: 'http://api.pastime.com/{{league_id}}/{{number}}/teams'
+        }
     };
     $(document).ready(function() {
       $("#main").html(join(season));      

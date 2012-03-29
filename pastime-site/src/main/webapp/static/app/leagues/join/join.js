@@ -7,7 +7,7 @@ define(["pastime", "require", "jquery", "mvc", "text!./franchise.html"], functio
     });
     
     function start() {
-      var xhr = pastime.get(pastime.me.links["franchises"], { league: season.league.id });
+      var xhr = pastime.get(pastime.me.resources["franchises"].url, { league: season.league.id });
       xhr.done(function(franchises) {
         if (franchises.length == 1) {
           container.html(mvc.view({
