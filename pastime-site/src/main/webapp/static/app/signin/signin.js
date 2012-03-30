@@ -65,8 +65,8 @@ define(["pastime", "mvc", "text!./account.html", "text!./signin.html", "text!./s
                       events: {
                         "submit": function() {
                           var xhr = $.post(pastime.links["signup"], signupForm);
-                          xhr.done(function(accessGrant) {
-                            pastime.accessGrant = accessGrant;
+                          xhr.done(function(grant) {
+                            pastime.grant = grant;
                             var xhr = pastime.get(pastime.links["me"]);
                             xhr.done(function(me) {
                               pastime.me = me;

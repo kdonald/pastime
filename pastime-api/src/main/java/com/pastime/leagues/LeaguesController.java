@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -21,6 +22,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +46,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriTemplate;
 
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Location;
@@ -179,7 +183,7 @@ public class LeaguesController {
     }
     
     @RequestMapping(value="/leagues/{league}/seasons/{season}/sample-players", method=RequestMethod.GET, produces="application/json")
-    public ResponseEntity<JsonNode> samplePlayers(@PathVariable Integer league, @PathVariable Integer season) {
+    public ResponseEntity<JsonNode> samplePlayers(@PathVariable("league") Integer league, @PathVariable("season") Integer season) {
         final ArrayNode players = mapper.createArrayNode();
         jdbcTemplate.query(randomPlayersSql, new RowCallbackHandler() {
             public void processRow(ResultSet rs) throws SQLException {
@@ -227,7 +231,7 @@ public class LeaguesController {
     
     @RequestMapping(value="/leagues/{league}/seasons/{season}/teams", method=RequestMethod.POST)
     @Transactional
-    public ResponseEntity<? extends Object> addTeam(@PathVariable Integer league, @PathVariable Integer season, @RequestParam Map<String, Object> team) {
+    public ResponseEntity<? extends Object> addTeam(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @RequestParam Map<String, Object> team) {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }        
@@ -251,18 +255,29 @@ public class LeaguesController {
             }
         }
         Integer number = jdbcTemplate.queryForInt("SELECT coalesce(max(number) + 1, 1) as next_number FROM teams WHERE league = ? AND season = ?", league, season); 
-        jdbcTemplate.update("INSERT INTO teams (league, season, team, name, slug, franchise) VALUES (?, ?, ?, ?, ?)", league, season, number, name, SlugUtils.toSlug(name), franchise);
+        jdbcTemplate.update("INSERT INTO teams (league, season, number, name, slug, franchise) VALUES (?, ?, ?, ?, ?, ?)", league, season, number, name, SlugUtils.toSlug(name), franchise);
         PlayerPrincipal currentPlayer = SecurityContext.getPrincipal();
         Map<String, Object> franchiseInfo = findFranchiseInfo(franchise, currentPlayer.getId());
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)", league, season, number, currentPlayer.getId(),
                 franchiseInfo.get("number"), franchiseInfo.get("nickname"));
-        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)", league, season, number, currentPlayer.getId(), TeamRoles.ADMIN);                
-        return new ResponseEntity<Integer>(number, HttpStatus.CREATED);
+        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)", league, season, number, currentPlayer.getId(), TeamRoles.ADMIN);
+        
+        Map<String, Object> teamData = new HashMap<String, Object>(2, 2);
+        teamData.put("number", number);
+        URI location = new UriTemplate("http://api.pastime.com/leagues/{league}/seasons/{season}/teams/{number}").expand(league, season, number);
+        Map<String, Object> links = new HashMap<String, Object>(2, 2);
+        links.put("players", location + "/players");
+        links.put("player-search", location + "/player-search");
+        teamData.put("links", links);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(location);
+        return new ResponseEntity<Map<String, Object>>(teamData, headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(value="/franchises/{id}", method=RequestMethod.GET, produces="application/json")
     @Transactional
-    public ResponseEntity<? extends Object> franchise(@PathVariable Integer id) {
+    public ResponseEntity<? extends Object> franchise(@PathVariable("id") Integer id) {
         Map<String, Object> franchise = jdbcTemplate.queryForMap(franchiseSql, id);
         String founderLink = playerLink((String) franchise.get("franchise_username"), (Integer) franchise.get("founder_id"));
         if (founderLink != null) {
@@ -275,10 +290,11 @@ public class LeaguesController {
         franchise.put("players", players);
         return new ResponseEntity<Map<String, Object>>(franchise, HttpStatus.OK);
     }
-        
-    @RequestMapping(value="/players", method=RequestMethod.GET, params="name", produces="application/json")
-    // TODO exclude "me" and existing franchise players from search on server or client?
-    public ResponseEntity<? extends Object> playerSearch(@RequestParam String name, @RequestParam Integer franchise) {
+
+    // TODO - filter out players that are already added, mark "me" as "me"
+    @RequestMapping(value="/leagues/{league}/seasons/{season}/teams/{team}/player-search", method=RequestMethod.GET, params="name", produces="application/json")
+    public ResponseEntity<? extends Object> playerSearch(@PathVariable("league") Integer league, @PathVariable("season") Integer season,
+            @PathVariable("team") Integer team, @RequestParam("name") String name) {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
         }
@@ -293,7 +309,8 @@ public class LeaguesController {
 
     @RequestMapping(value="/leagues/{league}/seasons/{season}/teams/{team}/players", method=RequestMethod.POST)
     @Transactional
-    public ResponseEntity<? extends Object> addPlayer(@PathVariable Integer league, @PathVariable Integer season, @PathVariable Integer teamNumber, @RequestParam Map<String, Object> playerForm) {
+    public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league, @PathVariable("season") Integer season,
+            @PathVariable("team") Integer teamNumber, @RequestParam Map<String, Object> playerForm) {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }
@@ -320,6 +337,14 @@ public class LeaguesController {
         }
         return new ResponseEntity<Object>(HttpStatus.CREATED);
     }
+
+    @RequestMapping(value="/error", method={ RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE }, produces="application/json")
+    public @ResponseBody ErrorBody error(HttpServletRequest request) {
+        String message = (String) request.getAttribute("javax.servlet.error.message");
+        return new ErrorBody(message);
+    }
+    
+    // internal helpers
     
     private SqlRowSet findTeam(Integer league, Integer season, Integer number) {
         return jdbcTemplate.queryForRowSet("SELECT t.league, t.season, t.number, t.name, t.slug, t.franchise FROM teams t WHERE t.league = ? AND t.season = ? AND t.number = ?", league, season, number);        
@@ -412,6 +437,7 @@ public class LeaguesController {
          mailSender.send(preparator);
          return new PlayerInvite(code);
     }
+    
     private boolean inviteAlreadySent(SqlRowSet team, String email) {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_invites WHERE league = ? AND season = ? AND team = ? AND email = ? AND role = 'Player')", Boolean.class, team, email);
     }
@@ -438,7 +464,9 @@ public class LeaguesController {
 
         @Override
         public Player mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new Player(rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), rs.getInt("number"), rs.getString("nickname"), link(rs));
+            String link = link(rs);
+            String picture = link + "/picture";
+            return new Player(rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), (Integer) rs.getObject("number"), rs.getString("nickname"), link, picture);
         }
         
         private String link(ResultSet rs) throws SQLException {

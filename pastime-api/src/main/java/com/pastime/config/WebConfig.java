@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.support.GlobalExceptionHandlerCapableExceptionResolver;
 
 import com.pastime.util.SigninInterceptor;
@@ -24,6 +25,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
         		new GlobalExceptionHandlerCapableExceptionResolver(new GlobalExceptionHandling(), getMessageConverters());
         resolver.afterPropertiesSet();
         exceptionResolvers.add(resolver);
+        exceptionResolvers.add(new DefaultHandlerExceptionResolver());        
     }
     
 }

@@ -8,20 +8,23 @@ public class Player {
 
     private Integer id;
     
-    private String link;
-    
     private Name name;
     
     private Integer number;
 
     private String nickname;
+
+    private String link;
     
-    public Player(Integer id, String firstName, String lastName, Integer number, String nickname, String link) {
+    private String picture;
+    
+    public Player(Integer id, String firstName, String lastName, Integer number, String nickname, String link, String picture) {
         this.id = id;
         this.name = new Name(firstName, lastName);
         this.number = number;
         this.nickname = nickname;
         this.link = link;
+        this.picture = picture;
     }
 
     public Integer getId() {
@@ -52,6 +55,10 @@ public class Player {
     
     public String getLink() {
         return link;
+    }
+    
+    public String getPicture() {
+        return picture;
     }
     
 }

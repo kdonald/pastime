@@ -11,9 +11,8 @@ define(["jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html"
         this.$("input").autocomplete({
           html: true,
           source: function(request, response) {
-            var xhr = $.getJSON("/me/players", {
-              name: request.term,
-              franchise: team.franchise
+            var xhr = $.getJSON(team.links["player_search"], {
+              name: request.term
             });
             xhr.done(function(players) {
               var items = new Array(players.length);

@@ -30,7 +30,7 @@ define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
       return $.ajax({
         type: "POST",
         url: url,
-        data: params,
+        data: data,
         beforeSend: addAuthorizationHeader
       });
     },

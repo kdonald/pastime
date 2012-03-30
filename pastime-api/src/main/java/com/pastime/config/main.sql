@@ -1,6 +1,7 @@
 DROP TABLE usernames;
 DROP TABLE games;
 DROP TABLE team_sponsorship;
+DROP TABLE team_member_invites;
 DROP TABLE team_member_roles;
 DROP TABLE team_members;
 DROP TABLE team_payments;
