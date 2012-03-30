@@ -1,4 +1,4 @@
-package com.pastime.old.players;
+package com.pastime.players;
 
 import static org.springframework.dao.support.DataAccessUtils.singleResult;
 import static org.springframework.jdbc.core.SqlStatements.use;
@@ -6,6 +6,8 @@ import static org.springframework.jdbc.core.SqlStatements.use;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -24,11 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.pastime.prelaunch.DefaultReferralCodeGenerator;
-import com.pastime.prelaunch.ReferralCodeGenerator;
+import com.pastime.util.DefaultReferralCodeGenerator;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Name;
 import com.pastime.util.PlayerPrincipal;
+import com.pastime.util.ReferralCodeGenerator;
 import com.pastime.util.SecurityContext;
 
 @Controller
@@ -38,7 +40,7 @@ public class AccountController {
     
     private ReferralCodeGenerator referralCodeGenerator = new DefaultReferralCodeGenerator();
 
-    private StringCookieGenerator cookieGenerator = new StringCookieGenerator("auth_token");
+    private StringCookieGenerator cookieGenerator = new StringCookieGenerator("access_token");
     
     public AccountController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -99,7 +101,9 @@ public class AccountController {
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
         signinSession(player, response);
-        return new ResponseEntity<PlayerPrincipal>(player, headers, HttpStatus.CREATED);
+        Map<String, Object> accessGrant = new HashMap<String, Object>();
+        accessGrant.put("access_token", player.getId());
+        return new ResponseEntity<Map<String, Object>>(accessGrant, headers, HttpStatus.CREATED);
     }
     
     private void signinSession(PlayerPrincipal player, HttpServletResponse response) {

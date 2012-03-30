@@ -3,18 +3,21 @@ define(["pastime", "require", "jquery", "mvc", "text!./franchise.html"], functio
   var join = function(season) {
 
     var container = $("<div></div>", {
-      id : "join-season"
+      id: "join-season"
     });
-    
-    function start() {
-      var xhr = pastime.get(pastime.me.resources["franchises"].url, { league: season.league.id });
+
+    var signin = pastime.signin(container);
+    signin.done(function() {
+      var xhr = pastime.get(pastime.me.links["franchises"], {
+        league: season.league.id
+      });
       xhr.done(function(franchises) {
         if (franchises.length == 1) {
           container.html(mvc.view({
-            model : franchises[0],
-            template : franchise,
-            events : {
-              "change form[input:radio[name=franchise]" : function(event) {
+            model: franchises[0],
+            template: franchise,
+            events: {
+              "change form[input:radio[name=franchise]": function(event) {
                 var val = event.currentTarget.value;
                 if ("yes" === val) {
                   team(franchises[0]);
@@ -25,13 +28,13 @@ define(["pastime", "require", "jquery", "mvc", "text!./franchise.html"], functio
             }
           }).render());
         } else if (franchises.length > 1) {
-          throw Error("TODO - not yet implemented");          
+          throw Error("TODO - not yet implemented");
         } else {
           joinType();
         }
 
         function joinType() {
-          require([ "./join-type" ], function(joinType) {
+          require(["./join-type"], function(joinType) {
             joinType.on("team", function() {
               team();
             });
@@ -43,28 +46,17 @@ define(["pastime", "require", "jquery", "mvc", "text!./franchise.html"], functio
         }
 
         function team(franchise) {
-          require([ "./team/team" ], function(team) {
+          require(["./team/team"], function(team) {
             container.html(team(season, franchise));
           });
-        }      
+        }
       });
-    }
+    });
 
-    if (!pastime.me) {
-      require([ "./signin/signin" ], function(signin) {
-        signin.on("signedin", function() {
-          start();
-        });
-        container.html(signin.render());
-      });
-    } else {
-      start();
-    }
-    
     return container;
-    
+
   };
 
   return join;
-  
+
 });

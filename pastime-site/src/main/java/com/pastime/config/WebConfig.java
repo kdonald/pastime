@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -18,11 +19,20 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.support.GlobalExceptionHandlerCapableExceptionResolver;
 import org.springframework.web.servlet.mvc.view.jmustache.JMustacheViewResolver;
 
+import com.pastime.util.SigninInterceptor;
+
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
     @Inject
     private BeanFactory beanFactory;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        SigninInterceptor interceptor = new SigninInterceptor();
+        interceptor.setCookie(true);
+        registry.addInterceptor(interceptor);
+    }
     
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {

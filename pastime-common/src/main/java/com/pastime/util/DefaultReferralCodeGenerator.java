@@ -1,4 +1,4 @@
-package com.pastime.prelaunch;
+package com.pastime.util;
 
 import org.springframework.security.crypto.keygen.InsecureRandomStringGenerator;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;

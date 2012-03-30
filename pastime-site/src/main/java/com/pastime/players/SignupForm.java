@@ -1,4 +1,4 @@
-package com.pastime.old.players;
+package com.pastime.players;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
+
 
 public class SignupForm {
 

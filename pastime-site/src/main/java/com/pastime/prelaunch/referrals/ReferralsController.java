@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.pastime.prelaunch.DefaultReferralCodeGenerator;
-import com.pastime.prelaunch.ReferralCodeGenerator;
 import com.pastime.prelaunch.SubscriptionRepository;
+import com.pastime.util.DefaultReferralCodeGenerator;
+import com.pastime.util.ReferralCodeGenerator;
 
 @Controller
 @RequestMapping("/referrals")

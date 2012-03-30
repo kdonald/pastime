@@ -1,4 +1,4 @@
-package com.pastime;
+package com.pastime.home;
 
 import java.io.IOException;
 import java.sql.ResultSet;

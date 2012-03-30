@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.pastime.util.DefaultReferralCodeGenerator;
+
 public class ReferralCodeGeneratorTests {
     
     private DefaultReferralCodeGenerator generator = new DefaultReferralCodeGenerator();

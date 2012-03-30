@@ -1,4 +1,4 @@
-package com.pastime.old.players;
+package com.pastime.players;
 
 public final class Gender {
     

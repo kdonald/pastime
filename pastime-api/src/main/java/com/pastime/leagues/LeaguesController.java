@@ -194,8 +194,22 @@ public class LeaguesController {
         return new ResponseEntity<JsonNode>(players, HttpStatus.OK);
     }
 
+    @RequestMapping(value="/me", method=RequestMethod.GET, produces="application/json")
+    public ResponseEntity<? extends Object> me() {
+        if (!SecurityContext.authorized()) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
+        }
+        PlayerPrincipal principal = SecurityContext.getPrincipal();
+        Map<String, Object> me = new HashMap<String, Object>();
+        me.put("id", principal.getId());
+        Map<String, Object> links = new HashMap<String, Object>();
+        links.put("franchises", "http://api.pastime.com/me/franchises");
+        me.put("links", links);
+        return new ResponseEntity<Map<String, Object>>(me, HttpStatus.OK);
+    }
+    
     @RequestMapping(value="/me/franchises", method=RequestMethod.GET, params="league", produces="application/json")
-    public ResponseEntity<? extends Object> qualifyingFranchises(@RequestParam Integer league) {
+    public ResponseEntity<? extends Object> qualifyingFranchises(@RequestParam("league") Integer league) {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
         }

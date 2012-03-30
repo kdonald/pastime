@@ -1,4 +1,4 @@
-package com.pastime.old.players;
+package com.pastime.players;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.util.EmailUtils;

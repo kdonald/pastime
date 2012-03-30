@@ -1,7 +1,6 @@
-package com.pastime.old.players;
+package com.pastime.players;
 
 import com.pastime.util.Name;
-
 
 public class ReferredBy {
 

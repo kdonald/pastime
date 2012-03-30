@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.pastime.prelaunch.Subscriber.ReferredBy;
+import com.pastime.util.DefaultReferralCodeGenerator;
 import com.pastime.util.Name;
+import com.pastime.util.ReferralCodeGenerator;
 
 public class SubscriptionRepository {
 
