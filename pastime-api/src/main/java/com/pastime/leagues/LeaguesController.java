@@ -267,7 +267,7 @@ public class LeaguesController {
         URI location = new UriTemplate("http://api.pastime.com/leagues/{league}/seasons/{season}/teams/{number}").expand(league, season, number);
         Map<String, Object> links = new HashMap<String, Object>(2, 2);
         links.put("players", location + "/players");
-        links.put("player-search", location + "/player-search");
+        links.put("player_search", location + "/player-search");
         teamData.put("links", links);
         
         HttpHeaders headers = new HttpHeaders();

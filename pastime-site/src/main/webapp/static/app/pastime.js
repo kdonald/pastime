@@ -31,6 +31,7 @@ define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
         type: "POST",
         url: url,
         data: data,
+        dataType: "json",
         beforeSend: addAuthorizationHeader
       });
     },
@@ -64,8 +65,6 @@ define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
     };
   }
 
-  console.log(pastime);
-  
   return pastime;
 
 });

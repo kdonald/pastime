@@ -1,5 +1,5 @@
-define(["jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html", "jqueryui-autocomplete-html"],
-    function($, mvc, addPlayerTemplate, addPlayerFormTemplate) {
+define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html", "jqueryui-autocomplete-html"],
+    function(pastime, $, mvc, addPlayerTemplate, addPlayerFormTemplate) {
 
   var addPlayer = function(team) {
 
@@ -11,7 +11,7 @@ define(["jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html"
         this.$("input").autocomplete({
           html: true,
           source: function(request, response) {
-            var xhr = $.getJSON(team.links["player_search"], {
+            var xhr = pastime.get(team.links["player_search"], {
               name: request.term
             });
             xhr.done(function(players) {
