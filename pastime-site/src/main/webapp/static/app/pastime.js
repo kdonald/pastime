@@ -1,5 +1,8 @@
 define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
 
+  var siteUrl = "http://localhost:8080";
+  var apiUrl = "http://localhost:8081";
+  
   function cookie() {
     return $.cookie("access_token");
   }
@@ -12,10 +15,10 @@ define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
 
   var pastime = {
     links: {
-      seasons: "http://api.pastime.com/seasons",
-      me: "http://api.pastime.com/me",
-      signup: "http://pastime.com/signup",
-      signin: "http://pastime.com/signin"
+      seasons: apiUrl + "/seasons",
+      me: apiUrl + "/me",
+      signup: siteUrl + "/signup",
+      signin: siteUrl + "/signin"
     },
     get: function(url, params) {
       return $.ajax({

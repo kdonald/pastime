@@ -1,10 +1,12 @@
 define("facebook", ["jquery", "https://connect.facebook.net/en_US/all.js"], function($) {
   
+  var appId = " 130304913761039"; // production: 212373618850030
+  
   $("<div id='fb-root'></div>").prependTo($("body"));
   
   FB.init({
-    appId : '212373618850030', // App ID
-    channelUrl : '//pastime.com/channel.html', // Channel File
+    appId : appId, // App ID
+    // channelUrl : '//pastime.com/channel.html', // Channel File (production only)
     status : false, // check login status
     cookie : false, // enable cookies to allow the server to access the session
     xfbml : false // parse XFBML

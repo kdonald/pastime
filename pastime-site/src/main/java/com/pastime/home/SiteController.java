@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class SiteController {
 
+    private String apiUrl = "http://localhost:8081";
+    
     private JdbcTemplate jdbcTemplate;
     
     private String seasonByNumberSql;
@@ -59,6 +61,7 @@ public class SiteController {
         if (populator.getInvocationCount() > 1) {
             throw new IllegalStateException("Should not happen");
         }
+        model.addAttribute("apiUrl", apiUrl);
         return "leagues/join";
     }
     

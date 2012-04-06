@@ -61,6 +61,12 @@ import com.pastime.util.TeamRoles;
 @Controller
 public class LeaguesController {
 
+    private String siteUrl = "http://localhost:8080";
+    
+    private String apiUrl = "http://localhost:8081";
+    
+    private String solrUrl = "http://localhost:8983/solr";
+    
     private RestTemplate client;
 
     private ObjectMapper mapper;
@@ -98,7 +104,7 @@ public class LeaguesController {
     @RequestMapping(value="/seasons", method=RequestMethod.GET, produces="application/json")
     public ResponseEntity<JsonNode> upcomingSeasons() throws URISyntaxException {
         Location location = new Location(28.0674,-80.5595);
-        JsonNode json = client.getForObject(new URI("http://localhost:8983/solr/select?wt=json&fl=organization_name,organization_link,organization_logo,league_sport,league_format,league_nature," + 
+        JsonNode json = client.getForObject(new URI(solrUrl + "/select?wt=json&fl=organization_name,organization_link,organization_logo,league_sport,league_format,league_nature," + 
                 "season_name,season_link,season_start_date,season_picture,venue_name&q=*:*&fq=%7B!geofilt%7D&sfield=venue_location&pt=" + location + "&d=25"), JsonNode.class);
         JsonNode docs = json.get("response").get("docs");
         ArrayNode upcoming = mapper.createArrayNode();
@@ -146,7 +152,7 @@ public class LeaguesController {
                 doc.put("organization_name", rs.getString("organization_name"));
                 String organizationLink = organizationLink(organizationId, rs.getString("organization_username"));
                 doc.put("organization_link", organizationLink);
-                doc.put("organization_logo", "http://pastime.com/static/images/organizations/1.png");
+                doc.put("organization_logo", siteUrl + "/static/images/organizations/1.png");
                 doc.put("league_id", rs.getInt("league_id"));
                 doc.put("league_sport", rs.getString("league_sport"));
                 doc.put("league_format", rs.getString("league_format"));
@@ -155,7 +161,7 @@ public class LeaguesController {
                 doc.put("season_name", rs.getString("season_name"));
                 String seasonPathVariable = seasonPathVariable(rs.getInt("season_number"), rs.getString("season_slug"));
                 doc.put("season_link", organizationLink + "/" + rs.getString("league_slug") + "/" + seasonPathVariable);                
-                doc.put("season_picture", "http://pastime.com/static/images/leagues/1/1.png");
+                doc.put("season_picture", siteUrl + "/static/images/leagues/1/1.png");
                 doc.put("season_start_date", new DateTime(rs.getDate("season_start_date"), DateTimeZone.UTC).toString());
                 doc.put("venue_id", rs.getInt("venue_id"));
                 doc.put("venue_name", rs.getString("venue_name"));
@@ -165,9 +171,9 @@ public class LeaguesController {
             private String organizationLink(Integer id, String name) {
                 // TODO: we could just always send to /organizations/id and rely on redirect if username is set...
                 if (name != null) {
-                    return "http://pastime.com/" + name;
+                    return siteUrl + "/" + name;
                 } else {
-                    return "http://pastime.com/organizations/" + id;
+                    return siteUrl + "/organizations/" + id;
                 }
             }
             private String seasonPathVariable(Integer number, String slug) {
@@ -178,7 +184,7 @@ public class LeaguesController {
                 }
             }
         });
-        client.postForLocation("http://localhost:8983/solr/update/json?commit=true", docs);
+        client.postForLocation(solrUrl + "/update/json?commit=true", docs);
         return new ResponseEntity<JsonNode>(HttpStatus.CREATED);
     }
     
@@ -207,7 +213,7 @@ public class LeaguesController {
         Map<String, Object> me = new HashMap<String, Object>();
         me.put("id", principal.getId());
         Map<String, Object> links = new HashMap<String, Object>();
-        links.put("franchises", "http://api.pastime.com/me/franchises");
+        links.put("franchises", apiUrl + "/me/franchises");
         me.put("links", links);
         return new ResponseEntity<Map<String, Object>>(me, HttpStatus.OK);
     }
@@ -264,7 +270,7 @@ public class LeaguesController {
         
         Map<String, Object> teamData = new HashMap<String, Object>(2, 2);
         teamData.put("number", number);
-        URI location = new UriTemplate("http://api.pastime.com/leagues/{league}/seasons/{season}/teams/{number}").expand(league, season, number);
+        URI location = new UriTemplate(apiUrl + "/leagues/{league}/seasons/{season}/teams/{number}").expand(league, season, number);
         Map<String, Object> links = new HashMap<String, Object>(2, 2);
         links.put("players", location + "/players");
         links.put("player_search", location + "/player-search");
@@ -385,7 +391,7 @@ public class LeaguesController {
     }
 
     private String url(SqlRowSet team) {
-        return "http://pastime.com/leagues/" + team.getInt("league") + "/seasons/" + team.getInt("season") + "/teams/" + team.getString("id");
+        return siteUrl + "/leagues/" + team.getInt("league") + "/seasons/" + team.getInt("season") + "/teams/" + team.getString("id");
     }
     
     private PlayerInvite sendPlayerInvite(final SqlRowSet team, final SqlRowSet admin, final SqlRowSet player) {
@@ -454,7 +460,7 @@ public class LeaguesController {
         return jdbcTemplate.queryForMap("SELECT number, nickname FROM franchise_members WHERE franchise = ? AND player = ?", franchise, playerId);
     }
     
-    public static class PlayerMapper implements RowMapper<Player> {
+    public class PlayerMapper implements RowMapper<Player> {
 
         private String teamLink;
         
@@ -504,19 +510,19 @@ public class LeaguesController {
         client.setMessageConverters(converters);        
     }
     
-    private static String franchiseLink(String username, Integer id) {
+    private  String franchiseLink(String username, Integer id) {
         return link("franchises", username, id);
     }
     
-    private static String playerLink(String username, Integer id) {
+    private String playerLink(String username, Integer id) {
         return link("players", username, id);
     }
     
-    private static String link(String type, String username, Integer id) {
+    private String link(String type, String username, Integer id) {
         if (username != null) {
-            return "http://pastime.com/" + username;
+            return siteUrl + "/" + username;
         } else if (id != null) {
-            return "http:/pastime.com/" + type + "/" + id;
+            return siteUrl + "/" + type + "/" + id;
         } else {
             return null;
         }

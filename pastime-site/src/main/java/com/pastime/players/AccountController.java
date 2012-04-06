@@ -36,6 +36,8 @@ import com.pastime.util.SecurityContext;
 @Controller
 public class AccountController {
 
+    private String siteUrl = "http://localhost:8080/";
+    
     private JdbcTemplate jdbcTemplate;
     
     private ReferralCodeGenerator referralCodeGenerator = new DefaultReferralCodeGenerator();
@@ -97,7 +99,7 @@ public class AccountController {
                 signupForm.getFirst_name(), signupForm.getLast_name(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().getCode(), signupForm.getZip_code(), referralCode, referredBy != null ? referredBy.getId() : null);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
         PlayerPrincipal player = new PlayerPrincipal(playerId);
-        URI url = UriComponentsBuilder.fromHttpUrl("http://pastime.com/players/{id}").buildAndExpand(player.getId()).toUri();
+        URI url = UriComponentsBuilder.fromHttpUrl(siteUrl + "/players/{id}").buildAndExpand(player.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
         signinSession(player, response);
