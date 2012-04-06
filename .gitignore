@@ -7,3 +7,6 @@ bin
 pastime.esproj
 *.DS_Store
 Thumbs.db
+*.iml
+out
+.idea
