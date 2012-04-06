@@ -9,6 +9,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -25,11 +26,14 @@ import com.pastime.util.SigninInterceptor;
 public class WebConfig extends WebMvcConfigurationSupport {
 
     @Inject
+    private JdbcTemplate jdbcTemplate;
+    
+    @Inject
     private BeanFactory beanFactory;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        SigninInterceptor interceptor = new SigninInterceptor();
+        SigninInterceptor interceptor = new SigninInterceptor(jdbcTemplate);
         interceptor.setCookie(true);
         registry.addInterceptor(interceptor);
     }

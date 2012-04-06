@@ -33,6 +33,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -73,6 +74,8 @@ public class LeaguesController {
     
     private JdbcTemplate jdbcTemplate;
     
+    private NamedParameterJdbcTemplate namedJdbcTemplate;
+    
     private String randomPlayersSql;
 
     private String qualifyingFranchisesSql;
@@ -92,6 +95,7 @@ public class LeaguesController {
     public LeaguesController(JdbcTemplate jdbcTemplate, JavaMailSender mailSender, StringTemplateLoader templateLoader) {
         initHttpClient();
         this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.randomPlayersSql = SqlUtils.sql(new ClassPathResource("random-registered-players.sql", getClass()));
         this.franchiseSql = SqlUtils.sql(new ClassPathResource("franchise.sql", getClass()));
         this.activeFranchisePlayersSql = SqlUtils.sql(new ClassPathResource("franchise-players-active.sql", getClass()));        
@@ -237,11 +241,11 @@ public class LeaguesController {
     
     @RequestMapping(value="/leagues/{league}/seasons/{season}/teams", method=RequestMethod.POST)
     @Transactional
-    public ResponseEntity<? extends Object> addTeam(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @RequestParam Map<String, Object> team) {
+    public ResponseEntity<? extends Object> addTeam(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @RequestParam Map<String, String> team) {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }        
-        String name = (String) team.get("name");
+        String name = team.get("name");
         if (name == null) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("team name is required"), HttpStatus.BAD_REQUEST);            
         }
@@ -251,7 +255,7 @@ public class LeaguesController {
         }
         Integer franchise = null;
         if (team.containsKey("franchise")) {
-            String value = (String) team.get("franchise");
+            String value = team.get("franchise");
             if (value != null && value.trim().length() > 0) {
                 try {
                     franchise = Integer.parseInt(value);
@@ -285,12 +289,12 @@ public class LeaguesController {
     @Transactional
     public ResponseEntity<? extends Object> franchise(@PathVariable("id") Integer id) {
         Map<String, Object> franchise = jdbcTemplate.queryForMap(franchiseSql, id);
-        String founderLink = playerLink((String) franchise.get("franchise_username"), (Integer) franchise.get("founder_id"));
+        String founderLink = playerSiteLink((String) franchise.get("franchise_username"), (Integer) franchise.get("founder_id"));
         if (founderLink != null) {
             franchise.put("founder_link", founderLink);
         }
         franchise.put("founder", extract("founder_", franchise));
-        String franchiseLink = franchiseLink((String) franchise.get("username"), (Integer) franchise.get("id"));
+        String franchiseLink = franchiseSiteLink((String) franchise.get("username"), (Integer) franchise.get("id"));
         franchise.put("link", franchiseLink);
         List<Player> players = jdbcTemplate.query(activeFranchisePlayersSql, new PlayerMapper(franchiseLink), id);
         franchise.put("players", players);
@@ -304,23 +308,28 @@ public class LeaguesController {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);
         }
-        List<Player> players = jdbcTemplate.query(playerSearchSql, new PlayerMapper(null), name + "%");
+        Map<String, Object> params = new HashMap<String, Object>(1, 1);
+        params.put("name", name);
+        List<Integer> existing = new ArrayList<Integer>(1);
+        existing.add(SecurityContext.getPrincipal().getId());
+        params.put("existing", existing);
+        List<Player> players = namedJdbcTemplate.query(playerSearchSql, params, new PlayerMapper(null));
         return new ResponseEntity<List<Player>>(players, HttpStatus.OK);
     }
     
-    @RequestMapping(value="/{username}/picture", method=RequestMethod.GET)
-    public String picture() {
-        return "redirect:http://pastime.com/static/images/players/18/small.png";        
+    @RequestMapping(value="/players/{id}/picture", method=RequestMethod.GET)
+    public String playerPicture(@PathVariable("id") Integer id) {
+        return "redirect:" + siteUrl + "/static/images/players/18/small.png";        
     }
 
     @RequestMapping(value="/leagues/{league}/seasons/{season}/teams/{team}/players", method=RequestMethod.POST)
     @Transactional
     public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league, @PathVariable("season") Integer season,
-            @PathVariable("team") Integer teamNumber, @RequestParam Map<String, Object> playerForm) {
+            @PathVariable("team") Integer teamNumber, @RequestParam Map<String, String> playerForm) {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }
-        if (playerForm.get("id") == null && playerForm.get("email") == null || ((String) playerForm.get("email")).length() == 0) {
+        if (playerForm.get("id") == null && (playerForm.get("email") == null || (playerForm.get("email")).length() == 0)) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("neither a player id or email address is provided"), HttpStatus.BAD_REQUEST);            
         }
         SqlRowSet team = findTeam(league, season, teamNumber);
@@ -334,7 +343,7 @@ public class LeaguesController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
         }
         if (playerForm.get("id") != null) {
-            Integer id = (Integer) playerForm.get("id");
+            Integer id = Integer.parseInt(playerForm.get("id"));
             SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, e.email FROM players p INNER JOIN player_emails e ON p.id = e.player WHERE p.id = ? AND e.primary_email = true", id);
             if (!player.last()) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid player id"), HttpStatus.BAD_REQUEST);                
@@ -347,7 +356,11 @@ public class LeaguesController {
     @RequestMapping(value="/error", method={ RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE }, produces="application/json")
     public @ResponseBody ErrorBody error(HttpServletRequest request) {
         String message = (String) request.getAttribute("javax.servlet.error.message");
-        return new ErrorBody(message);
+        if (message != null && message.length() > 0) {
+            return new ErrorBody(message);
+        } else {
+            return null;
+        }
     }
     
     // internal helpers
@@ -470,12 +483,12 @@ public class LeaguesController {
 
         @Override
         public Player mapRow(ResultSet rs, int rowNum) throws SQLException {
-            String link = link(rs);
-            String picture = link + "/picture";
+            String link = siteLink(rs);
+            String picture = playerApiLink(rs.getInt("id")) + "/picture";
             return new Player(rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), (Integer) rs.getObject("number"), rs.getString("nickname"), link, picture);
         }
         
-        private String link(ResultSet rs) throws SQLException {
+        private String siteLink(ResultSet rs) throws SQLException {
             if (teamLink != null) {
                 Object playerPath = rs.getString("slug");
                 if (playerPath == null) {
@@ -483,7 +496,7 @@ public class LeaguesController {
                 }
                 return teamLink + "/" + playerPath;
             } else {
-                return playerLink(rs.getString("username"), rs.getInt("id"));                
+                return playerSiteLink(rs.getString("username"), rs.getInt("id"));                
             }
         }
         
@@ -510,21 +523,33 @@ public class LeaguesController {
         client.setMessageConverters(converters);        
     }
     
-    private  String franchiseLink(String username, Integer id) {
-        return link("franchises", username, id);
+    private String franchiseSiteLink(String username, Integer id) {
+        return siteLink("franchises", username, id);
     }
     
-    private String playerLink(String username, Integer id) {
-        return link("players", username, id);
+    private String playerSiteLink(String username, Integer id) {
+        return siteLink("players", username, id);
     }
     
-    private String link(String type, String username, Integer id) {
+    private String playerApiLink(Integer id) {
+        return apiLink("players", id);
+    }
+    
+    private String siteLink(String type, String username, Integer id) {
         if (username != null) {
             return siteUrl + "/" + username;
         } else if (id != null) {
             return siteUrl + "/" + type + "/" + id;
         } else {
-            return null;
+            return siteUrl + "/" + type;
+        }
+    }
+    
+    private String apiLink(String type, Integer id) {
+        if (id != null) {
+            return apiUrl + "/" + type + "/" + id;
+        } else {
+            return apiUrl + "/" + type;
         }
     }
     

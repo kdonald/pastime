@@ -2,7 +2,10 @@ package com.pastime.config;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -14,9 +17,12 @@ import com.pastime.util.SigninInterceptor;
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
+    @Inject
+    private JdbcTemplate jdbcTemplate;
+    
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SigninInterceptor());
+        registry.addInterceptor(new SigninInterceptor(jdbcTemplate));
     }
     
     @Override

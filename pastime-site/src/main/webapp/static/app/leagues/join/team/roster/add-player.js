@@ -20,7 +20,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
                 var fullName = player.first_name + " " + player.last_name;
                 items[i] = {};
                 items[i].value = fullName;
-                items[i].label = "<div class='player'><img src='" + player.link + "/picture'/><strong>" + fullName + "</strong></div>";
+                items[i].label = "<div class='player'><img src='" + player.picture + "'/><strong>" + fullName + "</strong></div>";
                 items[i].player = player;
               });
               response(items);
@@ -34,6 +34,10 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           template: addPlayerFormTemplate,
           events: {
             "submit": function() {
+        			var xhr = pastime.post(team.links["players"], this.model);
+        			xhr.done(function(player) {
+        				this.trigger("player-added", player);
+        			}.bind(this));
               return false;
             },
             "click button.cancel": function() {
@@ -48,16 +52,21 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
         this.expand = function(player) {
           self.collapsed = self.$("form").detach();
           self.root.append(mvc.extend(expanded, player).render());
-          this.$("button[type=submit]").focus();                
+          this.$("input[name=email]").focus();                
         };
         this.input = this.$("input");          
       },
       events: {
         "submit form": function(event) {
           if (this.selectedPlayer) {
-            this.trigger("player-added", this.selectedPlayer);            
+        	  var xhr = pastime.post(team.links["players"], {
+        		  id: this.selectedPlayer.id
+        	  });
+        	  xhr.done(function() {
+        		  this.trigger("player-added", this.selectedPlayer);
+        	  }.bind(this));
           } else {
-            this.expand({ email: this.model.value });            
+            this.expand({ name: this.model.value });            
           }
           return false;
         } 
