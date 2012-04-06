@@ -10,3 +10,4 @@ Thumbs.db
 *.iml
 out
 .idea
+.buildpath

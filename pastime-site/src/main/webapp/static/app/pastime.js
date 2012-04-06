@@ -67,7 +67,7 @@ define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
       access_token: cookie()
     };
   }
-
+  
   return pastime;
 
 });
