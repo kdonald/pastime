@@ -329,9 +329,6 @@ public class LeaguesController {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }
-        if (playerForm.get("id") == null && (playerForm.get("email") == null || (playerForm.get("email")).length() == 0)) {
-            return new ResponseEntity<ErrorBody>(new ErrorBody("neither a player id or email address is provided"), HttpStatus.BAD_REQUEST);            
-        }
         SqlRowSet team = findTeam(league, season, teamNumber);
         if (!team.last()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid team id"), HttpStatus.BAD_REQUEST);                        
@@ -340,17 +337,28 @@ public class LeaguesController {
                 "INNER JOIN team_members t ON r.team = t.team AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.team = ? and r.player = ? AND r.role = ?",
                 teamNumber, SecurityContext.getPrincipal().getId(), TeamRoles.ADMIN);
         if (!admin.last()) {
-            return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
+            return new ResponseEntity<ErrorBody>(new ErrorBody("user not an admin for this team"), HttpStatus.FORBIDDEN);            
         }
         if (playerForm.get("id") != null) {
             Integer id = Integer.parseInt(playerForm.get("id"));
-            SqlRowSet player = jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, e.email FROM players p INNER JOIN player_emails e ON p.id = e.player WHERE p.id = ? AND e.primary_email = true", id);
+            SqlRowSet player = findPlayer(id);
             if (!player.last()) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid player id"), HttpStatus.BAD_REQUEST);                
-            }
+            }            
             return addOrInvite(team, admin, player, player.getString("email"));            
+        } else if (playerForm.get("email") != null) {
+            return addOrInvite(team, admin, null, playerForm.get("email"));
+        } else {
+            SqlRowSet player = findPlayer(SecurityContext.getPrincipal().getId());            
+            if (!player.last()) {
+                return new ResponseEntity<ErrorBody>(new ErrorBody("authorized player id is no longer valid"), HttpStatus.CONFLICT);                
+            }            
+            return addOrInvite(team, admin, player, playerForm.get("email"));
         }
-        return new ResponseEntity<Object>(HttpStatus.CREATED);
+    }
+    
+    private SqlRowSet findPlayer(Integer id) {
+        return jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, e.email FROM players p INNER JOIN player_emails e ON p.id = e.player WHERE p.id = ? AND e.primary_email = true", id);
     }
 
     @RequestMapping(value="/error", method={ RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE }, produces="application/json")

@@ -133,8 +133,9 @@ define(
             }
 
             function trigger(event, args) {
+              var self = this;
               this.listeners.get(event).forEach(function(listener) {
-                listener(args);
+                listener.call(self, args);
               });
               return this;
             }

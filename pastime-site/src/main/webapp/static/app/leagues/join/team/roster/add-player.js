@@ -36,7 +36,8 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
             "submit": function() {
         			var xhr = pastime.post(team.links["players"], this.model);
         			xhr.done(function(player) {
-        				this.trigger("player-added", player);
+        			  this.destroy();
+        				self.trigger("player-added", player);
         			}.bind(this));
               return false;
             },
@@ -46,7 +47,6 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
             }
           }
         }).on("destroy", function() {
-          self.model.value = "";
           self.root.append(self.collapsed);            
         });
         this.expand = function(player) {
@@ -66,11 +66,20 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
         		  this.trigger("player-added", this.selectedPlayer);
         	  }.bind(this));
           } else {
-            this.expand({ name: this.model.value });            
+            if (this.model.value === "me") {
+            	pastime.post(team.links["players"]).done(function(player) {
+            		this.trigger("player-added", player);
+            	}.bind(this));
+            } else {
+            	this.expand({ name: this.model.value });
+            }
           }
           return false;
         } 
       }
+    }).on("player-added", function() {
+        console.log(this);
+    	this.model.value = "";        
     });
 
   };
