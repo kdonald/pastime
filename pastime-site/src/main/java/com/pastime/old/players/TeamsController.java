@@ -35,9 +35,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.pastime.players.PlayerInvite;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Name;
-import com.pastime.util.PlayerInvite;
 import com.pastime.util.PlayerPrincipal;
 import com.pastime.util.SecurityContext;
 import com.pastime.util.TeamRoles;

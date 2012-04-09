@@ -22,6 +22,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,12 +30,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -54,7 +56,6 @@ import org.springframework.web.util.UriTemplate;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Location;
 import com.pastime.util.Name;
-import com.pastime.util.PlayerInvite;
 import com.pastime.util.PlayerPrincipal;
 import com.pastime.util.SecurityContext;
 import com.pastime.util.TeamRoles;
@@ -82,8 +83,6 @@ public class LeaguesController {
 
     private String franchiseSql;
 
-    private String activeFranchisePlayersSql;
-    
     private String playerSearchSql;
     
     private JavaMailSender mailSender;
@@ -98,7 +97,6 @@ public class LeaguesController {
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.randomPlayersSql = SqlUtils.sql(new ClassPathResource("random-registered-players.sql", getClass()));
         this.franchiseSql = SqlUtils.sql(new ClassPathResource("franchise.sql", getClass()));
-        this.activeFranchisePlayersSql = SqlUtils.sql(new ClassPathResource("franchise-players-active.sql", getClass()));        
         this.qualifyingFranchisesSql = SqlUtils.sql(new ClassPathResource("qualifying-franchises.sql", getClass()));
         this.playerSearchSql = SqlUtils.sql(new ClassPathResource("player-search.sql", getClass()));
         this.mailSender = mailSender;
@@ -296,7 +294,7 @@ public class LeaguesController {
         franchise.put("founder", extract("founder_", franchise));
         String franchiseLink = franchiseSiteLink((String) franchise.get("username"), (Integer) franchise.get("id"));
         franchise.put("link", franchiseLink);
-        List<Player> players = jdbcTemplate.query(activeFranchisePlayersSql, new PlayerMapper(franchiseLink), id);
+        List<TeamPlayer> players = Collections.emptyList(); // jdbcTemplate.query(activeFranchisePlayersSql, new TeamPlayerMapper(franchiseLink), id);
         franchise.put("players", players);
         return new ResponseEntity<Map<String, Object>>(franchise, HttpStatus.OK);
     }
@@ -313,8 +311,8 @@ public class LeaguesController {
         List<Integer> existing = new ArrayList<Integer>(1);
         existing.add(SecurityContext.getPrincipal().getId());
         params.put("existing", existing);
-        List<Player> players = namedJdbcTemplate.query(playerSearchSql, params, new PlayerMapper(null));
-        return new ResponseEntity<List<Player>>(players, HttpStatus.OK);
+        List<PlayerThumbnail> players = namedJdbcTemplate.query(playerSearchSql, params, new PlayerThumbnailMapper());
+        return new ResponseEntity<List<PlayerThumbnail>>(players, HttpStatus.OK);
     }
     
     @RequestMapping(value="/players/{id}/picture", method=RequestMethod.GET)
@@ -329,36 +327,58 @@ public class LeaguesController {
         if (!SecurityContext.authorized()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }
-        SqlRowSet team = findTeam(league, season, teamNumber);
-        if (!team.last()) {
+        Map<String, Object> team = findTeam(league, season, teamNumber);
+        if (team == null) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid team id"), HttpStatus.BAD_REQUEST);                        
-        }         
-        SqlRowSet admin = jdbcTemplate.queryForRowSet("select p.id, p.first_name, p.last_name, t.nickname, t.slug FROM team_member_roles r " + 
-                "INNER JOIN team_members t ON r.team = t.team AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.team = ? and r.player = ? AND r.role = ?",
-                teamNumber, SecurityContext.getPrincipal().getId(), TeamRoles.ADMIN);
-        if (!admin.last()) {
+        }
+        if ((Integer)team.get("player_count") >= (Integer)team.get("roster_max")) {
+            return new ResponseEntity<ErrorBody>(new ErrorBody("max roster size reached: cannot add anymore players, remove some players first"), HttpStatus.BAD_REQUEST);                                    
+        }
+        Map<String, Object> admin = DataAccessUtils.singleResult(jdbcTemplate.query("SELECT p.id, p.first_name, p.last_name, t.nickname, t.slug FROM team_member_roles r " + 
+                "INNER JOIN team_members t ON r.team = t.team AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.league = ? AND r.season = ? AND r.team = ? AND r.player = ? AND r.role = ?",
+                new ColumnMapRowMapper(), league, season, teamNumber, SecurityContext.getPrincipal().getId(), TeamRoles.ADMIN));
+        if (admin == null) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("user not an admin for this team"), HttpStatus.FORBIDDEN);            
         }
         if (playerForm.get("id") != null) {
             Integer id = Integer.parseInt(playerForm.get("id"));
-            SqlRowSet player = findPlayer(id);
-            if (!player.last()) {
+            Map<String, Object> player = findPlayer(id);
+            if (player == null) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("not a valid player id"), HttpStatus.BAD_REQUEST);                
-            }            
-            return addOrInvite(team, admin, player, player.getString("email"));            
+            }
+            if (team.get("gender") != null) {
+                if ("m".equals(team.get("gender")) && "f".equals(player.get("gender"))) {
+                    return new ResponseEntity<ErrorBody>(new ErrorBody("this team does not allow female players"), HttpStatus.BAD_REQUEST);                    
+                } else if ("f".equals(team.get("gender")) && "m".equals(player.get("gender"))) {
+                    return new ResponseEntity<ErrorBody>(new ErrorBody("this team does not allow male players"), HttpStatus.BAD_REQUEST);                    
+                } else if ("c".equals(team.get("gender"))) {
+                    Integer minFemale = (Integer) team.get("roster_min_female");
+                    if (minFemale != null) {
+                        Integer reservedFemaleSpots = Math.max(0, minFemale - (Integer) team.get("female_player_count"));
+                        if (reservedFemaleSpots > 0 && "m".equals(player.get("gender"))) {
+                            Integer spotsLeft = (Integer)team.get("roster_max") - (Integer)team.get("player_count");
+                            if (reservedFemaleSpots == spotsLeft) {
+                                return new ResponseEntity<ErrorBody>(new ErrorBody("all roster spots left are reserved for females"), HttpStatus.BAD_REQUEST);                                
+                            }
+                        }
+                    }
+                }
+            }
+            return addOrInvite(team, admin, player);            
         } else if (playerForm.get("email") != null) {
-            return addOrInvite(team, admin, null, playerForm.get("email"));
+            return addOrInviteByEmail(team, admin, playerForm);
         } else {
-            SqlRowSet player = findPlayer(SecurityContext.getPrincipal().getId());            
-            if (!player.last()) {
+            Map<String, Object> player = findPlayer(SecurityContext.getPrincipal().getId());            
+            if (player == null) {
                 return new ResponseEntity<ErrorBody>(new ErrorBody("authorized player id is no longer valid"), HttpStatus.CONFLICT);                
             }            
-            return addOrInvite(team, admin, player, playerForm.get("email"));
+            return addOrInvite(team, admin, player);
         }
     }
     
-    private SqlRowSet findPlayer(Integer id) {
-        return jdbcTemplate.queryForRowSet("SELECT p.id, p.first_name, p.last_name, e.email FROM players p INNER JOIN player_emails e ON p.id = e.player WHERE p.id = ? AND e.primary_email = true", id);
+    private Map<String, Object> findPlayer(Integer id) {
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT p.id, p.first_name, p.last_name, e.email FROM players p INNER JOIN player_emails e ON p.id = e.player WHERE p.id = ? AND e.primary_email = true",
+                new ColumnMapRowMapper(), id));
     }
 
     @RequestMapping(value="/error", method={ RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE }, produces="application/json")
@@ -373,105 +393,112 @@ public class LeaguesController {
     
     // internal helpers
     
-    private SqlRowSet findTeam(Integer league, Integer season, Integer number) {
-        return jdbcTemplate.queryForRowSet("SELECT t.league, t.season, t.number, t.name, t.slug, t.franchise FROM teams t WHERE t.league = ? AND t.season = ? AND t.number = ?", league, season, number);        
+    private Map<String, Object> findTeam(Integer league, Integer season, Integer number) {
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT t.league, t.season, t.number, t.name, t.slug, t.franchise FROM teams t WHERE t.league = ? AND t.season = ? AND t.number = ?", new ColumnMapRowMapper(), league, season, number));        
     }
-    
-    private ResponseEntity<? extends Object> addOrInvite(SqlRowSet team, SqlRowSet admin, SqlRowSet player, String email) {
-        if (player.getInt("id") == admin.getInt("id")) {
-            // no invite needed for adding yourself
-            addPlayer(team, player.getInt("id"));
-            return new ResponseEntity<Object>(HttpStatus.CREATED);
+
+    private ResponseEntity<? extends Object> addOrInviteByEmail(Map<String, Object> team, Map<String, Object> admin, Map<String, String> playerForm) {
+        Map<String, Object> player = findPlayerByEmail((String) playerForm.get("email"));
+        if (player != null) {
+            return addOrInvite(team, admin, player);
         } else {
-            return invite(team, admin, player, email);
+            return new ResponseEntity<InvitedPlayer>(sendPersonInvite(team, admin, playerForm), HttpStatus.CREATED);
         }
     }
     
-    private void addPlayer(SqlRowSet team, Integer playerId) {
+    private Map<String, Object> findPlayerByEmail(String string) {
+        // TODO
+        return null;
+    }
+
+    private ResponseEntity<? extends Object> addOrInvite(Map<String, Object> team, Map<String, Object> admin, Map<String, Object> player) {
+        if (player.get("id").equals(admin.get("id"))) {
+            return new ResponseEntity<TeamPlayer>(addPlayer(team, (Integer) player.get("id")), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<InvitedPlayer>(sendPlayerInvite(team, admin, player), HttpStatus.CREATED);        
+        }
+    }
+
+    private TeamPlayer addPlayer(Map<String, Object> team, Integer playerId) {
         if (!teamMember(team, playerId)) {
             // the player isn't already a team member, make him or her one            
-            Map<String, Object> franchiseInfo = findFranchiseInfo(team.getInt("Franchise"), playerId);            
-            jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)", team.getInt("league"), team.getInt("season"), team.getInt("number"), playerId,
+            Map<String, Object> franchiseInfo = findFranchiseInfo((Integer) team.get("Franchise"), playerId);            
+            jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)", team.get("league"), team.get("season"), team.get("number"), playerId,
                     franchiseInfo.get("number"), franchiseInfo.get("nickname"));                    
         }
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role, player_status) VALUES (?, ?, ?, ?, ?, ?)",
-                team.getInt("league"), team.getInt("season"), team.getInt("number"), playerId, TeamRoles.PLAYER, 'a');
+                team.get("league"), team.get("season"), team.get("number"), playerId, TeamRoles.PLAYER, 'a');
+        // TODO
+        return null;
     }
     
-    private ResponseEntity<? extends Object> invite(SqlRowSet team, SqlRowSet admin, SqlRowSet player, String email) {
-        if (inviteAlreadySent(team, email)) {
-            return new ResponseEntity<ErrorBody>(new ErrorBody("player invite already sent: POST to " + url(team) + "/invites/{code} if you wish to resend"), HttpStatus.CONFLICT);                    
-        }
-        PlayerInvite invite;
-        if (player.last()) {
-            invite = sendPlayerInvite(team, admin, player);
-        } else {
-            invite = sendPersonInvite(team, admin, email);
-        }
-        return new ResponseEntity<PlayerInvite>(invite, HttpStatus.CREATED);        
-    }
-
-    private String url(SqlRowSet team) {
-        return siteUrl + "/leagues/" + team.getInt("league") + "/seasons/" + team.getInt("season") + "/teams/" + team.getString("id");
+    private String url(Map<String, Object> team) {
+        return siteUrl + "/leagues/" + team.get("league") + "/seasons/" + team.get("season") + "/teams/" + team.get("number");
     }
     
-    private PlayerInvite sendPlayerInvite(final SqlRowSet team, final SqlRowSet admin, final SqlRowSet player) {
+    private InvitedPlayer sendPlayerInvite(final Map<String, Object> team, final Map<String, Object> admin, final Map<String, Object> player) {
         final String code = inviteGenerator.generateKey();        
-        jdbcTemplate.update("INSERT INTO franchise_member_invites (franchise, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?)",
-                team.getInt("id"), player.getString("email"), TeamRoles.PLAYER, code, admin.getInt("id"), player.getInt("id"));
+        jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?)",
+                team.get("league"), team.get("season"), team.get("number"), player.get("email"), TeamRoles.PLAYER, code, admin.get("id"), player.get("id"));
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
                invite.setFrom(new InternetAddress("invites@pastime.com", "Pastime Invites"));
-               invite.setTo(new InternetAddress(player.getString("email"), player.getString("first_name") + " " + player.getString("last_name")));
-               invite.setSubject("Confirm your " + team.getString("name") + " team membership.");
+               invite.setTo(new InternetAddress((String)player.get("email"), player.get("first_name") + " " + player.get("last_name")));
+               invite.setSubject("Confirm your " + team.get("name") + " team membership.");
                Map<String, Object> model = new HashMap<String, Object>(7, 1);
-               model.put("name", player.getString("first_name"));
+               model.put("name", player.get("first_name"));
                //model.put("adminUrl", url(team) + playerPath(admin));               
-               model.put("admin", new Name(admin.getString("first_name"), admin.getString("last_name")).toString());
-               model.put("sport", team.getString("sport"));               
+               model.put("admin", new Name((String)admin.get("first_name"), (String)admin.get("last_name")).toString());
+               model.put("sport", team.get("sport"));               
                model.put("teamUrl", url(team));
-               model.put("team", team.getString("name"));
+               model.put("team", team.get("name"));
                model.put("code", code);
                invite.setText(templateLoader.getTemplate("teams/mail/player-invite").render(model), true);
             }
          };
          mailSender.send(preparator);
-         return new PlayerInvite(code, player.getInt("id"), player.getString("first_name"), player.getString("last_name"), null, player.getString("username"));
+         return null;
+         //return new InvitedPlayer(code, sent, (String) player.get("email"), resendLink, (String) player.get("first_name"), (String) player.get("last_name"), link, picture);
     }
 
-    private PlayerInvite sendPersonInvite(final SqlRowSet team, final SqlRowSet admin, final String email) {
+    private InvitedPlayer sendPersonInvite(final Map<String, Object> team, final Map<String, Object> admin, final Map<String, String> playerForm) {
         final String code = inviteGenerator.generateKey();
-        jdbcTemplate.update("INSERT INTO franchise_member_invites (franchise, email, role, code, sent_by) VALUES (?, ?, ?, ?, ?)",
-                team.getInt("id"), email, TeamRoles.PLAYER, code, admin.getInt("id"));        
+        jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, sent_by) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                team.get("league"), team.get("season"), team.get("number"), playerForm.get("email"), TeamRoles.PLAYER, code, admin.get("id"));        
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
                invite.setFrom(new InternetAddress("invites@pastime.com", "Pastime Invites"));
-               invite.setTo(new InternetAddress(email));
-               invite.setSubject("Confirm your " + team.getString("name") + " team membership.");
+               if (playerForm.get("name") != null) {
+                   invite.setTo(new InternetAddress(playerForm.get("email"), playerForm.get("name")));                   
+               } else {
+                   invite.setTo(new InternetAddress(playerForm.get("email")));                   
+               }
+               invite.setSubject("Confirm your " + team.get("name") + " team membership.");
                Map<String, Object> model = new HashMap<String, Object>(7, 1);
-               model.put("name", "Hello");
+               if (playerForm.get("name") != null) {
+                   model.put("name", playerForm.get("name"));                   
+               } else {
+                   model.put("name", "Hello");                   
+               }
                //model.put("adminUrl", url(team) + playerPath(admin));               
-               model.put("admin", new Name(admin.getString("first_name"), admin.getString("last_name")).toString());
-               model.put("sport", team.getString("sport"));
+               model.put("admin", new Name((String)admin.get("first_name"), (String)admin.get("last_name")).toString());
+               model.put("sport", (String)team.get("sport"));
                model.put("teamUrl", url(team));
-               model.put("team", team.getString("name"));               
+               model.put("team", (String)team.get("name"));               
                model.put("code", code);
                invite.setText(templateLoader.getTemplate("teams/mail/player-invite").render(model), true);
             }
          };
          mailSender.send(preparator);
-         return new PlayerInvite(code);
+         return null;
+         // return new InvitedPlayer(code, sent, playerForm.get("email"), resendLink, playerForm.get("name"));
     }
     
-    private boolean inviteAlreadySent(SqlRowSet team, String email) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_invites WHERE league = ? AND season = ? AND team = ? AND email = ? AND role = 'Player')", Boolean.class, team, email);
-    }
-
-    private Boolean teamMember(SqlRowSet team, Integer player) {
+    private Boolean teamMember(Map<String, Object> team, Integer player) {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members where league = ? AND season = ? AND team = ? AND player = ?)", Boolean.class, 
-                team.getInt("league"), team.getInt("season"), team.getInt("number"), player);
+                team.get("league"), team.get("season"), team.get("number"), player);
     }
     
     private Map<String, Object> findFranchiseInfo(Integer franchise, Integer playerId) {
@@ -481,31 +508,16 @@ public class LeaguesController {
         return jdbcTemplate.queryForMap("SELECT number, nickname FROM franchise_members WHERE franchise = ? AND player = ?", franchise, playerId);
     }
     
-    public class PlayerMapper implements RowMapper<Player> {
-
-        private String teamLink;
-        
-        public PlayerMapper(String teamLink) {
-            this.teamLink = teamLink;
-        }
+    public class PlayerThumbnailMapper implements RowMapper<PlayerThumbnail> {
 
         @Override
-        public Player mapRow(ResultSet rs, int rowNum) throws SQLException {
-            String link = siteLink(rs);
+        public PlayerThumbnail mapRow(ResultSet rs, int rowNum) throws SQLException {
             String picture = playerApiLink(rs.getInt("id")) + "/picture";
-            return new Player(rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), (Integer) rs.getObject("number"), rs.getString("nickname"), link, picture);
+            return new PlayerThumbnail(rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"), siteLink(rs), picture);
         }
         
         private String siteLink(ResultSet rs) throws SQLException {
-            if (teamLink != null) {
-                Object playerPath = rs.getString("slug");
-                if (playerPath == null) {
-                    playerPath = rs.getInt("id");
-                }
-                return teamLink + "/" + playerPath;
-            } else {
-                return playerSiteLink(rs.getString("username"), rs.getInt("id"));                
-            }
+            return playerSiteLink(rs.getString("username"), rs.getInt("id"));                
         }
         
     }

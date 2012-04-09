@@ -379,7 +379,7 @@ CREATE TABLE team_member_roles (league integer,
   CONSTRAINT fk_team_member_roles_team_member FOREIGN KEY (league, season, team, player) REFERENCES team_members(league, season, team, player) ON DELETE CASCADE
 );
 
--- Pastime "Team" Member Invites e.g. Invite for keith.donald@gmail.com to join team 'Hitmen'.
+-- Pastime "Team" Member Invites e.g. Invite for keith.donald@gmail.com to join team 'Hitmen' as a 'Player'.
 CREATE TABLE team_member_invites (league integer,
   season integer,
   team integer,
@@ -396,7 +396,8 @@ CREATE TABLE team_member_invites (league integer,
   CONSTRAINT fk_team_member_invites_team FOREIGN KEY (league, season, team) REFERENCES teams(league, season, number) ON DELETE CASCADE,
   CONSTRAINT fk_team_member_invites_sent_by FOREIGN KEY (league, season, team, sent_by) REFERENCES team_members(league, season, team, player),
   CONSTRAINT fk_team_member_invites_player FOREIGN KEY (player) REFERENCES players(id),
-  CONSTRAINT fk_team_member_invites_accepted_player FOREIGN KEY (accepted_player) REFERENCES players(id)  
+  CONSTRAINT fk_team_member_invites_accepted_player FOREIGN KEY (accepted_player) REFERENCES players(id),
+  CONSTRAINT uq_invited_player UNIQUE (league, season, team, role, player)  
 );
 
 -- Pastime Team Sponsorship e.g. Fired Up Pizza Hitmen $250.00

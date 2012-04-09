@@ -1,64 +1,35 @@
 package com.pastime.leagues;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.joda.time.LocalDate;
+import org.joda.time.Years;
 
-import com.pastime.util.Name;
+import com.pastime.util.Gender;
 
 public class Player {
+    
+    private Gender gender;
 
-    private Integer id;
+    private LocalDate birthday;
     
-    private Name name;
+    public Player(Gender gender, LocalDate birthday) {
+        this.gender = gender;
+        this.birthday = birthday;
+    }
     
-    private Integer number;
-
-    private String nickname;
-
-    private String link;
-    
-    private String picture;
-    
-    public Player(Integer id, String firstName, String lastName, Integer number, String nickname, String link, String picture) {
-        this.id = id;
-        this.name = new Name(firstName, lastName);
-        this.number = number;
-        this.nickname = nickname;
-        this.link = link;
-        this.picture = picture;
+    public Gender getGender() {
+        return gender;
     }
 
-    public Integer getId() {
-        return id;
-    }
-    
-    public String getName() {
-        return name.toString();
+    public boolean isFemale() {
+        return gender == Gender.FEMALE;
     }
 
-    @JsonProperty("first_name")
-    public String getFirstName() {
-        return name.getFirstName();
+    public boolean isMale() {
+        return gender == Gender.MALE;
     }
 
-    @JsonProperty("last_name")
-    public String getLastName() {
-        return name.getLastName();
-    }
-
-    public Integer getNumber() {
-        return number;
-    }
-    
-    public String getNickname() {
-        return nickname;
-    }
-    
-    public String getLink() {
-        return link;
-    }
-    
-    public String getPicture() {
-        return picture;
+    public int getAge() {
+        return Years.yearsBetween(birthday, new LocalDate()).getYears();
     }
     
 }

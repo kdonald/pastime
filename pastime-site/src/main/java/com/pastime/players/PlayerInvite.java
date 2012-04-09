@@ -1,4 +1,4 @@
-package com.pastime.util;
+package com.pastime.players;
 
 public class PlayerInvite {
     

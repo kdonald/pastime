@@ -11,6 +11,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 
+import com.pastime.util.Gender;
+
 
 public class SignupForm {
 
