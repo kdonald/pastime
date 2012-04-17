@@ -1,24 +1,18 @@
-package com.pastime.leagues;
+package com.pastime.leagues.season;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.pastime.util.Name;
 
-public class PlayerThumbnail {
+public class PlayerSummary {
 
     private Integer id;
     
     private Name name;
     
-    private String link;
-    
-    private String picture;
-    
-    public PlayerThumbnail(Integer id, String firstName, String lastName, String link, String picture) {
+    public PlayerSummary(Integer id, String firstName, String lastName) {
         this.id = id;
         this.name = new Name(firstName, lastName);
-        this.link = link;
-        this.picture = picture;
     }
 
     public Integer getId() {
@@ -38,13 +32,5 @@ public class PlayerThumbnail {
     public String getLastName() {
         return name.getLastName();
     }
-
-    public String getLink() {
-        return link;
-    }
-    
-    public String getPicture() {
-        return picture;
-    }
-    
+   
 }

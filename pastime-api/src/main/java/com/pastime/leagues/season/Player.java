@@ -1,4 +1,4 @@
-package com.pastime.leagues;
+package com.pastime.leagues.season;
 
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
@@ -30,6 +30,10 @@ public class Player {
 
     public int getAge() {
         return Years.yearsBetween(birthday, new LocalDate()).getYears();
+    }
+
+    public boolean samePersonAs(Player person) {
+        return false;
     }
     
 }

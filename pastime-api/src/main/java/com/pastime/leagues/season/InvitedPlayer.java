@@ -1,4 +1,4 @@
-package com.pastime.leagues;
+package com.pastime.leagues.season;
 
 import java.util.Date;
 

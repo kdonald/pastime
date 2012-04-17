@@ -8,6 +8,10 @@ import static org.junit.Assert.assertTrue;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 
+import com.pastime.leagues.season.Player;
+import com.pastime.leagues.season.Roster;
+import com.pastime.leagues.season.TeamGender;
+import com.pastime.util.ErrorReporter;
 import com.pastime.util.Gender;
 import com.pastime.util.Range;
 

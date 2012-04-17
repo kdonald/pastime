@@ -29,7 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pastime.util.DefaultReferralCodeGenerator;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Name;
-import com.pastime.util.PlayerPrincipal;
+import com.pastime.util.UserPrincipal;
 import com.pastime.util.ReferralCodeGenerator;
 import com.pastime.util.SecurityContext;
 
@@ -77,7 +77,7 @@ public class AccountController {
         if (!password.equals(form.getPassword())) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("password doesn't match"), HttpStatus.BAD_REQUEST);               
         }
-        PlayerPrincipal player = new PlayerPrincipal(rs.getInt("id"));
+        UserPrincipal player = new UserPrincipal(rs.getInt("id"));
         signinSession(player, response);
         return new ResponseEntity<Object>(player, HttpStatus.OK);           
     }
@@ -98,7 +98,7 @@ public class AccountController {
         Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
                 signupForm.getFirst_name(), signupForm.getLast_name(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().getCode(), signupForm.getZip_code(), referralCode, referredBy != null ? referredBy.getId() : null);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
-        PlayerPrincipal player = new PlayerPrincipal(playerId);
+        UserPrincipal player = new UserPrincipal(playerId);
         URI url = UriComponentsBuilder.fromHttpUrl(siteUrl + "/players/{id}").buildAndExpand(player.getId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
@@ -108,7 +108,7 @@ public class AccountController {
         return new ResponseEntity<Map<String, Object>>(accessGrant, headers, HttpStatus.CREATED);
     }
     
-    private void signinSession(PlayerPrincipal player, HttpServletResponse response) {
+    private void signinSession(UserPrincipal player, HttpServletResponse response) {
         SecurityContext.setCurrentPlayer(player);
         cookieGenerator.addCookie(player.getId().toString(), response);        
     }

@@ -1,4 +1,4 @@
-package com.pastime.leagues;
+package com.pastime.leagues.season;
 
 import java.util.Date;
 
@@ -6,7 +6,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.pastime.util.Name;
 
-public class TeamPlayer {
+public class AddedPlayer {
 
     private Integer id;
     
@@ -22,7 +22,7 @@ public class TeamPlayer {
     
     private String picture;
 
-    public TeamPlayer(Integer id, Date joinedDate, Name name, Integer number, String nickname, String link, String picture) {
+    public AddedPlayer(Integer id, Date joinedDate, Name name, Integer number, String nickname, String link, String picture) {
         this.id = id;
         this.joinedDate = joinedDate;
         this.name = name;

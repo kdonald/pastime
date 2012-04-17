@@ -1,4 +1,4 @@
-package com.pastime.leagues;
+package com.pastime.util;
 
 public class ErrorReporter {
     

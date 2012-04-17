@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.templating.StringTemplateLoader;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.pastime.leagues.LeaguesController;
+import com.pastime.leagues.season.SeasonController;
 
 @Configuration
 public class ControllerConfig extends WebMvcConfigurerAdapter {
@@ -24,8 +24,8 @@ public class ControllerConfig extends WebMvcConfigurerAdapter {
     private StringTemplateLoader templateLoader;
     
     @Bean
-    public LeaguesController leaguesController() {
-        return new LeaguesController(jdbcTemplate, mailSender, templateLoader);
+    public SeasonController leaguesController() {
+        return new SeasonController(jdbcTemplate, mailSender, templateLoader);
     }
     
 }

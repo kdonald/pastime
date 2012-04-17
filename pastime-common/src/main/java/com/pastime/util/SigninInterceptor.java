@@ -51,12 +51,12 @@ public class SigninInterceptor extends HandlerInterceptorAdapter {
     	}    	
     }
     
-    private PlayerPrincipal findPlayer(String accessToken) {
+    private UserPrincipal findPlayer(String accessToken) {
         Integer playerId = Integer.parseInt(accessToken);
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT id FROM players WHERE id = ?", new RowMapper<PlayerPrincipal>() {
-			public PlayerPrincipal mapRow(ResultSet rs, int rowNum)
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT id FROM players WHERE id = ?", new RowMapper<UserPrincipal>() {
+			public UserPrincipal mapRow(ResultSet rs, int rowNum)
 					throws SQLException {
-				return new PlayerPrincipal(rs.getInt("id"));
+				return new UserPrincipal(rs.getInt("id"));
 			}
         	
         }, playerId));

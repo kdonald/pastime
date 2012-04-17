@@ -1,38 +1,23 @@
 package com.pastime.leagues;
 
-import javax.sql.DataSource;
+import java.net.URI;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.pastime.TestDataAccessConfig;
+import com.pastime.leagues.season.TeamRepository;
+import com.pastime.players.PlayerRepository;
+
+@Import(value=TestDataAccessConfig.class)
 public class TeamRepositoryTestsConfig {
 
     @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql:pastime");
-        dataSource.setUsername("pastime");
-        dataSource.setPassword("pastime");
-        return dataSource;
-    }
-    
-    @Bean
-    public JdbcTemplate jdbcTemplate() {
-        return new JdbcTemplate(dataSource());
-    }
-    
-    @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(dataSource());
-    }
-
-    @Bean
-    public TeamRepository teamRepository() {
-        return new TeamRepository(jdbcTemplate());
+    public TeamRepository teamRepository(JdbcTemplate jdbcTemplate) {
+        return new TeamRepository(jdbcTemplate);
     }
     
 }

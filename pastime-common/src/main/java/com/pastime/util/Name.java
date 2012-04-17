@@ -33,4 +33,8 @@ public class Name {
         return firstName + " " + lastName;
     }
 
+	public static Name valueOf(String name) {
+		return null;
+	}
+
 }

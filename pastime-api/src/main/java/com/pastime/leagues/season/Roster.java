@@ -1,5 +1,6 @@
-package com.pastime.leagues;
+package com.pastime.leagues.season;
 
+import com.pastime.util.ErrorReporter;
 import com.pastime.util.Range;
 
 public class Roster {

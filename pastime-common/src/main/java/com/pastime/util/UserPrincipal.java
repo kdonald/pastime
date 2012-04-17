@@ -1,10 +1,10 @@
 package com.pastime.util;
 
-public class PlayerPrincipal {
+public class UserPrincipal {
 
     private Integer id;
 
-    public PlayerPrincipal(Integer id) {
+    public UserPrincipal(Integer id) {
         this.id = id;
     }
 

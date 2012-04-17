@@ -38,7 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pastime.players.PlayerInvite;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Name;
-import com.pastime.util.PlayerPrincipal;
+import com.pastime.util.UserPrincipal;
 import com.pastime.util.SecurityContext;
 import com.pastime.util.TeamRoles;
 
@@ -73,7 +73,7 @@ public class TeamsController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }        
         Integer teamId = (Integer) use(jdbcTemplate).insert("INSERT INTO franchises (name, sport) VALUES (?, ?)", teamForm.getName(), teamForm.getSport());
-        PlayerPrincipal player = SecurityContext.getPrincipal();
+        UserPrincipal player = SecurityContext.getPrincipal();
         jdbcTemplate.update("INSERT INTO franchise_members (franchise, player) VALUES (?, ?)", teamId, player.getId());
         jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (?, ?, ?)", teamId, player.getId(), TeamRoles.ADMIN);
         Team team = new Team(teamId);        
@@ -165,7 +165,7 @@ public class TeamsController {
                 // a. if no user is signed in, allows the user to sign-up if they are new 
                 // b. if no user is signed in, allows the user to sign-in if they already have an account (the email the invite was sent to can then be added to this account)
                 // c. if a user is signed in, allows them to add this email to that account, sign-out & sign-in to another account, or sign-out & create a new account
-                PlayerPrincipal currentPlayer = SecurityContext.getPrincipal();
+                UserPrincipal currentPlayer = SecurityContext.getPrincipal();
                 if (currentPlayer == null) {
                     // nobody is signed-in, assume a completely new user
                     return "redirect:/signup?email=" + invite.getString("email");
@@ -237,7 +237,7 @@ public class TeamsController {
     @RequestMapping(value="/teams/{teamId}/{memberKey}", method=RequestMethod.POST)
     @Transactional
     public ResponseEntity<? extends Object> member(@PathVariable Integer teamId, @PathVariable String memberKey, @Valid TeamMemberForm form, Model model) {
-        PlayerPrincipal currentPlayer = SecurityContext.getPrincipal();
+        UserPrincipal currentPlayer = SecurityContext.getPrincipal();
         if (currentPlayer == null) {
             return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);            
         }
@@ -305,7 +305,7 @@ public class TeamsController {
     }
 
     private void addAdmin(Integer team, Model model) {
-        PlayerPrincipal player = SecurityContext.getPrincipal();
+        UserPrincipal player = SecurityContext.getPrincipal();
         if (player != null) {
             model.addAttribute("admin", isAdmin(team, player.getId()));
         }        

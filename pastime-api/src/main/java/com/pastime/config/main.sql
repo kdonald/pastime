@@ -144,7 +144,7 @@ CREATE TABLE franchises (id serial CONSTRAINT pk_franchises PRIMARY KEY,
   founder integer,
   gender char(1), -- (m)ale only, (f)emale only, (c)o-ed, null (not specified, accepts either male or female)
   age_min smallint, -- used to help in adding players (exclude by name search results for people not meeting gender or age_min)
-  created timestamp NOT NULL CONSTRAINT df_franchises_created DEFAULT now(),
+  joined timestamp NOT NULL CONSTRAINT df_franchises_joined DEFAULT now(),
   CONSTRAINT fk_franchises_sport FOREIGN KEY (sport) REFERENCES sports(name),
   CONSTRAINT fk_franchises_founder FOREIGN KEY (founder) REFERENCES players(id)
 );
