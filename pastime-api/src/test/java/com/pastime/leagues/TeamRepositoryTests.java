@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pastime.leagues.season.TeamForm;
 import com.pastime.leagues.season.TeamRepository;
-import com.pastime.util.Principal;
 
 @ContextConfiguration(classes=TeamRepositoryTestsConfig.class)
 @Transactional
@@ -42,7 +41,7 @@ public class TeamRepositoryTests {
         form.setLeague(1);
         form.setSeason(1);
         form.setName("Hitmen");
-        URI link = teamRepository.createTeam(form, new Principal(1));
+        URI link = teamRepository.createTeam(form, 1);
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1"), link);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from teams where league = 1 and season = 1");
         assertEquals("Hitmen", record.get("name"));
@@ -66,7 +65,7 @@ public class TeamRepositoryTests {
         form.setSeason(1);
         form.setName("Doesn't Matter");
         form.setFranchise(1);
-        URI link = teamRepository.createTeam(form, new Principal(1));
+        URI link = teamRepository.createTeam(form, 1);
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1"), link);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from teams where league = 1 and season = 1");
         assertEquals("Hitmen", record.get("name"));

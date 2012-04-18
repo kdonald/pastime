@@ -34,7 +34,7 @@ public class SeasonController {
     @RequestMapping(value="/teams", method=RequestMethod.POST)
     @Authorized("teams")
     public ResponseEntity<Object> createTeam(@Valid TeamForm teamForm, Principal principal) {
-        URI link = teamRepository.createTeam(teamForm, principal);        
+        URI link = teamRepository.createTeam(teamForm, principal.getPlayerId());        
         return created(link);
     }
 
@@ -43,7 +43,7 @@ public class SeasonController {
     public @ResponseBody List<PlayerSummary> playerSearch(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number, 
             @RequestParam("name") String name, Principal principal) {
-        return teamRepository.searchPlayers(new TeamKey(league, season, number), name, principal);
+        return teamRepository.searchPlayers(new TeamKey(league, season, number), name, principal.getPlayerId());
     }
     
     @RequestMapping(value="/teams/{team}/players", method=RequestMethod.POST)
@@ -53,7 +53,7 @@ public class SeasonController {
             AddPlayerForm playerForm, Principal principal) {
         Team team;
         try {
-            team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal);
+            team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
         } catch (NoSuchAdminException e) {
             return forbidden("user not an admin for this team");
         }

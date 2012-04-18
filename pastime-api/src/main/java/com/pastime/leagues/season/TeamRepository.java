@@ -16,7 +16,6 @@ import org.springframework.util.SlugUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pastime.util.PastimeEnvironment;
-import com.pastime.util.Principal;
 import com.pastime.util.TeamRoles;
 
 public class TeamRepository {
@@ -35,23 +34,23 @@ public class TeamRepository {
     }
 
     @Transactional
-    public URI createTeam(TeamForm team, Principal principal) {
+    public URI createTeam(TeamForm team, Integer adminId) {
         FranchiseAdmin admin = null;
         if (team.getFranchise() != null) {
-            admin = findQualifiedFranchiseAdmin(team.getFranchise(), team.getLeague(), principal.getPlayerId());
+            admin = findQualifiedFranchiseAdmin(team.getFranchise(), team.getLeague(), adminId);
             team.setName(admin.getFranchiseName());
         }
         Integer number = insertTeam(team);
-        makeAdmin(team, number, principal, admin);
+        makeAdmin(team, number, adminId, admin);
         return apiUrl().path("/leagues/{league}/seasons/{season}/teams/{team}").buildAndExpand(team.getLeague(), team.getSeason(), number).toUri();
     }
 
-    public List<PlayerSummary> searchPlayers(TeamKey team, String name, Principal principal) {
+    public List<PlayerSummary> searchPlayers(TeamKey team, String name, Integer adminId) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Team getTeamForEditing(TeamKey teamKey, Principal principal) throws NoSuchAdminException {
+    public Team getTeamForEditing(TeamKey teamKey, Integer adminId) throws NoSuchAdminException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -73,11 +72,11 @@ public class TeamRepository {
         return number;
     }
     
-    private void makeAdmin(TeamForm team, Integer number, Principal principal, FranchiseAdmin franchiseAdmin) {
+    private void makeAdmin(TeamForm team, Integer number, Integer adminId, FranchiseAdmin franchiseAdmin) {
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)", team.getLeague(), team.getSeason(), number,
-                principal.getPlayerId(), franchiseAdmin != null ? franchiseAdmin.getNumber() : null, franchiseAdmin != null ? franchiseAdmin.getNickname() : null);
+                adminId, franchiseAdmin != null ? franchiseAdmin.getNumber() : null, franchiseAdmin != null ? franchiseAdmin.getNickname() : null);
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)", team.getLeague(), team.getSeason(), number,
-                principal.getPlayerId(), TeamRoles.ADMIN);        
+                adminId, TeamRoles.ADMIN);        
     }
 
     private UriComponentsBuilder apiUrl() {
