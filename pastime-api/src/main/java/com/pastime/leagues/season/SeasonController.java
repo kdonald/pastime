@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.pastime.players.Player;
 import com.pastime.util.Authorized;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Principal;
@@ -40,7 +41,7 @@ public class SeasonController {
 
     @RequestMapping(value="/teams/{team}/player-search", method=RequestMethod.GET, params="name", produces="application/json")
     @Authorized("teams")
-    public @ResponseBody List<PlayerSummary> playerSearch(@PathVariable("league") Integer league,
+    public @ResponseBody List<Player> playerSearch(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number, 
             @RequestParam("name") String name, Principal principal) {
         return teamRepository.searchPlayers(new TeamKey(league, season, number), name, principal.getPlayerId());

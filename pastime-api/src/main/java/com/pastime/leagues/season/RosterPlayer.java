@@ -5,13 +5,13 @@ import org.joda.time.Years;
 
 import com.pastime.util.Gender;
 
-public class Player {
+public class RosterPlayer {
     
     private Gender gender;
 
     private LocalDate birthday;
     
-    public Player(Gender gender, LocalDate birthday) {
+    public RosterPlayer(Gender gender, LocalDate birthday) {
         this.gender = gender;
         this.birthday = birthday;
     }
@@ -32,7 +32,7 @@ public class Player {
         return Years.yearsBetween(birthday, new LocalDate()).getYears();
     }
 
-    public boolean samePersonAs(Player person) {
+    public boolean samePersonAs(RosterPlayer person) {
         return false;
     }
     

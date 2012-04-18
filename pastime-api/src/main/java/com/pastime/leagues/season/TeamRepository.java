@@ -3,7 +3,10 @@ package com.pastime.leagues.season;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -11,26 +14,35 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.SlugUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.pastime.players.Player;
+import com.pastime.players.PlayerMapper;
 import com.pastime.util.PastimeEnvironment;
 import com.pastime.util.TeamRoles;
 
 public class TeamRepository {
 
     private JdbcTemplate jdbcTemplate;
+
+    private NamedParameterJdbcTemplate namedJdbcTemplate;
     
     private PastimeEnvironment environment;
 
     private String qualifiedFranchiseAdminSql;
+
+    private String playerSearchSql;
     
     @Inject
     public TeamRepository(JdbcTemplate jdbcTemplate, PastimeEnvironment environment) {
         this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.environment = environment;
         this.qualifiedFranchiseAdminSql = SqlUtils.sql(new ClassPathResource("qualified-franchise-admin.sql", getClass()));
+        this.playerSearchSql = SqlUtils.sql(new ClassPathResource("player-search.sql", getClass()));
     }
 
     @Transactional
@@ -45,9 +57,14 @@ public class TeamRepository {
         return apiUrl().path("/leagues/{league}/seasons/{season}/teams/{team}").buildAndExpand(team.getLeague(), team.getSeason(), number).toUri();
     }
 
-    public List<PlayerSummary> searchPlayers(TeamKey team, String name, Integer adminId) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<Player> searchPlayers(TeamKey team, String name, Integer adminId) {
+        Map<String, Object> params = new HashMap<String, Object>(1, 1);
+        params.put("name", name);
+        List<Integer> execludes = new ArrayList<Integer>(1);
+        execludes.add(adminId);
+        params.put("excludes", execludes);
+        List<Player> players = namedJdbcTemplate.query(playerSearchSql, params, new PlayerMapper(environment));
+        return players;
     }
 
     public Team getTeamForEditing(TeamKey teamKey, Integer adminId) throws NoSuchAdminException {

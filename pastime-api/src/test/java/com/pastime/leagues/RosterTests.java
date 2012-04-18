@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 
-import com.pastime.leagues.season.Player;
+import com.pastime.leagues.season.RosterPlayer;
 import com.pastime.leagues.season.Roster;
 import com.pastime.leagues.season.TeamGender;
 import com.pastime.util.ErrorReporter;
@@ -22,7 +22,7 @@ public class RosterTests {
     @Test
     public void rosterMaxSize() {
         Roster roster = new Roster(0, 0, null, null, TeamGender.DOES_NOT_MATTER, null);
-        Player player = new Player(Gender.MALE, new LocalDate(1977, 12, 29));
+        RosterPlayer player = new RosterPlayer(Gender.MALE, new LocalDate(1977, 12, 29));
         boolean result = roster.isAcceptable(player, reporter);
         assertTrue(result);
         assertNull(reporter.getMessage());
@@ -46,28 +46,28 @@ public class RosterTests {
     @Test
     public void rosterAge() {
         Roster roster = new Roster(0, 0, null, new Range(30, 50), TeamGender.DOES_NOT_MATTER, null);
-        Player player = new Player(Gender.MALE, new LocalDate(1977, 12, 29));
+        RosterPlayer player = new RosterPlayer(Gender.MALE, new LocalDate(1977, 12, 29));
         boolean result = roster.isAcceptable(player, reporter);
         assertTrue(result);
         assertNull(reporter.getMessage());
 
         reporter.clear();
         
-        player = new Player(Gender.MALE, new LocalDate().minusYears(29));
+        player = new RosterPlayer(Gender.MALE, new LocalDate().minusYears(29));
         result = roster.isAcceptable(player, reporter);
         assertFalse(result);
         assertNotNull(reporter.getMessage());
 
         reporter.clear();
         
-        player = new Player(Gender.MALE, new LocalDate().minusYears(50));
+        player = new RosterPlayer(Gender.MALE, new LocalDate().minusYears(50));
         result = roster.isAcceptable(player, reporter);
         assertTrue(result);
         assertNull(reporter.getMessage());
 
         reporter.clear();
         
-        player = new Player(Gender.MALE, new LocalDate().minusYears(51));
+        player = new RosterPlayer(Gender.MALE, new LocalDate().minusYears(51));
         result = roster.isAcceptable(player, reporter);
         assertFalse(result);
         assertNotNull(reporter.getMessage());
@@ -77,14 +77,14 @@ public class RosterTests {
     @Test
     public void rosterGender() {
         Roster roster = new Roster(0, 0, null, null, TeamGender.MALE_ONLY, null);
-        Player player = new Player(Gender.MALE, null);
+        RosterPlayer player = new RosterPlayer(Gender.MALE, null);
         boolean result = roster.isAcceptable(player, reporter);
         assertTrue(result);
         assertNull(reporter.getMessage());
 
         reporter.clear();
         
-        player = new Player(Gender.FEMALE, null);
+        player = new RosterPlayer(Gender.FEMALE, null);
         result = roster.isAcceptable(player, reporter);
         assertFalse(result);
         assertNotNull(reporter.getMessage());
@@ -92,14 +92,14 @@ public class RosterTests {
         reporter.clear();
         
         roster = new Roster(0, 0, null, null, TeamGender.FEMALE_ONLY, null);
-        player = new Player(Gender.FEMALE, null);
+        player = new RosterPlayer(Gender.FEMALE, null);
         result = roster.isAcceptable(player, reporter);
         assertTrue(result);
         assertNull(reporter.getMessage());
 
         reporter.clear();
         
-        player = new Player(Gender.MALE, null);
+        player = new RosterPlayer(Gender.MALE, null);
         result = roster.isAcceptable(player, reporter);
         assertFalse(result);
         assertNotNull(reporter.getMessage());
@@ -107,7 +107,7 @@ public class RosterTests {
         reporter.clear();
 
         roster = new Roster(8, 2, 10, null, TeamGender.CO_ED, 3);
-        player = new Player(Gender.MALE, null);
+        player = new RosterPlayer(Gender.MALE, null);
         result = roster.isAcceptable(player, reporter);
         assertTrue(result);
         assertNull(reporter.getMessage());
@@ -115,7 +115,7 @@ public class RosterTests {
         reporter.clear();
 
         roster = new Roster(8, 1, 10, null, TeamGender.CO_ED, 3);
-        player = new Player(Gender.MALE, null);
+        player = new RosterPlayer(Gender.MALE, null);
         result = roster.isAcceptable(player, reporter);
         assertFalse(result);
         assertNotNull(reporter.getMessage());

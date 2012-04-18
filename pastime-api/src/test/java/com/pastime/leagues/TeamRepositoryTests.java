@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -16,7 +17,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pastime.leagues.season.TeamForm;
+import com.pastime.leagues.season.TeamKey;
 import com.pastime.leagues.season.TeamRepository;
+import com.pastime.players.Player;
 
 @ContextConfiguration(classes=TeamRepositoryTestsConfig.class)
 @Transactional
@@ -71,6 +74,15 @@ public class TeamRepositoryTests {
         assertEquals("Hitmen", record.get("name"));
         assertEquals("hitmen", record.get("slug"));        
         assertEquals(1, record.get("franchise"));
+    }
+    
+    @Test
+    public void searchPlayers() {
+        jdbcTemplate.update("INSERT INTO players (id, first_name, last_name, gender, birthday, zip_code, password, referral_code) VALUES (1, 'Keith', 'Donald', 'm', '1977-12-29', '32904', 'password', '123456')");
+        jdbcTemplate.update("INSERT INTO players (id, first_name, last_name, gender, birthday, zip_code, password, referral_code) VALUES (2, 'Keith', 'Jones', 'm', '1979-04-29', '32904', 'password', '234567')");
+        List<Player> players = teamRepository.searchPlayers(new TeamKey(1, 1, 1), "Keith", 1);
+        assertEquals(1, players.size());
+        assertEquals("Keith Jones", players.get(0).getName());
     }
     
 }
