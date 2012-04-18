@@ -4,16 +4,38 @@ import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
 import com.pastime.util.Gender;
+import com.pastime.util.Name;
 
-public class RosterPlayer {
+public class ProposedPlayer {
+    
+    private Integer id;
+    
+    private Name name;
+    
+    private String email;
     
     private Gender gender;
 
     private LocalDate birthday;
     
-    public RosterPlayer(Gender gender, LocalDate birthday) {
+    public ProposedPlayer(Integer id, Name name, String email, Gender gender, LocalDate birthday) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
         this.gender = gender;
         this.birthday = birthday;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+    
+    public Name getName() {
+        return name;
+    }
+    
+    public String getEmail() {
+        return email;
     }
     
     public Gender getGender() {
@@ -32,8 +54,4 @@ public class RosterPlayer {
         return Years.yearsBetween(birthday, new LocalDate()).getYears();
     }
 
-    public boolean samePersonAs(RosterPlayer person) {
-        return false;
-    }
-    
 }

@@ -1,6 +1,6 @@
 package com.pastime.leagues.season;
 
-public class FranchiseAdmin {
+public class FranchiseMember {
 
     private String franchiseName;
     
@@ -8,7 +8,7 @@ public class FranchiseAdmin {
     
     private String nickname;
     
-    public FranchiseAdmin(String franchiseName, Integer number, String nickname) {
+    public FranchiseMember(String franchiseName, Integer number, String nickname) {
         this.franchiseName = franchiseName;
         this.number = number;
         this.nickname = nickname;

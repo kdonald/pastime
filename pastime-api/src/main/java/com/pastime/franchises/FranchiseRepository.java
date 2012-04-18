@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pastime.leagues.season.FranchiseAdmin;
 import com.pastime.players.PictureType;
 import com.pastime.players.Player;
 import com.pastime.players.PlayerMapper;
@@ -79,11 +78,6 @@ public class FranchiseRepository {
     
     public URI findFounder(Integer franchiseId) {
         throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public FranchiseAdmin findQualifiedFranchiseAdmin(Integer franchise, Integer league, Integer playerId) {
-        // TODO Auto-generated method stub
-        return null;
     }
     
     // internal helpers

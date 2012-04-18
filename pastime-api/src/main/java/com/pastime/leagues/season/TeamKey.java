@@ -3,7 +3,9 @@ package com.pastime.leagues.season;
 public final class TeamKey {
     
     private final Integer league;
+    
     private final Integer season;
+    
     private final Integer number;
 
     public TeamKey(Integer league, Integer season, Integer number) {
@@ -12,11 +14,11 @@ public final class TeamKey {
         this.number = number;
     }
 
-    public Integer getLeague() {
+    public Integer getLeagueId() {
         return league;
     }
 
-    public Integer getSeason() {
+    public Integer getSeasonId() {
         return season;
     }
 

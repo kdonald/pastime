@@ -26,7 +26,7 @@ public class Roster {
         this.minFemales = minFemales;        
     }
 
-    public boolean isAcceptable(RosterPlayer player, ErrorReporter reporter) {
+    public boolean isAcceptable(ProposedPlayer player, ErrorReporter reporter) {
         if (!hasRoomForMorePlayers()) {
             reporter.setMessage("max roster size has been reached");
             return false;
