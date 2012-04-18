@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pastime.leagues.season.FranchiseAdmin;
 import com.pastime.players.PictureType;
 import com.pastime.players.Player;
 import com.pastime.players.PlayerMapper;
 import com.pastime.util.PastimeEnvironment;
-import com.pastime.util.Principal;
 
 public class FranchiseRepository {
     
@@ -26,7 +26,7 @@ public class FranchiseRepository {
     private PastimeEnvironment environment;
 
     private String qualifyingFranchisesSql;
-    
+
     private String franchiseSql;
     
     private String currentMembersOfRoleSql;
@@ -39,26 +39,27 @@ public class FranchiseRepository {
         this.currentMembersOfRoleSql = SqlUtils.sql(new ClassPathResource("members-current-role.sql", getClass()));
     }
 
-    public List<Franchise> findQualifyingFranchises(Integer league, Principal principal) {
-        return jdbcTemplate.query(qualifyingFranchisesSql, new FranchiseMapper(), principal.getPlayerId(), league);        
+    public List<Franchise> findQualifyingFranchises(Integer leagueId, Integer playerId) {
+        return jdbcTemplate.query(qualifyingFranchisesSql, new FranchiseMapper(), playerId, leagueId);        
     }
-    
+
     public Franchise findFranchise(Integer id) {
         return jdbcTemplate.queryForObject(franchiseSql, new FranchiseMapper(), id);
     }
 
-    public URI findPicture(Integer id, PictureType type) {
-        return null;
+    public URI findPicture(Integer franchiseId, PictureType type) {
+        throw new UnsupportedOperationException("Not yet implemented");        
     }
 
     @Transactional
-    public List<FranchiseMember> findFranchiseMembers(Integer id, MemberRole role, MemberStatus status) {
-        String username = jdbcTemplate.queryForObject("select u.username FROM franchises f LEFT OUTER JOIN usernames u ON f.id = u.franchise WHERE f.id = ?", String.class, id);
+    public List<FranchiseMember> findFranchiseMembers(Integer franchiseId, MemberRole role, MemberStatus status) {
+        String franchiseUsername = findFranchiseUsername(franchiseId);
         if (role == MemberRole.ALL) {
             throw new UnsupportedOperationException("Not yet implemented");
         } else {
             if (status == MemberStatus.CURRENT) {
-                return jdbcTemplate.query(currentMembersOfRoleSql, new SingleRoleFranchiseMemberMapper(id, username), id, role.getValue());
+                return jdbcTemplate.query(currentMembersOfRoleSql, new SingleRoleFranchiseMemberMapper(franchiseId, franchiseUsername),
+                        franchiseId, role.getValue());
             } else if (status == MemberStatus.RETIRED) {
                 throw new UnsupportedOperationException("Not yet implemented");
             } else {
@@ -67,19 +68,30 @@ public class FranchiseRepository {
         }
     }
 
-    public FranchiseMember findFranchiseMember(Integer id, Integer memberId) {
+    @Transactional
+    public FranchiseMember findFranchiseMember(Integer franchiseId, Integer playerId) {
+        throw new UnsupportedOperationException("Not yet implemented");        
+    }
+    
+    public URI findFranchiseMemberPicture(Integer franchiseId, Integer playerId) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
-    public URI findFranchiseMemberPicture(Integer id, Integer memberId) {
+    public URI findFounder(Integer franchiseId) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    
-    public URI findFounder(Integer id) {
-        throw new UnsupportedOperationException("Not yet implemented");
+
+    public FranchiseAdmin findQualifiedFranchiseAdmin(Integer franchise, Integer league, Integer playerId) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
     // internal helpers
+    
+    private String findFranchiseUsername(Integer franchiseId) {
+        return jdbcTemplate.queryForObject("select u.username FROM franchises f LEFT OUTER JOIN usernames u ON f.id = u.franchise WHERE f.id = ?",
+                String.class, franchiseId);        
+    }
     
     private class FranchiseMapper implements RowMapper<Franchise> {
         public Franchise mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -111,7 +123,8 @@ public class FranchiseRepository {
                 member.getRoles().put("Player", new PlayerMemberRole(new LocalDate(rs.getDate("became")),
                         localDate(rs.getDate("retired")), rs.getBoolean("player_captain"), rs.getString("player_captain_of")));
             } else {
-                throw new UnsupportedOperationException("Not yet implemented");
+                member.getRoles().put(role, new FranchiseMemberRole(new LocalDate(rs.getDate("became")),
+                        localDate(rs.getDate("retired"))));
             }
             return member;
         }

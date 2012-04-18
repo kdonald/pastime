@@ -40,14 +40,16 @@ public class SeasonController {
 
     @RequestMapping(value="/teams/{team}/player-search", method=RequestMethod.GET, params="name", produces="application/json")
     @Authorized("teams")
-    public @ResponseBody List<PlayerSummary> playerSearch(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @PathVariable("team") Integer number, 
+    public @ResponseBody List<PlayerSummary> playerSearch(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @PathVariable("team") Integer number, 
             @RequestParam("name") String name, Principal principal) {
         return teamRepository.searchPlayers(new TeamKey(league, season, number), name, principal);
     }
     
     @RequestMapping(value="/teams/{team}/players", method=RequestMethod.POST)
     @Authorized("teams")
-    public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @PathVariable("team") Integer number,
+    public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @PathVariable("team") Integer number,
             AddPlayerForm playerForm, Principal principal) {
         Team team;
         try {

@@ -26,7 +26,7 @@ public class MyFranchisesController {
     @RequestMapping(value="/me/franchises", method=RequestMethod.GET, params="league", produces="application/json")
     @Authorized("franchises")
     public @ResponseBody List<Franchise> qualifyingFranchises(@RequestParam("league") Integer league, Principal principal) {
-        return franchiseRepository.findQualifyingFranchises(league, principal);
+        return franchiseRepository.findQualifyingFranchises(league, principal.getPlayerId());
     }
 
 }

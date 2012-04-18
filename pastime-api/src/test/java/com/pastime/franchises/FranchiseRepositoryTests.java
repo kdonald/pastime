@@ -16,8 +16,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pastime.util.Principal;
-
 @ContextConfiguration(classes=FranchiseRepositoryTestsConfig.class)
 @Transactional
 @RunWith(value=SpringJUnit4ClassRunner.class)
@@ -54,7 +52,7 @@ public class FranchiseRepositoryTests {
         jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (1, 1, 'Admin')");
         jdbcTemplate.update("INSERT INTO organizations (id, name) VALUES (1, 'Brevard County Parks & Recreation')");
         jdbcTemplate.update("INSERT INTO leagues (organization, id, name, slug, sport, format, roster_min, roster_healthy, roster_max) VALUES (1, 1, 'South Brevard Adult Flag Football', 'south-flag', 'Flag Football', '7-on-7', 7, 10, 21)");
-        List<Franchise> franchises = franchiseRepository.findQualifyingFranchises(1, new Principal(1));
+        List<Franchise> franchises = franchiseRepository.findQualifyingFranchises(1, 1);
         assertEquals(1, franchises.size());
         assertEquals("Hitmen", franchises.get(0).getName());
         assertEquals(new URI("https://api.pastime.com/franchises/1"), franchises.get(0).getUrl());        

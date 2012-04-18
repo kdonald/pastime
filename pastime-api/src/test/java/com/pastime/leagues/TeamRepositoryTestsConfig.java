@@ -1,23 +1,27 @@
 package com.pastime.leagues;
 
-import java.net.URI;
+import javax.inject.Inject;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pastime.TestDataAccessConfig;
 import com.pastime.leagues.season.TeamRepository;
-import com.pastime.players.PlayerRepository;
+import com.pastime.util.PastimeEnvironment;
 
-@Import(value=TestDataAccessConfig.class)
+@Import(value={ TestDataAccessConfig.class })
 public class TeamRepositoryTestsConfig {
 
+    @Inject
+    private JdbcTemplate jdbcTemplate;
+
+    @Inject
+    private PastimeEnvironment environment;
+
     @Bean
-    public TeamRepository teamRepository(JdbcTemplate jdbcTemplate) {
-        return new TeamRepository(jdbcTemplate);
+    public TeamRepository teamRepository() {
+        return new TeamRepository(jdbcTemplate, environment);
     }
     
 }

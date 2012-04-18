@@ -2,8 +2,6 @@ package com.pastime.leagues.season;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 public class TeamForm {
 
     @NotNull
@@ -12,7 +10,6 @@ public class TeamForm {
     @NotNull
     private Integer season;
     
-    @NotEmpty
     private String name;
     
     private Integer franchise;
@@ -47,6 +44,13 @@ public class TeamForm {
 
     public void setFranchise(Integer franchise) {
         this.franchise = franchise;
+    }
+    
+    // TODO - look into JSR303 bean validation
+    public void validateNameOrFranchiseSet() {
+        if ((name == null || name.length() == 0) && franchise == null) {
+            throw new IllegalStateException("Team name or franchise property must be set");
+        }
     }
     
 }
