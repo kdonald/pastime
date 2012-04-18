@@ -3,7 +3,6 @@ package com.pastime.leagues.season;
 import java.net.URI;
 
 import com.pastime.leagues.season.AddPlayerForm.EmailAddress;
-import com.pastime.util.Principal;
 
 public class Team {
 
@@ -24,12 +23,12 @@ public class Team {
         return roster;
     }
 
-    public URI addPlayer(Integer userId, Principal principal) {
+    public URI addPlayer(Integer userId) {
         // TODO Auto-generated method stub
         return null;
     }
     
-    public URI addPlayer(EmailAddress email, Principal principal) {
+    public URI addPlayer(EmailAddress email) {
         // TODO Auto-generated method stub
         return null;
     }

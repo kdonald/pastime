@@ -47,6 +47,9 @@ public class TeamRepository {
 
     @Transactional
     public URI createTeam(TeamForm team, Integer adminId) {
+        if (registrationClosed(team.getLeague(), team.getSeason())) {
+            throw new RegistrationClosedException(team.getLeague(), team.getSeason());
+        }
         FranchiseAdmin admin = null;
         if (team.getFranchise() != null) {
             admin = findQualifiedFranchiseAdmin(team.getFranchise(), team.getLeague(), adminId);
@@ -67,12 +70,16 @@ public class TeamRepository {
         return players;
     }
 
-    public Team getTeamForEditing(TeamKey teamKey, Integer adminId) throws NoSuchAdminException {
+    public Team getTeamForEditing(TeamKey teamKey, Integer adminId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     // internal helpers
+
+    private boolean registrationClosed(Integer league, Integer season) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM seasons WHERE league = ? and number = ? and registration_status = 'c')", Boolean.class, league, season);
+    }
 
     private FranchiseAdmin findQualifiedFranchiseAdmin(Integer franchiseId, Integer leagueId, Integer playerId) {
         return jdbcTemplate.queryForObject(qualifiedFranchiseAdminSql, new RowMapper<FranchiseAdmin>() {

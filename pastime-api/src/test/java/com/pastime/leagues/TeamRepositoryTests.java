@@ -39,7 +39,7 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO players (id, first_name, last_name, gender, birthday, zip_code, password, referral_code) VALUES (1, 'Keith', 'Donald', 'm', '1977-12-29', '32904', 'password', '123456')");                
         jdbcTemplate.update("INSERT INTO organizations (id, name) VALUES (1, 'Brevard County Parks & Recreation')");
         jdbcTemplate.update("INSERT INTO leagues (organization, id, name, slug, sport, format, roster_min, roster_healthy, roster_max) VALUES (1, 1, 'South Brevard Adult Flag Football', 'south-flag', 'Flag Football', '7-on-7', 7, 10, 21)");
-        jdbcTemplate.update("INSERT INTO seasons (league, number, name) VALUES (1, 1, 'South Brevard Adult Flag Football')");
+        jdbcTemplate.update("INSERT INTO seasons (league, number, name, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', 'o')");
         TeamForm form = new TeamForm();
         form.setLeague(1);
         form.setSeason(1);
@@ -62,7 +62,7 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (1, 1, 'Admin')");        
         jdbcTemplate.update("INSERT INTO organizations (id, name) VALUES (1, 'Brevard County Parks & Recreation')");
         jdbcTemplate.update("INSERT INTO leagues (organization, id, name, slug, sport, format, roster_min, roster_healthy, roster_max) VALUES (1, 1, 'South Brevard Adult Flag Football', 'south-flag', 'Flag Football', '7-on-7', 7, 10, 21)");
-        jdbcTemplate.update("INSERT INTO seasons (league, number, name) VALUES (1, 1, 'South Brevard Adult Flag Football')");
+        jdbcTemplate.update("INSERT INTO seasons (league, number, name, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', 'o')");
         TeamForm form = new TeamForm();
         form.setLeague(1);
         form.setSeason(1);

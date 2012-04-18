@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pastime.players.Player;
 import com.pastime.util.Authorized;
-import com.pastime.util.ErrorBody;
 import com.pastime.util.Principal;
 
 @Controller
@@ -52,25 +51,19 @@ public class SeasonController {
     public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number,
             AddPlayerForm playerForm, Principal principal) {
-        Team team;
-        try {
-            team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
-        } catch (NoSuchAdminException e) {
-            return forbidden("user not an admin for this team");
-        }
-        URI link;
-        if (playerForm.getEmail() != null) {
-           link = team.addPlayer(playerForm.getEmailAddress(), principal);
-        } else {
-           link = team.addPlayer(playerForm.getUserId(), principal);
-        }
+        Team team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
+        URI link = addPlayer(playerForm, team);
         return created(link);       
     }
 
     // internal helpers
 
-    private ResponseEntity<ErrorBody> forbidden(String message) {
-        return new ResponseEntity<ErrorBody>(new ErrorBody("user not an admin for this team"), HttpStatus.FORBIDDEN);        
+    private URI addPlayer(AddPlayerForm playerForm, Team team) {
+        if (playerForm.getEmail() != null) {
+           return team.addPlayer(playerForm.getEmailAddress());
+        } else {
+           return team.addPlayer(playerForm.getUserId());
+        }        
     }
     
     private ResponseEntity<Object> created(URI link) {

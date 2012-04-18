@@ -287,7 +287,7 @@ CREATE TABLE seasons (league integer,
   start_date date,
   registration_opens date,
   registration_closes date,
-  status char(1) NOT NULL CONSTRAINT df_seasons_status DEFAULT 'n', -- (n)ew, registration (o)pen, registration (c)losed, (r)unning, (x) over
+  registration_status char(1) NOT NULL CONSTRAINT df_seasons_registration_status DEFAULT 'c', -- registration (o)pen, registration (c)losed
   created timestamp NOT NULL CONSTRAINT df_seasons_created DEFAULT now(),  
   CONSTRAINT pk_seasons PRIMARY KEY (league, number),  
   CONSTRAINT fk_seasons_league FOREIGN KEY (league) REFERENCES leagues(id),
