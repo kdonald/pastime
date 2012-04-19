@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.joda.time.LocalDate;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +19,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.security.crypto.keygen.InsecureRandomStringGenerator;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.templating.StringTemplateLoader;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.SlugUtils;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,6 +44,10 @@ public class TeamRepository {
 
     private NamedParameterJdbcTemplate namedJdbcTemplate;
     
+    private JavaMailSender mailSender;
+    
+    private StringTemplateLoader templateLoader;
+    
     private PastimeEnvironment environment;
 
     private String qualifiedFranchiseAdminSql;
@@ -48,10 +60,14 @@ public class TeamRepository {
 
     private String proposedPlayerByEmailSql;
     
+    private StringKeyGenerator inviteGenerator = new InsecureRandomStringGenerator(6);
+    
     @Inject
-    public TeamRepository(JdbcTemplate jdbcTemplate, PastimeEnvironment environment) {
+    public TeamRepository(JdbcTemplate jdbcTemplate, JavaMailSender mailSender, StringTemplateLoader templateLoader, PastimeEnvironment environment) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.mailSender = mailSender;
+        this.templateLoader = templateLoader;
         this.environment = environment;
         this.qualifiedFranchiseAdminSql = SqlUtils.sql(new ClassPathResource("qualified-franchise-admin.sql", getClass()));
         this.playerSearchSql = SqlUtils.sql(new ClassPathResource("player-search.sql", getClass()));
@@ -60,6 +76,10 @@ public class TeamRepository {
         this.proposedPlayerByEmailSql = SqlUtils.sql(new ClassPathResource("proposed-player-byemail.sql", getClass()));        
     }
 
+    public void setInviteGenerator(StringKeyGenerator inviteGenerator) {
+        this.inviteGenerator = inviteGenerator;
+    }
+    
     @Transactional
     public URI createTeam(TeamForm team, Integer adminId) {
         if (registrationClosed(team.getLeague(), team.getSeason())) {
@@ -100,7 +120,7 @@ public class TeamRepository {
                         seasonPath(rs.getInt("season_number"), rs.getString("season_slug")), rs.getString("slug")).toUri();
                 TeamMember admin = new TeamMember(rs.getInt("admin_id"), new Name(rs.getString("admin_first_name"), rs.getString("admin_last_name")), 
                         (Integer) rs.getObject("admin_number"), rs.getString("admin_nickname"), rs.getString("admin_slug"), teamSiteUrl);
-                return new Team(teamKey, rs.getString("name"), roster, admin, teamApiUrl(teamKey), teamSiteUrl, TeamRepository.this);
+                return new Team(teamKey, rs.getString("name"), rs.getString("sport"), roster, admin, teamApiUrl(teamKey), teamSiteUrl, TeamRepository.this);
             }
             private Object seasonPath(Integer seasonId, String seasonSlug) {
                 return seasonSlug != null ? seasonSlug : seasonId;
@@ -142,12 +162,12 @@ public class TeamRepository {
                 Boolean.class, key.getLeagueId(), key.getSeasonId(), key.getNumber(), playerId);
     }
 
-    String sendPlayerInvite(ProposedPlayer player, TeamMember from, Team team) {
-        return "12345";
+    URI sendPlayerInvite(final ProposedPlayer player, final TeamMember from, final Team team) {
+        return sendPersonInvite(new EmailAddress(player.getEmail(), player.getName()), from, team, player.getId());
     }
 
-    String sendPersonInvite(EmailAddress email, TeamMember from, Team team) {
-        return "12345";
+    URI sendPersonInvite(final EmailAddress email, final TeamMember from, final Team team) {
+        return sendPersonInvite(email, from, team, null);
     }
     
     // internal helpers
@@ -182,6 +202,32 @@ public class TeamRepository {
     
     private UriComponentsBuilder siteUrl() {
         return UriComponentsBuilder.fromUri(environment.getSiteUrl());
+    }
+    
+    private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final Team team, Integer playerId) {
+        String code = inviteGenerator.generateKey();
+        final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
+        jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                team.getKey().getLeagueId(), team.getKey().getSeasonId(), team.getKey().getNumber(), email.getValue(), TeamRoles.PLAYER, code, from.getId(), playerId);
+        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+            public void prepare(MimeMessage message) throws Exception {
+               MimeMessageHelper invite = new MimeMessageHelper(message);
+               invite.setFrom(new InternetAddress("invites@pastime.com", "Pastime Invites"));
+               invite.setTo(new InternetAddress(email.getValue(), email.getDisplayName().toString()));
+               invite.setSubject("Confirm your " + team.getName() + " team membership");
+               Map<String, Object> model = new HashMap<String, Object>(7, 1);
+               model.put("name", email.getDisplayName() != null ? email.getDisplayName().getFirstName() : "Hello");
+               model.put("adminUrl", from.getSiteUrl().toString());               
+               model.put("admin", from.getName().toString());
+               model.put("sport", team.getSport());              
+               model.put("teamUrl", team.getSiteUrl());
+               model.put("team", team.getName());
+               model.put("inviteUrl", inviteUrl.toString());
+               invite.setText(templateLoader.getTemplate("teams/mail/player-invite").render(model), true);
+            }
+         };
+         mailSender.send(preparator);
+         return inviteUrl;
     }
     
     private static class ProposedPlayerMapper implements RowMapper<ProposedPlayer> {

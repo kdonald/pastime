@@ -2,16 +2,22 @@ package com.pastime.leagues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.mail.Message;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage.RecipientType;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.jvnet.mock_javamail.Mailbox;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,10 +146,26 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO seasons (league, number, name, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', 'o')");
         jdbcTemplate.update("INSERT INTO teams (league, season, number, name, slug) VALUES (1, 1, 1, 'Hitmen', 'hitmen')");
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player) VALUES (1, 1, 1, 1)");
-        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");        
+        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");
+        teamRepository.setInviteGenerator(new StringKeyGenerator() {
+            public String generateKey() {
+                return "123456";
+            }
+        });
         Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         URI uri = team.addPlayer(2);
-        assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/invites/12345"), uri);
+        assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/invites/123456"), uri);
+        Map<String, Object> record = jdbcTemplate.queryForMap("select * from team_member_invites where league = 1 and season = 1 and team = 1 and code = '123456'");
+        assertEquals(2, record.get("player"));
+        assertEquals(1, Mailbox.get("alexander.weaver@gmail.com").getNewMessageCount());
+        Message message = Mailbox.get("alexander.weaver@gmail.com").get(0);
+        assertEquals("Confirm your Hitmen team membership", message.getSubject());
+        assertEquals("Pastime Invites", ((InternetAddress) message.getFrom()[0]).getPersonal());        
+        assertEquals("invites@pastime.com", ((InternetAddress) message.getFrom()[0]).getAddress());
+        assertEquals("Alexander Weaver", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getPersonal());        
+        assertEquals("alexander.weaver@gmail.com", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getAddress());
+        assertTrue(((String) message.getContent()).contains("Keith"));        
+        assertTrue(((String) message.getContent()).contains("123456"));        
     }
     
     @Test
@@ -159,10 +181,26 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO seasons (league, number, name, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', 'o')");
         jdbcTemplate.update("INSERT INTO teams (league, season, number, name, slug) VALUES (1, 1, 1, 'Hitmen', 'hitmen')");
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player) VALUES (1, 1, 1, 1)");
-        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");        
+        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");
+        teamRepository.setInviteGenerator(new StringKeyGenerator() {
+            public String generateKey() {
+                return "123456";
+            }
+        });        
         Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         URI uri = team.addPlayer(new EmailAddress("alexander.weaver@gmail.com", new Name("Alexander" ,"Weaver")));
-        assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/invites/12345"), uri);
+        assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/invites/123456"), uri);
+        Map<String, Object> record = jdbcTemplate.queryForMap("select * from team_member_invites where league = 1 and season = 1 and team = 1 and code = '123456'");
+        assertEquals(2, record.get("player"));
+        assertEquals(1, Mailbox.get("alexander.weaver@gmail.com").getNewMessageCount());
+        Message message = Mailbox.get("alexander.weaver@gmail.com").get(0);
+        assertEquals("Confirm your Hitmen team membership", message.getSubject());
+        assertEquals("Pastime Invites", ((InternetAddress) message.getFrom()[0]).getPersonal());        
+        assertEquals("invites@pastime.com", ((InternetAddress) message.getFrom()[0]).getAddress());
+        assertEquals("Alexander Weaver", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getPersonal());        
+        assertEquals("alexander.weaver@gmail.com", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getAddress());
+        assertTrue(((String) message.getContent()).contains("Keith"));        
+        assertTrue(((String) message.getContent()).contains("123456"));        
     }
     
     @Test(expected=AlreadyPlayingException.class)

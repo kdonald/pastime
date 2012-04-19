@@ -14,6 +14,8 @@ public class Team {
     
     private final String name;
     
+    private final String sport;
+    
     private final Roster roster;
 
     private final TeamMember admin;
@@ -24,9 +26,10 @@ public class Team {
 
     private final URI siteUrl;
     
-    public Team(TeamKey key, String name, Roster roster, TeamMember admin, URI apiUrl, URI siteUrl, TeamRepository teamRepository) {
+    public Team(TeamKey key, String name, String sport, Roster roster, TeamMember admin, URI apiUrl, URI siteUrl, TeamRepository teamRepository) {
         this.key = key;
         this.name = name;
+        this.sport = sport;
         this.roster = roster;
         this.admin = admin;
         this.apiUrl = apiUrl;
@@ -41,7 +44,15 @@ public class Team {
     public String getName() {
         return name;
     }
-    
+
+    public String getSport() {
+        return sport;
+    }
+
+    public URI getApiUrl() {
+        return apiUrl;
+    }
+
     public URI getSiteUrl() {
         return siteUrl;
     }
@@ -60,8 +71,7 @@ public class Team {
         if (player != null) {
             return addPlayer(player);
         } else {
-            String invite = teamRepository.sendPersonInvite(email, admin, this);
-            return UriComponentsBuilder.fromUri(apiUrl).path("/invites/{invite}").buildAndExpand(invite).toUri();           
+            return teamRepository.sendPersonInvite(email, admin, this);
         }
     }
     
@@ -79,8 +89,7 @@ public class Team {
             teamRepository.addTeamMemberRole(key, player.getId(), TeamRoles.PLAYER);
             return UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").buildAndExpand(player.getId()).toUri();
         } else {
-            String invite = teamRepository.sendPlayerInvite(player, admin, this);
-            return UriComponentsBuilder.fromUri(apiUrl).path("/invites/{code}").buildAndExpand(invite).toUri();
+            return teamRepository.sendPlayerInvite(player, admin, this);
         }        
     }
     

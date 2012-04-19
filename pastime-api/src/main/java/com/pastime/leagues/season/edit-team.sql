@@ -1,5 +1,5 @@
 SELECT u.username as organization_username,
-  l.id as league_id, l.slug as league_slug, l.roster_min, l.roster_max, l.age_min, l.age_max, l.gender, l.roster_min_female,
+  l.id as league_id, l.slug as league_slug, l.sport, l.roster_min, l.roster_max, l.age_min, l.age_max, l.gender, l.roster_min_female,
   s.number as season_number, s.slug as season_slug,
   t.number, t.name, t.slug, t.franchise,
   (SELECT count(*) FROM team_member_roles WHERE league = :league AND season = :season AND team = :team AND role = 'Player') as total_player_count,
