@@ -2,7 +2,6 @@ package com.pastime.leagues.season;
 
 import com.pastime.util.Name;
 
-
 public class AddPlayerForm {
     
     private Integer userId;
