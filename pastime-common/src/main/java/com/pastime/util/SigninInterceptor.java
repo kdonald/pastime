@@ -32,9 +32,9 @@ public class SigninInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = readToken(request);   	
         if (token != null && token.length() > 0) {
-            SecurityContext.setCurrentPlayer(findPlayer(token));            
+            SecurityContext.setPrincipal(findPlayer(token));            
         } else {
-            SecurityContext.setCurrentPlayer(null);
+            SecurityContext.setPrincipal(null);
         }    	
         return true;
     }
@@ -51,12 +51,12 @@ public class SigninInterceptor extends HandlerInterceptorAdapter {
     	}    	
     }
     
-    private UserPrincipal findPlayer(String accessToken) {
+    private Principal findPlayer(String accessToken) {
         Integer playerId = Integer.parseInt(accessToken);
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT id FROM players WHERE id = ?", new RowMapper<UserPrincipal>() {
-			public UserPrincipal mapRow(ResultSet rs, int rowNum)
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT id FROM players WHERE id = ?", new RowMapper<Principal>() {
+			public Principal mapRow(ResultSet rs, int rowNum)
 					throws SQLException {
-				return new UserPrincipal(rs.getInt("id"));
+				return new Principal(rs.getInt("id"));
 			}
         	
         }, playerId));

@@ -22,6 +22,10 @@ public final class Gender {
     	return label.toLowerCase();
     }
     
+    public String toString() {
+    	return toLowerCase(); 
+    }
+    
     public static Gender valueOf(String string) {
         if (string == null) {
             return null;

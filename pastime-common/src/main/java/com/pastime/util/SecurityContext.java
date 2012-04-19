@@ -2,22 +2,22 @@ package com.pastime.util;
 
 public final class SecurityContext {
 
-    private static final ThreadLocal<UserPrincipal> currentPlayer = new ThreadLocal<UserPrincipal>();
+    private static final ThreadLocal<Principal> principal = new ThreadLocal<Principal>();
 
-    public static UserPrincipal getPrincipal() {
-        return currentPlayer.get();
+    public static Principal getPrincipal() {
+        return principal.get();
     }
 
-    public static void setCurrentPlayer(UserPrincipal player) {
-        currentPlayer.set(player);
+    public static void setPrincipal(Principal player) {
+        principal.set(player);
     }
 
     public static boolean authorized() {
-        return currentPlayer.get() != null;
+        return principal.get() != null;
     }
 
     public static void remove() {
-        currentPlayer.remove();
+        principal.remove();
     }
 
 }

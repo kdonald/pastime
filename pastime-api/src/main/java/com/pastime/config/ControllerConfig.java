@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.templating.StringTemplateLoader;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.pastime.errors.ErrorController;
 import com.pastime.franchises.FranchiseController;
 import com.pastime.franchises.FranchiseRepository;
 import com.pastime.franchises.MyFranchisesController;
@@ -39,6 +40,11 @@ public class ControllerConfig extends WebMvcConfigurerAdapter {
         return new PastimeEnvironment("http://localhost:8081", "http://localhost:8080");
     }
 
+    @Bean
+    public ErrorController errorController() {
+        return new ErrorController();
+    }
+    
     @Bean
     public PlayersController playerController() {
         PlayerRepository playerRepository = new PlayerRepository(jdbcTemplate, environment(), resourceLoader);

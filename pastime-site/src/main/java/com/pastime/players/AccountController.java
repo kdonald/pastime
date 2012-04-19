@@ -29,9 +29,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pastime.util.DefaultReferralCodeGenerator;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Name;
-import com.pastime.util.UserPrincipal;
+import com.pastime.util.Principal;
 import com.pastime.util.ReferralCodeGenerator;
 import com.pastime.util.SecurityContext;
+import com.sun.security.auth.UserPrincipal;
 
 @Controller
 public class AccountController {
@@ -77,9 +78,9 @@ public class AccountController {
         if (!password.equals(form.getPassword())) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("password doesn't match"), HttpStatus.BAD_REQUEST);               
         }
-        UserPrincipal player = new UserPrincipal(rs.getInt("id"));
-        signinSession(player, response);
-        return new ResponseEntity<Object>(player, HttpStatus.OK);           
+        Principal principal = new Principal(rs.getInt("id"));
+        signinSession(principal, response);
+        return new ResponseEntity<Object>(principal, HttpStatus.OK);           
     }
 
     @RequestMapping(value="/signup", method=RequestMethod.GET)
@@ -98,19 +99,19 @@ public class AccountController {
         Integer playerId = use(jdbcTemplate).insert("INSERT INTO players (first_name, last_name, password, birthday, gender, zip_code, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", "id", Integer.class,
                 signupForm.getFirst_name(), signupForm.getLast_name(), signupForm.getPassword(), signupForm.getBirthday(), signupForm.getGender().getCode(), signupForm.getZip_code(), referralCode, referredBy != null ? referredBy.getId() : null);
         jdbcTemplate.update("INSERT INTO player_emails (email, label, primary_email, player) VALUES (?, ?, ?, ?)", signupForm.getEmail(), "home", true, playerId);
-        UserPrincipal player = new UserPrincipal(playerId);
-        URI url = UriComponentsBuilder.fromHttpUrl(siteUrl + "/players/{id}").buildAndExpand(player.getId()).toUri();
+        Principal principal = new Principal(playerId);
+        URI url = UriComponentsBuilder.fromHttpUrl(siteUrl + "/players/{id}").buildAndExpand(principal.getPlayerId()).toUri();
         HttpHeaders headers = new HttpHeaders();    
         headers.setLocation(url);
-        signinSession(player, response);
+        signinSession(principal, response);
         Map<String, Object> accessGrant = new HashMap<String, Object>();
-        accessGrant.put("access_token", player.getId());
+        accessGrant.put("access_token", principal.getPlayerId());
         return new ResponseEntity<Map<String, Object>>(accessGrant, headers, HttpStatus.CREATED);
     }
     
-    private void signinSession(UserPrincipal player, HttpServletResponse response) {
-        SecurityContext.setCurrentPlayer(player);
-        cookieGenerator.addCookie(player.getId().toString(), response);        
+    private void signinSession(Principal principal, HttpServletResponse response) {
+        SecurityContext.setPrincipal(principal);
+        cookieGenerator.addCookie(principal.getPlayerId().toString(), response);        
     }
     
     private boolean playerExists(String email) {

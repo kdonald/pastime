@@ -5,13 +5,21 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.MethodParameter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.support.GlobalExceptionHandlerCapableExceptionResolver;
 
+import com.pastime.util.AuthorizedInterceptor;
+import com.pastime.util.Principal;
+import com.pastime.util.SecurityContext;
 import com.pastime.util.SigninInterceptor;
 
 @Configuration
@@ -23,6 +31,12 @@ public class WebConfig extends WebMvcConfigurationSupport {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SigninInterceptor(jdbcTemplate));
+        registry.addInterceptor(new AuthorizedInterceptor());
+    }
+
+    @Override
+    protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new PrincipalMethodArgumentResolver());
     }
     
     @Override
@@ -34,4 +48,17 @@ public class WebConfig extends WebMvcConfigurationSupport {
         exceptionResolvers.add(new DefaultHandlerExceptionResolver());        
     }
     
+    private static class PrincipalMethodArgumentResolver implements HandlerMethodArgumentResolver {
+
+        public boolean supportsParameter(MethodParameter parameter) {
+            return Principal.class.isAssignableFrom(parameter.getParameterType());
+        }
+
+        @Override
+        public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+                NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+            return SecurityContext.getPrincipal();
+        }
+        
+    }
 }

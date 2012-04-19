@@ -38,7 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pastime.players.PlayerInvite;
 import com.pastime.util.ErrorBody;
 import com.pastime.util.Name;
-import com.pastime.util.UserPrincipal;
+import com.pastime.util.Principal;
 import com.pastime.util.SecurityContext;
 import com.pastime.util.TeamRoles;
 
@@ -73,9 +73,9 @@ public class TeamsController {
             return new ResponseEntity<ErrorBody>(new ErrorBody("not authorized"), HttpStatus.FORBIDDEN);            
         }        
         Integer teamId = (Integer) use(jdbcTemplate).insert("INSERT INTO franchises (name, sport) VALUES (?, ?)", teamForm.getName(), teamForm.getSport());
-        UserPrincipal player = SecurityContext.getPrincipal();
-        jdbcTemplate.update("INSERT INTO franchise_members (franchise, player) VALUES (?, ?)", teamId, player.getId());
-        jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (?, ?, ?)", teamId, player.getId(), TeamRoles.ADMIN);
+        Principal principal = SecurityContext.getPrincipal();
+        jdbcTemplate.update("INSERT INTO franchise_members (franchise, player) VALUES (?, ?)", teamId, principal.getPlayerId());
+        jdbcTemplate.update("INSERT INTO franchise_member_roles (franchise, player, role) VALUES (?, ?, ?)", teamId, principal.getPlayerId(), TeamRoles.ADMIN);
         Team team = new Team(teamId);        
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(UriComponentsBuilder.fromHttpUrl("http://pastime.com/teams/{id}").buildAndExpand(team.getId()).toUri());
@@ -113,7 +113,7 @@ public class TeamsController {
         }        
         SqlRowSet admin = jdbcTemplate.queryForRowSet("select p.id, p.first_name, p.last_name, t.nickname, t.slug FROM franchise_member_roles r " + 
                 "INNER JOIN franchise_members t ON r.franchise = t.franchise AND r.player = t.player INNER JOIN players p ON t.player = p.id WHERE r.franchise = ? and r.player = ? AND r.role = 'Admin'",
-                team.getInt("id"), SecurityContext.getPrincipal().getId());
+                team.getInt("id"), SecurityContext.getPrincipal().getPlayerId());
         if (!admin.last()) {
             return new ResponseEntity<ErrorBody>(new ErrorBody("you're not an admin for this team"), HttpStatus.FORBIDDEN);            
         }        
@@ -165,12 +165,12 @@ public class TeamsController {
                 // a. if no user is signed in, allows the user to sign-up if they are new 
                 // b. if no user is signed in, allows the user to sign-in if they already have an account (the email the invite was sent to can then be added to this account)
                 // c. if a user is signed in, allows them to add this email to that account, sign-out & sign-in to another account, or sign-out & create a new account
-                UserPrincipal currentPlayer = SecurityContext.getPrincipal();
-                if (currentPlayer == null) {
+                Principal principal = SecurityContext.getPrincipal();
+                if (principal == null) {
                     // nobody is signed-in, assume a completely new user
                     return "redirect:/signup?email=" + invite.getString("email");
                 }
-                playerId = currentPlayer.getId();
+                playerId = principal.getPlayerId();
                 if (!emailOnFile(invite.getString("email"), playerId)) {
                   // somebody else is signed-in, assume a existing user under a different address
                   return "redirect:/signin?email=" + invite.getString("email");
@@ -237,8 +237,8 @@ public class TeamsController {
     @RequestMapping(value="/teams/{teamId}/{memberKey}", method=RequestMethod.POST)
     @Transactional
     public ResponseEntity<? extends Object> member(@PathVariable Integer teamId, @PathVariable String memberKey, @Valid TeamMemberForm form, Model model) {
-        UserPrincipal currentPlayer = SecurityContext.getPrincipal();
-        if (currentPlayer == null) {
+        Principal principal = SecurityContext.getPrincipal();
+        if (principal == null) {
             return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);            
         }
         Integer memberId = parseInteger(memberKey);
@@ -254,7 +254,7 @@ public class TeamsController {
             }
             memberId = member.getInt("player");
         }
-        if (!currentPlayer.getId().equals(memberId)) {
+        if (!principal.getPlayerId().equals(memberId)) {
             return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);                
         }
         jdbcTemplate.update("UPDATE franchise_members SET number = ?, nickname = ? WHERE franchise = ? AND player = ?", form.getNumber(), form.getNickname(), teamId, memberId);        
@@ -305,9 +305,9 @@ public class TeamsController {
     }
 
     private void addAdmin(Integer team, Model model) {
-        UserPrincipal player = SecurityContext.getPrincipal();
-        if (player != null) {
-            model.addAttribute("admin", isAdmin(team, player.getId()));
+        Principal principal = SecurityContext.getPrincipal();
+        if (principal != null) {
+            model.addAttribute("admin", isAdmin(team, principal.getPlayerId()));
         }        
     }
     private boolean isAdmin(Integer team, Integer player) {
