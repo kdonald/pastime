@@ -237,4 +237,7 @@ public class TeamRepository {
         }
     }
     
+    // cglib ceremony 
+    public TeamRepository() {}
+    
 }

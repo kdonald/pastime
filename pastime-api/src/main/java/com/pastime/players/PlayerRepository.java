@@ -23,9 +23,9 @@ public class PlayerRepository {
     
     private JdbcTemplate jdbcTemplate;
     
-    private final PastimeEnvironment environment;
+    private PastimeEnvironment environment;
     
-    private final Resource pictures;
+    private Resource pictures;
     
     private String playerSql;
     
@@ -81,5 +81,8 @@ public class PlayerRepository {
             throw new IllegalStateException("Unable to access picture repository to load player profile picture", e);
         }
     }
+    
+    // cglib ceremony 
+    public PlayerRepository() {}
     
 }

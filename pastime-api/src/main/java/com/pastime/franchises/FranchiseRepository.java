@@ -129,4 +129,7 @@ public class FranchiseRepository {
         return date != null ? new LocalDate(date) : null;
     }
     
+    // cglib ceremony 
+    public FranchiseRepository() {}
+    
 }

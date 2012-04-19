@@ -25,7 +25,7 @@ import com.pastime.util.Principal;
 @RequestMapping("/leagues/{league}/seasons/{season}")
 public class SeasonController {
 
-    private final TeamRepository teamRepository;
+    private TeamRepository teamRepository;
     
     @Inject
     public SeasonController(TeamRepository teamRepository) {
@@ -78,4 +78,6 @@ public class SeasonController {
         return HttpHeaders.readOnlyHttpHeaders(headers);
     }
     
+    // cglib ceremony 
+    public SeasonController() {}
 }
