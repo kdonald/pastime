@@ -31,7 +31,7 @@ public class PlayersController {
     }
     
     @RequestMapping(value="/players/{id}/picture", method=RequestMethod.GET)
-    public String userPicture(@PathVariable("id") Integer id, @RequestParam(value="type", defaultValue="small") PictureType type) {
+    public String userPicture(@PathVariable("id") Integer id, @RequestParam(value="type", defaultValue="SMALL") PictureType type) {
         URI imageLink = playerRepository.findPicture(id, type); 
         return "redirect:" + imageLink;      
     }

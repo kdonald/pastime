@@ -14,6 +14,7 @@ import com.pastime.errors.ErrorController;
 import com.pastime.franchises.FranchiseController;
 import com.pastime.franchises.FranchiseRepository;
 import com.pastime.franchises.MyFranchisesController;
+import com.pastime.leagues.UpcomingSeasonsController;
 import com.pastime.leagues.season.SeasonController;
 import com.pastime.leagues.season.TeamRepository;
 import com.pastime.players.PlayerRepository;
@@ -43,6 +44,11 @@ public class ControllerConfig extends WebMvcConfigurerAdapter {
     @Bean
     public ErrorController errorController() {
         return new ErrorController();
+    }
+    
+    @Bean
+    public UpcomingSeasonsController upcomingSeasonsController() {
+        return new UpcomingSeasonsController(jdbcTemplate);
     }
     
     @Bean

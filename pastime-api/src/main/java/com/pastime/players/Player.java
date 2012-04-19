@@ -2,13 +2,12 @@ package com.pastime.players;
 
 import java.net.URI;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 import org.springframework.util.LinkedResource;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.pastime.util.Gender;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pastime.util.Name;
 
 public class Player extends LinkedResource {
@@ -55,7 +54,7 @@ public class Player extends LinkedResource {
     }
     
     public Integer getAge() {
-        return Years.yearsBetween(new LocalDate(), birthday).getYears();
+        return Years.yearsBetween(birthday, new LocalDate()).getYears();
     }
     
     public static URI siteLink(URI siteUrl, Integer id, String username) {

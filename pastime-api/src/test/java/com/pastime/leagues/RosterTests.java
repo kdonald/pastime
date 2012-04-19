@@ -11,8 +11,8 @@ import org.junit.Test;
 import com.pastime.leagues.season.ProposedPlayer;
 import com.pastime.leagues.season.Roster;
 import com.pastime.leagues.season.TeamGender;
+import com.pastime.players.Gender;
 import com.pastime.util.ErrorReporter;
-import com.pastime.util.Gender;
 import com.pastime.util.Name;
 import com.pastime.util.Range;
 

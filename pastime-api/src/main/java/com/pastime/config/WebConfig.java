@@ -6,6 +6,8 @@ import javax.inject.Inject;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -17,6 +19,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.support.GlobalExceptionHandlerCapableExceptionResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pastime.util.AuthorizedInterceptor;
 import com.pastime.util.Principal;
 import com.pastime.util.SecurityContext;
@@ -35,6 +39,11 @@ public class WebConfig extends WebMvcConfigurationSupport {
     }
 
     @Override
+    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(jsonConverter());
+    }
+
+    @Override
     protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new PrincipalMethodArgumentResolver());
     }
@@ -46,6 +55,16 @@ public class WebConfig extends WebMvcConfigurationSupport {
         resolver.afterPropertiesSet();
         exceptionResolvers.add(resolver);
         exceptionResolvers.add(new DefaultHandlerExceptionResolver());        
+    }
+    
+    // internal helpers
+    
+    private static MappingJackson2HttpMessageConverter jsonConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        converter.setObjectMapper(objectMapper);
+        return converter;
     }
     
     private static class PrincipalMethodArgumentResolver implements HandlerMethodArgumentResolver {

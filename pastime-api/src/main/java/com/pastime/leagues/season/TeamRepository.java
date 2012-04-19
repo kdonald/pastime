@@ -30,9 +30,9 @@ import org.springframework.util.SlugUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pastime.leagues.season.AddPlayerForm.EmailAddress;
+import com.pastime.players.Gender;
 import com.pastime.players.Player;
 import com.pastime.players.PlayerMapper;
-import com.pastime.util.Gender;
 import com.pastime.util.Name;
 import com.pastime.util.PastimeEnvironment;
 import com.pastime.util.Range;
@@ -233,7 +233,7 @@ public class TeamRepository {
     private static class ProposedPlayerMapper implements RowMapper<ProposedPlayer> {
         public ProposedPlayer mapRow(ResultSet rs, int rowNum) throws SQLException {
             return new ProposedPlayer(rs.getInt("id"), new Name(rs.getString("first_name"), rs.getString("last_name")),
-                    rs.getString("email"), Gender.valueOf(rs.getString("gender")), new LocalDate(rs.getDate("birthday")));
+                    rs.getString("email"), Gender.dbValueOf(rs.getString("gender")), new LocalDate(rs.getDate("birthday")));
         }
     }
     

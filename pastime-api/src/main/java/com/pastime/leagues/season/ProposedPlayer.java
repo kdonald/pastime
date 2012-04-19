@@ -3,7 +3,7 @@ package com.pastime.leagues.season;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
-import com.pastime.util.Gender;
+import com.pastime.players.Gender;
 import com.pastime.util.Name;
 
 public class ProposedPlayer {
