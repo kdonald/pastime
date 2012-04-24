@@ -4,5 +4,5 @@ SELECT f.name AS franchise_name, m.number, m.nickname
     INNER JOIN franchises f ON m.franchise = f.id
   WHERE r.franchise = ?
     AND r.player = ?
-    AND r.role = 'Admin'
+    AND r.role = 'a'
     AND f.sport = (SELECT sport FROM leagues WHERE id = ?);

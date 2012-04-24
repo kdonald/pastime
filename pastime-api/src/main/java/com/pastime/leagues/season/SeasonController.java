@@ -46,32 +46,36 @@ public class SeasonController {
         return teamRepository.findTeam(new TeamKey(league, season, number));        
     }
 
-    @RequestMapping(value="/teams/{team}/player-search", method=RequestMethod.GET, params="name", produces="application/json")
+    @RequestMapping(value="/teams/{team}/new-member-search", method=RequestMethod.GET, params="name", produces="application/json")
     @Authorized("teams")
-    public @ResponseBody List<Player> playerSearch(@PathVariable("league") Integer league,
+    public @ResponseBody List<Player> newMemberSearch(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number, 
-            @RequestParam("name") String name, Principal principal) {
+            @RequestParam("name") String name, @RequestParam(value="role", defaultValue="Player") String role, Principal principal) {
         return teamRepository.searchPlayers(new TeamKey(league, season, number), name, principal.getPlayerId());
     }
     
-    @RequestMapping(value="/teams/{team}/players", method=RequestMethod.POST)
+    @RequestMapping(value="/teams/{team}/members", method=RequestMethod.POST)
     @Authorized("teams")
     @Transactional
-    public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league,
+    public ResponseEntity<? extends Object> addMember(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number,
-            AddPlayerForm playerForm, Principal principal) {
+            AddMemberForm playerForm, Principal principal) {
         EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
-        URI link = addPlayer(playerForm, team);
+        URI link = addMember(playerForm, team, principal);
         return created(link);       
     }
 
     // internal helpers
 
-    private URI addPlayer(AddPlayerForm playerForm, EditableTeam team) {
+    private URI addMember(AddMemberForm playerForm, EditableTeam team, Principal principal) {
         if (playerForm.getEmail() != null) {
-           return team.addPlayer(playerForm.getEmailAddress());
+           return team.addPlayer(playerForm.createEmailAddress());
         } else {
-           return team.addPlayer(playerForm.getUserId());
+           Integer id = playerForm.getId();
+           if (id == null) {
+               id = principal.getPlayerId();
+           }
+           return team.addPlayer(id);
         }        
     }
     

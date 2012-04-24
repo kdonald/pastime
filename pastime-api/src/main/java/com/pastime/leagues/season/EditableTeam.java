@@ -4,9 +4,7 @@ import java.net.URI;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.pastime.leagues.season.AddPlayerForm.EmailAddress;
 import com.pastime.util.ErrorReporter;
-import com.pastime.util.TeamRoles;
 
 public class EditableTeam {
 
@@ -70,6 +68,9 @@ public class EditableTeam {
     }
     
     public URI addPlayer(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id cannot be null");
+        }
         ProposedPlayer player = teamRepository.findProposedPlayer(id);
         return addPlayer(player);
     }
@@ -94,7 +95,7 @@ public class EditableTeam {
             throw new RosterViolationException(key, reporter.getMessage());
         }
         if (admin.sameAs(player)) {
-            teamRepository.addTeamMemberRole(key, player.getId(), TeamRoles.PLAYER);
+            teamRepository.addTeamMemberRole(key, player.getId(), TeamMemberRole.PLAYER);
             return UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").buildAndExpand(player.getId()).toUri();
         } else {
             return teamRepository.sendPlayerInvite(player, admin, this);

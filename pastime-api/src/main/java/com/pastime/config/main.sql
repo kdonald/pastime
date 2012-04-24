@@ -166,7 +166,7 @@ CREATE TABLE franchise_members (franchise integer,
 -- Pastime "Franchise" Member Roles e.g. Keith Donald (Admin, Player); Brian Fisher (Head Coach, Admin, Player).
 CREATE TABLE franchise_member_roles (franchise integer,
   player integer,
-  role varchar(64), -- Admin, Head Coach, Player, Assistant Coach, etc.
+  role char(1), -- (a)dmin, (p)layer, (c)oach
   became date NOT NULL CONSTRAINT df_franchise_member_roles_became DEFAULT now(),
   retired date,
   head_coach_wins smallint,
@@ -371,7 +371,7 @@ CREATE TABLE team_member_roles (league integer,
   season integer,
   team integer,
   player integer,
-  role varchar(64), -- Admin, Head Coach, Assistant Coach, Player, etc.
+  role char(1), -- (a)dmin, (p)layer, (c)oach
   player_captain boolean,
   player_captain_of varchar(64), -- Defense, Offense, Special Teams, etc.
   player_status varchar(1), -- (a)ctive (default), on (l)eave, (i)njured  

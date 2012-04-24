@@ -1,23 +1,20 @@
 package com.pastime.leagues.season;
 
-public final class TeamMemberRole {
-
-    public static final TeamMemberRole ADMIN = new TeamMemberRole("Admin");
+public enum TeamMemberRole {
     
-    public static final TeamMemberRole HEAD_COACH = new TeamMemberRole("Head Coach");
+    PLAYER, COACH, ADMIN;
 
-    public static final TeamMemberRole ASSISTANT_COACH = new TeamMemberRole("Assistant Coach");
-
-    public static final TeamMemberRole PLAYER = new TeamMemberRole("Player");
-    
-    private String value;
-    
-    private TeamMemberRole(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
+    public static String dbValue(TeamMemberRole role) {
+        if (role == null) {
+            throw new IllegalArgumentException("role cannot be null");
+        }
+        if (role == PLAYER) {
+            return "p";
+        } else if (role == COACH) {
+            return "c";
+        } else {
+            return "a";
+        }
     }
     
 }

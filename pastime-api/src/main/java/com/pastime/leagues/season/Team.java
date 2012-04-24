@@ -23,9 +23,10 @@ public class Team extends LinkedResource {
         addLink("site", site(siteUrl, organization, league, key.getSeason(), season, slug));
         if (franchise != null) {
             addLink("franchise", Franchise.api(apiUrl, franchise));
-        }        
+        }     
         addLink("season", UriComponentsBuilder.fromUri(apiUrl).path("/leagues/{league}/seasons/{season}").buildAndExpand(key.getLeague(), key.getSeason()).toUri());
-        addLink("season_site", UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}").buildAndExpand(organization, league, season).toUri());        
+        addLink("season_site", UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}").buildAndExpand(organization, league, season).toUri());
+        addLink("new_member_search", UriComponentsBuilder.fromUri(getUrl()).path("/new-member-search").build().toUri());
     }
 
     public Integer getNumber() {

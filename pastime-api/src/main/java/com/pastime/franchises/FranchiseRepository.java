@@ -58,7 +58,7 @@ public class FranchiseRepository {
         } else {
             if (status == MemberStatus.CURRENT) {
                 return jdbcTemplate.query(currentMembersOfRoleSql, new SingleRoleFranchiseMemberMapper(franchiseId, franchiseUsername),
-                        franchiseId, role.getValue());
+                        franchiseId, MemberRole.dbValue(role));
             } else if (status == MemberStatus.RETIRED) {
                 throw new UnsupportedOperationException("Not yet implemented");
             } else {
@@ -113,7 +113,7 @@ public class FranchiseRepository {
                     new LocalDate(rs.getDate("joined")), rs.getString("slug"),
                     Franchise.api(environment.getApiUrl(), franchiseId), Franchise.site(environment.getSiteUrl(), franchiseId, franchiseUsername));
             String role = rs.getString("role");
-            if ("Player".equals(role)) {
+            if ("p".equals(role)) {
                 member.getRoles().put("Player", new PlayerMemberRole(new LocalDate(rs.getDate("became")),
                         localDate(rs.getDate("retired")), rs.getBoolean("player_captain"), rs.getString("player_captain_of")));
             } else {

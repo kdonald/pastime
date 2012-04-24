@@ -68,7 +68,7 @@ public class PlayerRepository {
     private URI defaultPicture(Integer playerId, PictureType type) {
         Player player = findPlayer(playerId);            
         try {
-            return pictures.createRelative("defaults/" + player.getGender().name().toLowerCase() + "/" + type + PICTURE_FILE_EXTENSION).getURI();
+            return pictures.createRelative("defaults/" + player.getGender().name().toLowerCase() + "/" + type.name().toLowerCase() + PICTURE_FILE_EXTENSION).getURI();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to access picture repository to load default player profile pictures", e);
         }
@@ -76,7 +76,7 @@ public class PlayerRepository {
     
     private URI pictureFrom(Resource directory, PictureType type) {
         try {
-            return directory.createRelative(type + PICTURE_FILE_EXTENSION).getURI();
+            return directory.createRelative(type.name().toLowerCase() + PICTURE_FILE_EXTENSION).getURI();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to access picture repository to load player profile picture", e);
         }

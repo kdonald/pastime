@@ -35,14 +35,14 @@ public class FranchiseController {
     
     @RequestMapping(value="/picture", method=RequestMethod.GET, produces="application/json")
     public String picture(@PathVariable("id") Integer id,
-            @RequestParam(value="type", defaultValue="small") PictureType type) {
+            @RequestParam(value="type", defaultValue="SMALL") PictureType type) {
         return "redirect:" + franchiseRepository.findPicture(id, type);
     }
 
     @RequestMapping(value="/members", method=RequestMethod.GET, produces="application/json")
     public List<FranchiseMember> members(@PathVariable("id") Integer id,
-            @RequestParam(value="role", defaultValue="player") MemberRole role,
-            @RequestParam(value="status", defaultValue="current") MemberStatus status) {
+            @RequestParam(value="role", defaultValue="PLAYER") MemberRole role,
+            @RequestParam(value="status", defaultValue="CURRENT") MemberStatus status) {
         return franchiseRepository.findFranchiseMembers(id, role, status);
     }
 

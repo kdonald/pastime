@@ -29,14 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.SlugUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.pastime.leagues.season.AddPlayerForm.EmailAddress;
 import com.pastime.players.Gender;
 import com.pastime.players.Player;
 import com.pastime.players.PlayerMapper;
 import com.pastime.util.Name;
 import com.pastime.util.PastimeEnvironment;
 import com.pastime.util.Range;
-import com.pastime.util.TeamRoles;
 
 public class TeamRepository {
 
@@ -138,7 +136,7 @@ public class TeamRepository {
             }
         });
     }
-
+    
     // package private used by Team
 
     void addTeamMember(TeamKey key, Integer playerId, FranchiseMember franchise) {
@@ -147,9 +145,9 @@ public class TeamRepository {
                 playerId, franchise != null ? franchise.getNumber() : null, franchise != null ? franchise.getNickname() : null);
     }
 
-    void addTeamMemberRole(TeamKey key, Integer playerId, String role) {
+    void addTeamMemberRole(TeamKey key, Integer playerId, TeamMemberRole role) {
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)",
-                key.getLeague(), key.getSeason(), key.getNumber(), playerId, role);
+                key.getLeague(), key.getSeason(), key.getNumber(), playerId, TeamMemberRole.dbValue(role));
     }
 
     boolean isTeamMember(TeamKey key, Integer playerId) {
@@ -166,7 +164,7 @@ public class TeamRepository {
     }
 
     boolean alreadyPlaying(Integer playerId, TeamKey key) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles WHERE league = ? and season = ? and team = ? AND player = ? AND role = 'Player')",
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles WHERE league = ? and season = ? and team = ? AND player = ? AND role = 'p')",
                 Boolean.class, key.getLeague(), key.getSeason(), key.getNumber(), playerId);
     }
 
@@ -202,14 +200,14 @@ public class TeamRepository {
     
     private void makeAdmin(TeamKey key, Integer adminId, FranchiseMember franchiseAdmin) {
         addTeamMember(key, adminId, franchiseAdmin);
-        addTeamMemberRole(key, adminId, TeamRoles.ADMIN);        
+        addTeamMemberRole(key, adminId, TeamMemberRole.ADMIN);        
     }
     
     private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, Integer playerId) {
         String code = inviteGenerator.generateKey();
         final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
         jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamRoles.PLAYER, code, from.getId(), playerId);
+                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamMemberRole.dbValue(TeamMemberRole.PLAYER), code, from.getId(), playerId);
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
