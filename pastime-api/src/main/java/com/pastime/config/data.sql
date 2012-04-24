@@ -21,7 +21,7 @@ INSERT INTO leagues (name, slug, sport, format, nature, gender, age_min, age_max
 
 INSERT INTO league_venues (league, venue, primary_venue) VALUES (1, 1, true);
 
-INSERT INTO seasons (league, number, name, start_date, registration_opens, registration_closes, status) VALUES (1, 1, 'South Brevard Adult Flag Football', '2012-04-18', null, null, 'o');
+INSERT INTO seasons (league, number, name, slug, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', '2012-spring', 'o');
  
 -- Volleyball
 
@@ -31,7 +31,7 @@ INSERT INTO leagues (name, slug, sport, format, nature, gender, age_min, age_max
 
 INSERT INTO league_venues (league, venue, primary_venue) VALUES (2, 2, true);
 
-INSERT INTO seasons (league, number, name, start_date, registration_opens, registration_closes, status) VALUES (2, 1, 'Max Rodes Indoor Volleyball', '2012-05-01', null, null, 'o');
+INSERT INTO seasons (league, number, name, slug) VALUES (2, 1, 'Max Rodes Indoor Volleyball', '2012-spring');
 
   
 -- Teams and Players

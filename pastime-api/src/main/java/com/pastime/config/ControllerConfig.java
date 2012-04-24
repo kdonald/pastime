@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import com.pastime.errors.ErrorController;
 import com.pastime.franchises.FranchiseController;
 import com.pastime.franchises.FranchiseRepository;
-import com.pastime.franchises.MyFranchisesController;
+import com.pastime.franchises.FranchisesController;
 import com.pastime.leagues.UpcomingSeasonsController;
 import com.pastime.leagues.season.SeasonController;
 import com.pastime.leagues.season.TeamRepository;
@@ -68,8 +68,8 @@ public class ControllerConfig extends WebMvcConfigurerAdapter {
     }
     
     @Bean
-    public MyFranchisesController myFranchisesController() {
-        return new MyFranchisesController(franchiseRepository());
+    public FranchisesController myFranchisesController() {
+        return new FranchisesController(franchiseRepository());
     }
     
     @Bean

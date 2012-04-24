@@ -34,9 +34,16 @@ public class SeasonController {
 
     @RequestMapping(value="/teams", method=RequestMethod.POST)
     @Authorized("teams")
-    public ResponseEntity<Object> createTeam(@Valid TeamForm teamForm, Principal principal) {
-        URI link = teamRepository.createTeam(teamForm, principal.getPlayerId());        
+    public ResponseEntity<Object> createTeam(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @Valid CreateTeamForm form, Principal principal) {
+        URI link = teamRepository.createTeam(new SeasonKey(league, season), form, principal.getPlayerId());        
         return created(link);
+    }
+    
+    @RequestMapping(value="/teams/{team}", method=RequestMethod.GET)
+    public Team team(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @PathVariable("team") Integer number) {
+        return teamRepository.findTeam(new TeamKey(league, season, number));        
     }
 
     @RequestMapping(value="/teams/{team}/player-search", method=RequestMethod.GET, params="name", produces="application/json")
@@ -53,14 +60,14 @@ public class SeasonController {
     public ResponseEntity<? extends Object> addPlayer(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number,
             AddPlayerForm playerForm, Principal principal) {
-        Team team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
+        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
         URI link = addPlayer(playerForm, team);
         return created(link);       
     }
 
     // internal helpers
 
-    private URI addPlayer(AddPlayerForm playerForm, Team team) {
+    private URI addPlayer(AddPlayerForm playerForm, EditableTeam team) {
         if (playerForm.getEmail() != null) {
            return team.addPlayer(playerForm.getEmailAddress());
         } else {

@@ -100,6 +100,9 @@ public class SiteController {
         }
         
         private String formatDate(Date date) {
+            if (date == null) {
+                return "";
+            }
             return dateFormatter.print(date.getTime());
         }
         

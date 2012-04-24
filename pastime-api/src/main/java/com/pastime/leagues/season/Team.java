@@ -2,95 +2,52 @@ package com.pastime.leagues.season;
 
 import java.net.URI;
 
+import org.springframework.util.LinkedResource;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.pastime.leagues.season.AddPlayerForm.EmailAddress;
-import com.pastime.util.ErrorReporter;
-import com.pastime.util.TeamRoles;
+import com.pastime.franchises.Franchise;
 
-public class Team {
-
+public class Team extends LinkedResource {
+    
     private final TeamKey key;
     
     private final String name;
-    
-    private final String sport;
-    
-    private final Roster roster;
 
-    private final TeamMember admin;
-    
-    private final TeamRepository teamRepository;
-
-    private final URI apiUrl;
-
-    private final URI siteUrl;
-    
-    public Team(TeamKey key, String name, String sport, Roster roster, TeamMember admin, URI apiUrl, URI siteUrl, TeamRepository teamRepository) {
+    public Team(TeamKey key, String name, String organization, String league, String season, String slug, Integer franchise, URI apiUrl, URI siteUrl) {
+        super(api(apiUrl, key));
         this.key = key;
         this.name = name;
-        this.sport = sport;
-        this.roster = roster;
-        this.admin = admin;
-        this.apiUrl = apiUrl;
-        this.siteUrl = siteUrl;
-        this.teamRepository = teamRepository;        
+        addLink("season", UriComponentsBuilder.fromUri(apiUrl).path("/leagues/{league}/seasons/{season}").buildAndExpand(key.getLeague(), key.getSeason()).toUri());
+        addLink("season_site", UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}").buildAndExpand(organization, league, season).toUri());        
+        addLink("picture", UriComponentsBuilder.fromUri(getUrl()).path("/picture").build().toUri());
+        addLink("members", UriComponentsBuilder.fromUri(getUrl()).path("/members").build().toUri());
+        addLink("invites", UriComponentsBuilder.fromUri(getUrl()).path("/invites").build().toUri());
+        if (franchise != null) {
+            addLink("franchise", Franchise.api(apiUrl, franchise));
+        }
+        addLink("site", site(siteUrl, organization, league, key.getSeason(), season, slug));        
     }
 
-    public TeamKey getKey() {
-        return key;
+    public Integer getNumber() {
+        return key.getNumber();
     }
-
+    
     public String getName() {
         return name;
     }
-
-    public String getSport() {
-        return sport;
-    }
-
-    public URI getApiUrl() {
-        return apiUrl;
+    
+    public static URI api(URI apiUrl, TeamKey key) {
+        return UriComponentsBuilder.fromUri(apiUrl).path("/leagues/{league}/seasons/{season}/teams/{number}").
+                buildAndExpand(key.getLeague(), key.getSeason(), key.getNumber()).toUri();        
     }
 
-    public URI getSiteUrl() {
-        return siteUrl;
-    }
-
-    public Roster getRoster() {
-        return roster;
+    public static URI site(URI siteUrl, String organizationUsername, String leagueSlug, int seasonNumber, String seasonSlug, String slug) {
+        return UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}/{team}").
+                buildAndExpand(organizationUsername, leagueSlug, seasonPath(seasonNumber, seasonSlug), slug).toUri();
     }
     
-    public URI addPlayer(Integer id) {
-        ProposedPlayer player = teamRepository.findProposedPlayer(id);
-        return addPlayer(player);
+    private static Object seasonPath(Integer seasonNumber, String seasonSlug) {
+        return seasonSlug != null ? seasonSlug : seasonNumber;
     }
-    
-    public URI addPlayer(EmailAddress email) {
-        ProposedPlayer player = teamRepository.findProposedPlayer(email.getValue());
-        if (player != null) {
-            return addPlayer(player);
-        } else {
-            return teamRepository.sendPersonInvite(email, admin, this);
-        }
-    }
-    
-    // internal helpers
-    
-    private URI addPlayer(ProposedPlayer player) {
-        if (teamRepository.alreadyPlaying(player.getId(), key)) {
-            throw new AlreadyPlayingException(player.getId(), key);
-        }        
-        ErrorReporter reporter = new ErrorReporter();
-        if (!roster.isAcceptable(player, reporter)) {
-            throw new RosterViolationException(key, reporter.getMessage());
-        }
-        if (admin.sameAs(player)) {
-            teamRepository.addTeamMemberRole(key, player.getId(), TeamRoles.PLAYER);
-            return UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").buildAndExpand(player.getId()).toUri();
-        } else {
-            return teamRepository.sendPlayerInvite(player, admin, this);
-        }        
-    }
-    
+   
 }

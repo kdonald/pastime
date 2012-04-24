@@ -21,7 +21,8 @@
       "dateformat": "../../libs/dateformat/1.0.0/dateformat",
       "es5-shim": "../../libs/es5-shim/1.3.0.snapshot/es5-shim",      
       "handlebars" : "../../libs/handlebars/1.0.0.beta6/handlebars",
-      "jquery" : "../../libs/jquery/1.7.1/jquery",
+      "jquery" : "../../libs/jquery/1.7.2/jquery",
+      "jquery-cors-patch" : "../../libs/jquery-cors-patch/1.7/jquery-cors-patch",
       "jqueryui" : "../../libs/jqueryui/1.8.18",
       "jqueryui-autocomplete-html" : "../../libs/jqueryui-autocomplete-html/1.0.0-20101025/autocomplete-html",
       "jquery-cookie" : "../../libs/jquery-cookie/1.0.1.20120323/cookie",
@@ -32,7 +33,7 @@
     },
     priority : [ "common" ]
   });
-  require(["jquery", "leagues/join/join"], function($, join) {
+  require(["jquery", "leagues/join/join", "jquery-cors-patch"], function($, join) {
     var season = {
         name: '{{name}}',
         start_date: '{{start_date}}',

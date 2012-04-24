@@ -37,12 +37,12 @@ define(["pastime", "require", "jquery", "mvc", "text!./team-name.html"], functio
 
     function roster() {
       var xhr = createTeam();
-      xhr.done(function(created) {
-        // TODO read Location header and make a get request for team data
-        team.id = created.id;
-        team.links = created.links;
-        require(["./roster/submit"], function(roster) {
-          container.html(roster(team, season).render());
+      xhr.done(function() {
+        var location = xhr.getResponseHeader("Location");
+        pastime.get(location).done(function(team) {
+          require(["./roster/submit"], function(roster) {
+            container.html(roster(team, season).render());
+          });        	
         });
       });
     }

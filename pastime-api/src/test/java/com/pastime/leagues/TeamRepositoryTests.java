@@ -24,8 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pastime.leagues.season.AddPlayerForm.EmailAddress;
 import com.pastime.leagues.season.AlreadyPlayingException;
+import com.pastime.leagues.season.CreateTeamForm;
+import com.pastime.leagues.season.EditableTeam;
+import com.pastime.leagues.season.SeasonKey;
 import com.pastime.leagues.season.Team;
-import com.pastime.leagues.season.TeamForm;
 import com.pastime.leagues.season.TeamKey;
 import com.pastime.leagues.season.TeamRepository;
 import com.pastime.players.Player;
@@ -50,11 +52,9 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO organizations (id, name) VALUES (1, 'Brevard County Parks & Recreation')");
         jdbcTemplate.update("INSERT INTO leagues (organization, id, name, slug, sport, format, roster_min, roster_healthy, roster_max) VALUES (1, 1, 'South Brevard Adult Flag Football', 'south-flag', 'Flag Football', '7-on-7', 7, 10, 21)");
         jdbcTemplate.update("INSERT INTO seasons (league, number, name, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', 'o')");
-        TeamForm form = new TeamForm();
-        form.setLeague(1);
-        form.setSeason(1);
+        CreateTeamForm form = new CreateTeamForm();
         form.setName("Hitmen");
-        URI link = teamRepository.createTeam(form, 1);
+        URI link = teamRepository.createTeam(new SeasonKey(1, 1), form, 1);
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1"), link);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from teams where league = 1 and season = 1");
         assertEquals("Hitmen", record.get("name"));
@@ -73,17 +73,22 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO organizations (id, name) VALUES (1, 'Brevard County Parks & Recreation')");
         jdbcTemplate.update("INSERT INTO leagues (organization, id, name, slug, sport, format, roster_min, roster_healthy, roster_max) VALUES (1, 1, 'South Brevard Adult Flag Football', 'south-flag', 'Flag Football', '7-on-7', 7, 10, 21)");
         jdbcTemplate.update("INSERT INTO seasons (league, number, name, registration_status) VALUES (1, 1, 'South Brevard Adult Flag Football', 'o')");
-        TeamForm form = new TeamForm();
-        form.setLeague(1);
-        form.setSeason(1);
+        CreateTeamForm form = new CreateTeamForm();
         form.setName("Doesn't Matter");
         form.setFranchise(1);
-        URI link = teamRepository.createTeam(form, 1);
+        URI link = teamRepository.createTeam(new SeasonKey(1, 1), form, 1);
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1"), link);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from teams where league = 1 and season = 1");
         assertEquals("Hitmen", record.get("name"));
         assertEquals("hitmen", record.get("slug"));        
         assertEquals(1, record.get("franchise"));
+    }
+    
+    @Test
+    public void findTeam() throws Exception {
+        createTeam();
+        Team team = teamRepository.findTeam(new TeamKey(1, 1, 1));
+        assertEquals("Hitmen", team.getName());
     }
     
     @Test
@@ -107,7 +112,7 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO teams (league, season, number, name, slug) VALUES (1, 1, 1, 'Hitmen', 'hitmen')");
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player) VALUES (1, 1, 1, 1)");
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");        
-        Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
+        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         URI uri = team.addPlayer(1);
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/members/1"), uri);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from team_member_roles where league = 1 and season = 1 and team = 1 and role = 'Player'");
@@ -126,7 +131,7 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO teams (league, season, number, name, slug) VALUES (1, 1, 1, 'Hitmen', 'hitmen')");
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player) VALUES (1, 1, 1, 1)");
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");        
-        Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
+        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         URI uri = team.addPlayer(new EmailAddress("keith.donald@gmail.com", new Name("Keith" ,"Donald")));
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/members/1"), uri);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from team_member_roles where league = 1 and season = 1 and team = 1 and role = 'Player'");
@@ -152,7 +157,7 @@ public class TeamRepositoryTests {
                 return "123456";
             }
         });
-        Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
+        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         URI uri = team.addPlayer(2);
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/invites/123456"), uri);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from team_member_invites where league = 1 and season = 1 and team = 1 and code = '123456'");
@@ -187,7 +192,7 @@ public class TeamRepositoryTests {
                 return "123456";
             }
         });        
-        Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
+        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         URI uri = team.addPlayer(new EmailAddress("alexander.weaver@gmail.com", new Name("Alexander" ,"Weaver")));
         assertEquals(new URI("https://api.pastime.com/leagues/1/seasons/1/teams/1/invites/123456"), uri);
         Map<String, Object> record = jdbcTemplate.queryForMap("select * from team_member_invites where league = 1 and season = 1 and team = 1 and code = '123456'");
@@ -216,7 +221,7 @@ public class TeamRepositoryTests {
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player) VALUES (1, 1, 1, 1)");
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Admin')");
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (1, 1, 1, 1, 'Player')");        
-        Team team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
+        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(1, 1, 1), 1);
         team.addPlayer(1);
     }
     

@@ -53,7 +53,9 @@ public class TeamRepository {
     private String qualifiedFranchiseAdminSql;
 
     private String playerSearchSql;
-    
+
+    private String teamSql;
+
     private String editTeamSql;
 
     private String proposedPlayerSql;
@@ -71,6 +73,7 @@ public class TeamRepository {
         this.environment = environment;
         this.qualifiedFranchiseAdminSql = SqlUtils.sql(new ClassPathResource("qualified-franchise-admin.sql", getClass()));
         this.playerSearchSql = SqlUtils.sql(new ClassPathResource("player-search.sql", getClass()));
+        this.teamSql = SqlUtils.sql(new ClassPathResource("team.sql", getClass()));        
         this.editTeamSql = SqlUtils.sql(new ClassPathResource("edit-team.sql", getClass()));
         this.proposedPlayerSql = SqlUtils.sql(new ClassPathResource("proposed-player.sql", getClass()));        
         this.proposedPlayerByEmailSql = SqlUtils.sql(new ClassPathResource("proposed-player-byemail.sql", getClass()));        
@@ -81,20 +84,30 @@ public class TeamRepository {
     }
     
     @Transactional
-    public URI createTeam(TeamForm team, Integer adminId) {
-        if (registrationClosed(team.getLeague(), team.getSeason())) {
-            throw new RegistrationClosedException(team.getLeague(), team.getSeason());
+    public URI createTeam(SeasonKey season, CreateTeamForm team, Integer adminId) {
+        if (registrationClosed(season.getLeague(), season.getNumber())) {
+            throw new RegistrationClosedException(season);
         }
         FranchiseMember franchiseAdmin = null;
         if (team.getFranchise() != null) {
-            franchiseAdmin = findQualifiedFranchiseAdmin(team.getFranchise(), team.getLeague(), adminId);
+            franchiseAdmin = findQualifiedFranchiseAdmin(team.getFranchise(), season.getLeague(), adminId);
             team.setName(franchiseAdmin.getFranchiseName());
         }
-        TeamKey key = insertTeam(team);
+        TeamKey key = insertTeam(season, team);
         makeAdmin(key, adminId, franchiseAdmin);
-        return teamApiUrl(key);
+        return Team.api(environment.getApiUrl(), key);
     }
 
+    public Team findTeam(final TeamKey key) {
+        return jdbcTemplate.queryForObject(teamSql, new RowMapper<Team>() {
+            public Team mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new Team(key, rs.getString("name"), rs.getString("organization_username"), rs.getString("league_slug"),
+                        rs.getString("season_slug"), rs.getString("slug"), (Integer) rs.getObject("franchise"),
+                        environment.getApiUrl(), environment.getSiteUrl());
+            }
+        }, key.getLeague(), key.getSeason(), key.getNumber());
+    }
+    
     public List<Player> searchPlayers(TeamKey team, String name, Integer adminId) {
         Map<String, Object> params = new HashMap<String, Object>(1, 1);
         params.put("name", name);
@@ -105,25 +118,23 @@ public class TeamRepository {
         return players;
     }
 
-    public Team getTeamForEditing(final TeamKey teamKey, final Integer adminId) {
+    public EditableTeam getTeamForEditing(final TeamKey teamKey, final Integer adminId) {
         Map<String, Object> params = new HashMap<String, Object>(4, 4);
-        params.put("league", teamKey.getLeagueId());
-        params.put("season", teamKey.getSeasonId());
+        params.put("league", teamKey.getLeague());
+        params.put("season", teamKey.getSeason());
         params.put("team", teamKey.getNumber());
         params.put("admin", adminId);
-        return namedJdbcTemplate.queryForObject(editTeamSql, params, new RowMapper<Team>() {
-            public Team mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return namedJdbcTemplate.queryForObject(editTeamSql, params, new RowMapper<EditableTeam>() {
+            public EditableTeam mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Roster roster = new Roster(rs.getInt("total_player_count"), rs.getInt("female_player_count"), (Integer) rs.getObject("roster_max"), 
                         new Range((Integer) rs.getObject("age_min"), (Integer) rs.getObject("age_max")),
                         TeamGender.valueOf(rs.getString("gender")), (Integer) rs.getObject("roster_min_female"));
-                URI teamSiteUrl = siteUrl().path("/{organization}/{league}/{season}/{team}").buildAndExpand(rs.getString("organization_username"), rs.getString("league_slug"),
-                        seasonPath(rs.getInt("season_number"), rs.getString("season_slug")), rs.getString("slug")).toUri();
+                URI teamSiteUrl = Team.site(environment.getSiteUrl(), rs.getString("organization_username"), rs.getString("league_slug"), rs.getInt("season_number"), rs.getString("season_slug"), rs.getString("slug"));
                 TeamMember admin = new TeamMember(rs.getInt("admin_id"), new Name(rs.getString("admin_first_name"), rs.getString("admin_last_name")), 
                         (Integer) rs.getObject("admin_number"), rs.getString("admin_nickname"), rs.getString("admin_slug"), teamSiteUrl);
-                return new Team(teamKey, rs.getString("name"), rs.getString("sport"), roster, admin, teamApiUrl(teamKey), teamSiteUrl, TeamRepository.this);
-            }
-            private Object seasonPath(Integer seasonId, String seasonSlug) {
-                return seasonSlug != null ? seasonSlug : seasonId;
+                return new EditableTeam(teamKey, rs.getString("name"), rs.getString("sport"), roster, admin,
+                        Team.api(environment.getApiUrl(), teamKey), teamSiteUrl,
+                        TeamRepository.this);
             }
         });
     }
@@ -131,24 +142,21 @@ public class TeamRepository {
     // package private used by Team
 
     void addTeamMember(TeamKey key, Integer playerId, FranchiseMember franchise) {
-        jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)", key.getLeagueId(), key.getSeasonId(), key.getNumber(),
+        jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)",
+                key.getLeague(), key.getSeason(), key.getNumber(),
                 playerId, franchise != null ? franchise.getNumber() : null, franchise != null ? franchise.getNickname() : null);
     }
 
     void addTeamMemberRole(TeamKey key, Integer playerId, String role) {
-        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)", key.getLeagueId(), key.getSeasonId(), key.getNumber(),
-                playerId, role);
+        jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)",
+                key.getLeague(), key.getSeason(), key.getNumber(), playerId, role);
     }
 
     boolean isTeamMember(TeamKey key, Integer playerId) {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members where league = ? AND season = ? AND team = ? AND player = ?)", Boolean.class, 
-                key.getLeagueId(), key.getSeasonId(), key.getNumber(), playerId);
+                key.getLeague(), key.getSeason(), key.getNumber(), playerId);
     }
 
-    URI teamApiUrl(TeamKey key) {
-        return apiUrl().path("/leagues/{league}/seasons/{season}/teams/{number}").buildAndExpand(key.getLeagueId(), key.getSeasonId(), key.getNumber()).toUri();
-    }
-    
     ProposedPlayer findProposedPlayer(Integer id) {
         return jdbcTemplate.queryForObject(proposedPlayerSql, new ProposedPlayerMapper(), id);
     }
@@ -159,14 +167,14 @@ public class TeamRepository {
 
     boolean alreadyPlaying(Integer playerId, TeamKey key) {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles WHERE league = ? and season = ? and team = ? AND player = ? AND role = 'Player')",
-                Boolean.class, key.getLeagueId(), key.getSeasonId(), key.getNumber(), playerId);
+                Boolean.class, key.getLeague(), key.getSeason(), key.getNumber(), playerId);
     }
 
-    URI sendPlayerInvite(final ProposedPlayer player, final TeamMember from, final Team team) {
+    URI sendPlayerInvite(final ProposedPlayer player, final TeamMember from, final EditableTeam team) {
         return sendPersonInvite(new EmailAddress(player.getEmail(), player.getName()), from, team, player.getId());
     }
 
-    URI sendPersonInvite(final EmailAddress email, final TeamMember from, final Team team) {
+    URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team) {
         return sendPersonInvite(email, from, team, null);
     }
     
@@ -184,11 +192,12 @@ public class TeamRepository {
         }, franchiseId, leagueId, playerId);
     }
 
-    private TeamKey insertTeam(TeamForm team) {
-        Integer number = jdbcTemplate.queryForInt("SELECT coalesce(max(number) + 1, 1) as next_number FROM teams WHERE league = ? AND season = ?", team.getLeague(), team.getSeason()); 
+    private TeamKey insertTeam(SeasonKey season, CreateTeamForm team) {
+        Integer number = jdbcTemplate.queryForInt("SELECT coalesce(max(number) + 1, 1) as next_number FROM teams WHERE league = ? AND season = ?",
+                season.getLeague(), season.getNumber()); 
         jdbcTemplate.update("INSERT INTO teams (league, season, number, name, slug, franchise) VALUES (?, ?, ?, ?, ?, ?)",
-                team.getLeague(), team.getSeason(), number, team.getName(), SlugUtils.toSlug(team.getName()), team.getFranchise());
-        return new TeamKey(team.getLeague(), team.getSeason(), number);
+                season.getLeague(), season.getNumber(), number, team.getName(), SlugUtils.toSlug(team.getName()), team.getFranchise());
+        return new TeamKey(season, number);
     }
     
     private void makeAdmin(TeamKey key, Integer adminId, FranchiseMember franchiseAdmin) {
@@ -196,19 +205,11 @@ public class TeamRepository {
         addTeamMemberRole(key, adminId, TeamRoles.ADMIN);        
     }
     
-    private UriComponentsBuilder apiUrl() {
-        return UriComponentsBuilder.fromUri(environment.getApiUrl());
-    }
-    
-    private UriComponentsBuilder siteUrl() {
-        return UriComponentsBuilder.fromUri(environment.getSiteUrl());
-    }
-    
-    private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final Team team, Integer playerId) {
+    private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, Integer playerId) {
         String code = inviteGenerator.generateKey();
         final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
         jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                team.getKey().getLeagueId(), team.getKey().getSeasonId(), team.getKey().getNumber(), email.getValue(), TeamRoles.PLAYER, code, from.getId(), playerId);
+                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamRoles.PLAYER, code, from.getId(), playerId);
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
@@ -239,5 +240,5 @@ public class TeamRepository {
     
     // cglib ceremony 
     public TeamRepository() {}
-    
+
 }
