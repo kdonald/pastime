@@ -13,7 +13,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           source: function(request, response) {
             var xhr = pastime.get(team.links["new_member_search"], {
               name: request.term,
-              role: "Player"
+              role: "PLAYER"
             });
             xhr.done(function(players) {
               var items = new Array(players.length);
@@ -35,11 +35,11 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           template: addPlayerFormTemplate,
           events: {
             "submit": function() {
-        			var xhr = pastime.post(team.links["members"], this.model);
-        			xhr.done(function(player) {
-        			  this.destroy();
-        				self.trigger("player-added", player);
-        			}.bind(this));
+        			pastime.post(team.links["members"], this.model)
+        				.done(self.triggerPlayerAdded)
+        				.done(function() {
+        					this.destroy();
+        				}.bind(this));
               return false;
             },
             "click button.cancel": function() {
@@ -51,30 +51,27 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           self.root.append(self.collapsed);            
         });
         this.expand = function(name) {
-          var model = { name: name, email: "", role: "Player" };
+          var model = { name: name, email: "", role: "PLAYER" };
           self.collapsed = self.$("form").detach();
           self.root.append(mvc.extend(expanded, model).render());
           this.$("input[name=email]").focus();                
         };
-        this.input = this.$("input");          
+        this.triggerPlayerAdded = function(result, status, xhr) {
+    			this.trigger("player-added", xhr.getResponseHeader("Location"));
+    		}.bind(this);
       },
       events: {
         "submit form": function(event) {
           if (this.selectedPlayer) {
-        	  var xhr = pastime.post(team.links["members"], {
+        	  pastime.post(team.links["members"], {
         		  id: this.selectedPlayer.id,
-        		  role: "Player"
-        	  });
-        	  xhr.done(function() {
-        		  this.trigger("player-added", this.selectedPlayer);
-        	  }.bind(this));
+        		  role: "PLAYER"
+        	  }).done(this.triggerPlayerAdded);
           } else {
             if (this.model.value === "me") {
             	pastime.post(team.links["members"], {
-            		role: "Player"
-            	}).done(function(player) {
-            		this.trigger("player-added", player);
-            	}.bind(this));
+            		role: "PLAYER"
+            	}).done(this.triggerPlayerAdded);
             } else {
             	this.expand(this.model.value);
             }

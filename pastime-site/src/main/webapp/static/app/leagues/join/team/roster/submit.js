@@ -71,8 +71,11 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
     });
 
     var addPlayerView = addPlayer(team);
-    addPlayerView.on("player-added", function(player) {
-      roster.addPlayer(player);        
+    addPlayerView.on("player-added", function(location) {
+      var xhr = pastime.get(location);
+      xhr.done(function(player) {
+    	  roster.addPlayer(player);
+      });
     });
     createRoster.append(rosterPlayers.render()).append(addPlayerView.render());
     

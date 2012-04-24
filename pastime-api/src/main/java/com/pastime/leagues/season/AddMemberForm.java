@@ -10,7 +10,7 @@ public class AddMemberForm {
 
     private String name;
     
-    private String role;
+    private TeamMemberRole role;
     
     public Integer getId() {
         return id;
@@ -36,11 +36,11 @@ public class AddMemberForm {
         this.email = email;
     }
 
-    public String getRole() {
+    public TeamMemberRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(TeamMemberRole role) {
         this.role = role;
     }
 

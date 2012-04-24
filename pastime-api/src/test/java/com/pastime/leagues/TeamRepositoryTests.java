@@ -29,6 +29,7 @@ import com.pastime.leagues.season.EmailAddress;
 import com.pastime.leagues.season.SeasonKey;
 import com.pastime.leagues.season.Team;
 import com.pastime.leagues.season.TeamKey;
+import com.pastime.leagues.season.TeamMember;
 import com.pastime.leagues.season.TeamRepository;
 import com.pastime.players.Player;
 import com.pastime.util.Name;
@@ -89,6 +90,13 @@ public class TeamRepositoryTests {
         createTeam();
         Team team = teamRepository.findTeam(new TeamKey(1, 1, 1));
         assertEquals("Hitmen", team.getName());
+    }
+    
+    @Test
+    public void findTeamMember() throws Exception {
+        addPlayerMe();
+        TeamMember member = teamRepository.findTeamMember(new TeamKey(1, 1, 1), 1);
+        assertEquals("Keith Donald", member.getName());
     }
     
     @Test

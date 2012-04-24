@@ -42,9 +42,9 @@ public class Team extends LinkedResource {
                 buildAndExpand(key.getLeague(), key.getSeason(), key.getNumber()).toUri();        
     }
 
-    public static URI site(URI siteUrl, String organizationUsername, String leagueSlug, int seasonNumber, String seasonSlug, String slug) {
+    public static URI site(URI siteUrl, String organization, String league, Integer seasonNumber, String season, String slug) {
         return UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}/{team}").
-                buildAndExpand(organizationUsername, leagueSlug, seasonPath(seasonNumber, seasonSlug), slug).toUri();
+                buildAndExpand(organization, league, seasonPath(seasonNumber, season), slug).toUri();
     }
     
     private static Object seasonPath(Integer seasonNumber, String seasonSlug) {

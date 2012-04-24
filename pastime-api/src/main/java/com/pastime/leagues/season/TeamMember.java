@@ -2,11 +2,13 @@ package com.pastime.leagues.season;
 
 import java.net.URI;
 
+import org.springframework.util.LinkedResource;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pastime.util.Name;
 
-public class TeamMember {
+public class TeamMember extends LinkedResource {
 
     private final Integer id;
     
@@ -16,28 +18,34 @@ public class TeamMember {
     
     private final String nickname;
     
-    private final URI siteUrl;
-
-    public TeamMember(Integer id, Name name, Integer number, String nickname, String slug, URI teamSite) {
+    public TeamMember(Integer id, Name name, Integer number, String nickname, String slug, URI teamApi, URI teamSite) {
+        super(api(teamApi, id));
         this.id = id;
         this.name = name;
         this.number = number;
         this.nickname = nickname;
-        if (slug != null) {
-            this.siteUrl = UriComponentsBuilder.fromUri(teamSite).path("/{slug}").buildAndExpand(slug).toUri();
-        } else {
-            this.siteUrl = UriComponentsBuilder.fromUri(teamSite).path("/{id}").buildAndExpand(id).toUri();            
-        }
+        addLink("picture", UriComponentsBuilder.fromUri(getUrl()).path("/picture").build().toUri());
+        addLink("site", site(teamSite, id, slug));
     }
 
     public Integer getId() {
         return id;
     }
 
-    public Name getName() {
-        return name;
+    public String getName() {
+        return name.toString();
     }
 
+    @JsonProperty("first_name")
+    public String getFirstName() {
+        return name.getFirstName();
+    }
+
+    @JsonProperty("last_name")
+    public String getLastName() {
+        return name.getLastName();
+    }
+    
     public Integer getNumber() {
         return number;
     }
@@ -46,12 +54,18 @@ public class TeamMember {
         return nickname;
     }
 
-    public URI getSiteUrl() {
-        return siteUrl;
+    // static factory methods
+    
+    public static URI api(URI teamApi, Integer id) {
+        return UriComponentsBuilder.fromUri(teamApi).path("/members/{id}").buildAndExpand(id).toUri();
     }
-
-    public boolean sameAs(ProposedPlayer player) {
-        return id.equals(player.getId());
+    
+    public static URI site(URI teamSite, Integer id, String slug) {
+        if (slug != null) {
+            return UriComponentsBuilder.fromUri(teamSite).path("/{slug}").buildAndExpand(slug).toUri();
+        } else {
+            return UriComponentsBuilder.fromUri(teamSite).path("/{id}").buildAndExpand(id).toUri();            
+        }        
     }
 
 }

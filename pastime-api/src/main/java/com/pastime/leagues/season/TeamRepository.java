@@ -59,6 +59,8 @@ public class TeamRepository {
     private String proposedPlayerSql;
 
     private String proposedPlayerByEmailSql;
+
+    private String teamMemberSql;
     
     private StringKeyGenerator inviteGenerator = new InsecureRandomStringGenerator(6);
     
@@ -74,7 +76,8 @@ public class TeamRepository {
         this.teamSql = SqlUtils.sql(new ClassPathResource("team.sql", getClass()));        
         this.editTeamSql = SqlUtils.sql(new ClassPathResource("edit-team.sql", getClass()));
         this.proposedPlayerSql = SqlUtils.sql(new ClassPathResource("proposed-player.sql", getClass()));        
-        this.proposedPlayerByEmailSql = SqlUtils.sql(new ClassPathResource("proposed-player-byemail.sql", getClass()));        
+        this.proposedPlayerByEmailSql = SqlUtils.sql(new ClassPathResource("proposed-player-byemail.sql", getClass()));
+        this.teamMemberSql = SqlUtils.sql(new ClassPathResource("team-member.sql", getClass()));
     }
 
     public void setInviteGenerator(StringKeyGenerator inviteGenerator) {
@@ -127,16 +130,27 @@ public class TeamRepository {
                 Roster roster = new Roster(rs.getInt("total_player_count"), rs.getInt("female_player_count"), (Integer) rs.getObject("roster_max"), 
                         new Range((Integer) rs.getObject("age_min"), (Integer) rs.getObject("age_max")),
                         TeamGender.valueOf(rs.getString("gender")), (Integer) rs.getObject("roster_min_female"));
-                URI teamSiteUrl = Team.site(environment.getSiteUrl(), rs.getString("organization_username"), rs.getString("league_slug"), rs.getInt("season_number"), rs.getString("season_slug"), rs.getString("slug"));
-                TeamMember admin = new TeamMember(rs.getInt("admin_id"), new Name(rs.getString("admin_first_name"), rs.getString("admin_last_name")), 
-                        (Integer) rs.getObject("admin_number"), rs.getString("admin_nickname"), rs.getString("admin_slug"), teamSiteUrl);
-                return new EditableTeam(teamKey, rs.getString("name"), rs.getString("sport"), roster, admin,
-                        Team.api(environment.getApiUrl(), teamKey), teamSiteUrl,
-                        TeamRepository.this);
+                EditableTeam team = new EditableTeam(teamKey, rs.getString("name"), rs.getString("sport"), roster,
+                        rs.getString("organization_username"), rs.getString("league_slug"), rs.getInt("season_number"), rs.getString("season_slug"), rs.getString("slug"),
+                        environment.getApiUrl(), environment.getSiteUrl(), TeamRepository.this);
+                team.setAdmin(rs.getInt("admin_id"), new Name(rs.getString("admin_first_name"), rs.getString("admin_last_name")), 
+                        (Integer) rs.getObject("admin_number"), rs.getString("admin_nickname"), rs.getString("admin_slug"));
+                return team;
             }
         });
     }
-    
+
+    public TeamMember findTeamMember(final TeamKey team, Integer id) {
+        return jdbcTemplate.queryForObject(teamMemberSql, new RowMapper<TeamMember>() {
+            public TeamMember mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new TeamMember(rs.getInt("id"), new Name(rs.getString("first_name"), rs.getString("last_name")), 
+                        (Integer) rs.getObject("number"), rs.getString("nickname"), rs.getString("slug"),
+                        Team.api(environment.getApiUrl(), team), Team.site(environment.getSiteUrl(),
+                                rs.getString("organization"), rs.getString("league"), rs.getInt("season_number"), rs.getString("season"), rs.getString("team")));
+            }
+        }, team.getLeague(), team.getSeason(), team.getNumber(), id);
+    }
+
     // package private used by Team
 
     void addTeamMember(TeamKey key, Integer playerId, FranchiseMember franchise) {
@@ -216,7 +230,7 @@ public class TeamRepository {
                invite.setSubject("Confirm your " + team.getName() + " team membership");
                Map<String, Object> model = new HashMap<String, Object>(7, 1);
                model.put("name", email.getDisplayName() != null ? email.getDisplayName().getFirstName() : "Hello");
-               model.put("adminUrl", from.getSiteUrl().toString());               
+               model.put("adminUrl", from.getLinks().get("site").toString());               
                model.put("admin", from.getName().toString());
                model.put("sport", team.getSport());              
                model.put("teamUrl", team.getSiteUrl());

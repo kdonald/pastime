@@ -40,9 +40,9 @@ INSERT INTO players (id, first_name, last_name, gender, birthday, zip_code, numb
   VALUES (1, 'Keith', 'Donald', 'm', '1977-12-29', '32904', 9, 'Donald', 'whippet', 'jnhyy5', null);
 INSERT INTO player_emails (player, email, primary_email) VALUES (1, 'keith.donald@gmail.com', true);
 
-INSERT INTO players (first_name, last_name, gender, birthday, zip_code, number, nickname, password, referral_code, referred_by)
-  VALUES ('Alexander', 'Weaver', 'm', '1978-05-20', '32905', 37, 'OG Hitman', 'whippet', '96dvlb', null);
-INSERT INTO player_emails (player, email, primary_email) VALUES (2, 'alexander.weaver@gmail.com', true);
+INSERT INTO players (id, first_name, last_name, gender, birthday, zip_code, number, nickname, password, referral_code, referred_by)
+  VALUES (2, 'Alexander', 'Weaver', 'm', '1978-05-20', '32905', 37, 'OG Hitman', 'whippet', '96dvlb', null);
+INSERT INTO player_emails (player, email, primary_email) VALUES (2, 'keith@pastime.com', true);
 
 INSERT INTO players (first_name, last_name, gender, birthday, zip_code, number, nickname, password, referral_code, referred_by)
   VALUES ('Brian', 'Fisher', 'm', '1970-10-20', '32904', 26, 'Fish', 'whippet', 'mvwkdw', null);

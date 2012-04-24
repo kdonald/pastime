@@ -64,6 +64,12 @@ public class SeasonController {
         URI link = addMember(playerForm, team, principal);
         return created(link);       
     }
+    
+    @RequestMapping(value="/teams/{team}/members/{id}", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody TeamMember member(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @PathVariable("team") Integer team, @PathVariable("id") Integer id) {
+        return teamRepository.findTeamMember(new TeamKey(league, season, team), id);
+    }
 
     // internal helpers
 
