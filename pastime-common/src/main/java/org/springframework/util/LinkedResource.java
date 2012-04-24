@@ -1,14 +1,14 @@
 package org.springframework.util;
 
 import java.net.URI;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LinkedResource {
 
 	private final URI url;
 	
-    private final Map<String, URI> links = new HashMap<String, URI>();
+    private final Map<String, URI> links = new LinkedHashMap<String, URI>();
     
     public LinkedResource(URI url) {
 		this.url = url;

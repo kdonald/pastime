@@ -17,15 +17,15 @@ public class Team extends LinkedResource {
         super(api(apiUrl, key));
         this.key = key;
         this.name = name;
-        addLink("season", UriComponentsBuilder.fromUri(apiUrl).path("/leagues/{league}/seasons/{season}").buildAndExpand(key.getLeague(), key.getSeason()).toUri());
-        addLink("season_site", UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}").buildAndExpand(organization, league, season).toUri());        
         addLink("picture", UriComponentsBuilder.fromUri(getUrl()).path("/picture").build().toUri());
         addLink("members", UriComponentsBuilder.fromUri(getUrl()).path("/members").build().toUri());
         addLink("invites", UriComponentsBuilder.fromUri(getUrl()).path("/invites").build().toUri());
+        addLink("site", site(siteUrl, organization, league, key.getSeason(), season, slug));
         if (franchise != null) {
             addLink("franchise", Franchise.api(apiUrl, franchise));
-        }
-        addLink("site", site(siteUrl, organization, league, key.getSeason(), season, slug));        
+        }        
+        addLink("season", UriComponentsBuilder.fromUri(apiUrl).path("/leagues/{league}/seasons/{season}").buildAndExpand(key.getLeague(), key.getSeason()).toUri());
+        addLink("season_site", UriComponentsBuilder.fromUri(siteUrl).path("/{organization}/{league}/{season}").buildAndExpand(organization, league, season).toUri());        
     }
 
     public Integer getNumber() {

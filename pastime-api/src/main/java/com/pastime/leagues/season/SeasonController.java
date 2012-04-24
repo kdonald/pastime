@@ -40,8 +40,8 @@ public class SeasonController {
         return created(link);
     }
     
-    @RequestMapping(value="/teams/{team}", method=RequestMethod.GET)
-    public Team team(@PathVariable("league") Integer league,
+    @RequestMapping(value="/teams/{team}", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody Team team(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number) {
         return teamRepository.findTeam(new TeamKey(league, season, number));        
     }
