@@ -244,16 +244,17 @@ public class TeamRepository {
     private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, Integer playerId) {
         String code = inviteGenerator.generateKey();
         final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
-        jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamMemberRole.dbValue(TeamMemberRole.PLAYER), code, from.getId(), playerId);
+        jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, first_name, last_name, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamMemberRole.dbValue(TeamMemberRole.PLAYER), code,
+                email.getFirstName(), email.getLastName(), from.getId(), playerId);
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
                MimeMessageHelper invite = new MimeMessageHelper(message);
                invite.setFrom(new InternetAddress("invites@pastime.com", "Pastime Invites"));
-               invite.setTo(new InternetAddress(email.getValue(), email.getDisplayName().toString()));
+               invite.setTo(new InternetAddress(email.getValue(), email.getName()));
                invite.setSubject("Confirm your " + team.getName() + " team membership");
                Map<String, Object> model = new HashMap<String, Object>(7, 1);
-               model.put("name", email.getDisplayName() != null ? email.getDisplayName().getFirstName() : "Hello");
+               model.put("name", email.getName() != null ? email.getFirstName() : "Hello");
                model.put("adminUrl", from.getLinks().get("site").toString());               
                model.put("admin", from.getName().toString());
                model.put("sport", team.getSport());              
