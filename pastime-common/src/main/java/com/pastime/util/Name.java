@@ -37,4 +37,9 @@ public class Name {
 		return null;
 	}
 
+	public static Name valueOf(String string, String string2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -68,7 +68,13 @@ public class SeasonController {
     @RequestMapping(value="/teams/{team}/members/{id}", method=RequestMethod.GET, produces="application/json")
     public @ResponseBody TeamMember member(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer team, @PathVariable("id") Integer id) {
-        return teamRepository.findTeamMember(new TeamKey(league, season, team), id);
+        return teamRepository.findMember(new TeamKey(league, season, team), id);
+    }
+    
+    @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody TeamMemberInvite invite(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @PathVariable("team") Integer team, @PathVariable("invite") String code) {
+        return teamRepository.findInvite(new TeamKey(league, season, team), code);
     }
 
     // internal helpers

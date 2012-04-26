@@ -17,4 +17,17 @@ public enum TeamMemberRole {
         }
     }
     
+    public static TeamMemberRole dbValueOf(String role) {
+        if (role == null) {
+            throw new IllegalArgumentException("role cannot be null");
+        }
+        if (role.equals("p")) {
+            return PLAYER;
+        } else if (role.equals("c")) {
+            return COACH;
+        } else {
+            return ADMIN;
+        }
+    }
+    
 }

@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.support.DataAccessUtils;
@@ -61,6 +62,8 @@ public class TeamRepository {
     private String proposedPlayerByEmailSql;
 
     private String teamMemberSql;
+
+    private String teamMemberInviteSql;
     
     private StringKeyGenerator inviteGenerator = new InsecureRandomStringGenerator(6);
     
@@ -78,6 +81,7 @@ public class TeamRepository {
         this.proposedPlayerSql = SqlUtils.sql(new ClassPathResource("proposed-player.sql", getClass()));        
         this.proposedPlayerByEmailSql = SqlUtils.sql(new ClassPathResource("proposed-player-byemail.sql", getClass()));
         this.teamMemberSql = SqlUtils.sql(new ClassPathResource("team-member.sql", getClass()));
+        this.teamMemberInviteSql = SqlUtils.sql(new ClassPathResource("team-member-invite.sql", getClass()));        
     }
 
     public void setInviteGenerator(StringKeyGenerator inviteGenerator) {
@@ -140,7 +144,7 @@ public class TeamRepository {
         });
     }
 
-    public TeamMember findTeamMember(final TeamKey team, Integer id) {
+    public TeamMember findMember(final TeamKey team, Integer id) {
         return jdbcTemplate.queryForObject(teamMemberSql, new RowMapper<TeamMember>() {
             public TeamMember mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new TeamMember(rs.getInt("id"), new Name(rs.getString("first_name"), rs.getString("last_name")), 
@@ -149,6 +153,26 @@ public class TeamRepository {
                                 rs.getString("organization"), rs.getString("league"), rs.getInt("season_number"), rs.getString("season"), rs.getString("team")));
             }
         }, team.getLeague(), team.getSeason(), team.getNumber(), id);
+    }
+
+    public TeamMemberInvite findInvite(final TeamKey team, String code) {
+        return jdbcTemplate.queryForObject(teamMemberInviteSql, new RowMapper<TeamMemberInvite>() {
+            public TeamMemberInvite mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Integer player = (Integer) rs.getObject("player_id");
+                Name name = mapName(player, rs);                
+                return new TeamMemberInvite(rs.getString("code"), rs.getString("email"),
+                        TeamMemberRole.dbValueOf(rs.getString("role")), name,
+                        new DateTime(rs.getDate("sent")), player, rs.getString("username"),
+                        Team.api(environment.getApiUrl(), team), environment.getSiteUrl());
+            }
+            private Name mapName(Integer player, ResultSet rs) throws SQLException {
+                if (player != null) {
+                    return new Name(rs.getString("player_first_name"), rs.getString("player_last_name"));
+                } else {
+                    return Name.valueOf(rs.getString("first_name"), rs.getString("last_name"));
+                }                
+            }
+        }, team.getLeague(), team.getSeason(), team.getNumber(), code);
     }
 
     // package private used by Team

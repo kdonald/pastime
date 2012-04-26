@@ -13,6 +13,7 @@ import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage.RecipientType;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.jvnet.mock_javamail.Mailbox;
@@ -30,6 +31,8 @@ import com.pastime.leagues.season.SeasonKey;
 import com.pastime.leagues.season.Team;
 import com.pastime.leagues.season.TeamKey;
 import com.pastime.leagues.season.TeamMember;
+import com.pastime.leagues.season.TeamMemberInvite;
+import com.pastime.leagues.season.TeamMemberRole;
 import com.pastime.leagues.season.TeamRepository;
 import com.pastime.players.Player;
 import com.pastime.util.Name;
@@ -95,8 +98,23 @@ public class TeamRepositoryTests {
     @Test
     public void findTeamMember() throws Exception {
         addPlayerMe();
-        TeamMember member = teamRepository.findTeamMember(new TeamKey(1, 1, 1), 1);
+        TeamMember member = teamRepository.findMember(new TeamKey(1, 1, 1), 1);
         assertEquals("Keith Donald", member.getName());
+    }
+    
+    @Test
+    public void findTeamMemberInvite() throws Exception {
+        addPlayerByEmail();
+        TeamMemberInvite invite = teamRepository.findInvite(new TeamKey(1, 1, 1), "123456");
+        assertEquals("Alexander Weaver", invite.getName());
+        assertEquals("123456", invite.getCode());
+        assertEquals(TeamMemberRole.PLAYER, invite.getRole());
+        assertEquals(new URI("http://pastime.com/players/2"), invite.getLinks().get("player_site"));
+    }
+    
+    @After
+    public void clearMailbox() {
+        Mailbox.clearAll();        
     }
     
     @Test
@@ -179,6 +197,7 @@ public class TeamRepositoryTests {
         assertEquals("alexander.weaver@gmail.com", ((InternetAddress) message.getRecipients(RecipientType.TO)[0]).getAddress());
         assertTrue(((String) message.getContent()).contains("Keith"));        
         assertTrue(((String) message.getContent()).contains("123456"));        
+        Mailbox.clearAll();        
     }
     
     @Test
