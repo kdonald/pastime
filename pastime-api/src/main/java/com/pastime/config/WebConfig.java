@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.GlobalExceptionHandlerCapable
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.pastime.util.AuthorizedInterceptor;
 import com.pastime.util.Principal;
 import com.pastime.util.SecurityContext;
@@ -63,6 +64,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        objectMapper.registerModule(new JodaModule());
         converter.setObjectMapper(objectMapper);
         return converter;
     }
