@@ -385,7 +385,7 @@ CREATE TABLE team_member_invites (league integer,
   season integer,
   team integer,
   email varchar(320),
-  role varchar(64),  
+  role varchar(1), -- (p)layer, (c)oach, (a)dmin  
   code varchar(6) NOT NULL UNIQUE,
   sent timestamp NOT NULL CONSTRAINT df_team_member_invites_sent DEFAULT now(),
   sent_by integer NOT NULL,

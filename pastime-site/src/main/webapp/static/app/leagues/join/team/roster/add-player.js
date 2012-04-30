@@ -51,7 +51,14 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           self.root.append(self.collapsed);            
         });
         this.expand = function(value) {
-          var model = { name: value, email: "", role: "PLAYER" };
+          var model = { role: "PLAYER" }, emailExp = "/\S+@\S+\.\S+/";
+          if (emailExp.test(value)) {
+        	  model.name = "";
+        	  model.email = value;
+          } else {
+        	  model.name = value;
+        	  model.email = "";
+          }
           self.collapsed = self.$("form").detach();
           self.root.append(mvc.extend(expanded, model).render());
           this.$("input[name=email]").focus();                

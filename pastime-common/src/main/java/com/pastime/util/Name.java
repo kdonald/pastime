@@ -32,7 +32,17 @@ public class Name {
     }
 
     public String toString() {
-        return firstName + " " + lastName;
+    	StringBuilder builder = new StringBuilder();
+    	if (firstName != null) {
+    		builder.append(firstName);
+    		if (lastName != null) {
+    			builder.append(' ');
+    		}
+    	}
+    	if (lastName != null) {
+    		builder.append(lastName);    		
+    	}
+    	return builder.toString();
     }
 
 	public static Name valueOf(String name) {
