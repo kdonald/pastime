@@ -147,7 +147,7 @@ public class TeamRepository {
     public TeamMember findMember(final TeamKey team, Integer id) {
         return jdbcTemplate.queryForObject(teamMemberSql, new RowMapper<TeamMember>() {
             public TeamMember mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return new TeamMember(rs.getInt("id"), new Name(rs.getString("first_name"), rs.getString("last_name")), 
+                return new TeamMember(rs.getInt("id"), TeamMemberRole.PLAYER, new Name(rs.getString("first_name"), rs.getString("last_name")), 
                         (Integer) rs.getObject("number"), rs.getString("nickname"), rs.getString("slug"),
                         Team.api(environment.getApiUrl(), team), Team.site(environment.getSiteUrl(),
                                 rs.getString("organization"), rs.getString("league"), rs.getInt("season_number"), rs.getString("season"), rs.getString("team")));

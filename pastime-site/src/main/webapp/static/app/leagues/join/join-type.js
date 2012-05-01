@@ -1,6 +1,6 @@
-define(["mvc", "text!./join-type.html"], function(mvc, template) {
+define(["mvc/view", "text!./join-type.html"], function(view, template) {
 
-  var joinType = mvc.view({
+  var joinType = view.create({
     template: template,
     init: function() {
       this.handleSelectedType = function(val) {

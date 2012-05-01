@@ -1,4 +1,4 @@
-define(["pastime", "require", "jquery", "mvc", "text!./franchise.html"], function(pastime, require, $, mvc, franchise) {
+define(["pastime", "require", "jquery", "mvc/view", "text!./franchise.html"], function(pastime, require, $, view, franchise) {
 
   var join = function(season) {
 
@@ -13,7 +13,7 @@ define(["pastime", "require", "jquery", "mvc", "text!./franchise.html"], functio
       });
       xhr.done(function(franchises) {
         if (franchises.length == 1) {
-          container.html(mvc.view({
+          container.html(view.create({
             model: franchises[0],
             template: franchise,
             events: {

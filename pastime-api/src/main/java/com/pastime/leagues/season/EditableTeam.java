@@ -106,7 +106,7 @@ public class EditableTeam {
     }
 
     void setAdmin(Integer id, Name name, Integer number, String nickname, String slug) {
-        this.admin = new TeamMember(id, name, number, nickname, slug, getApiUrl(), getSiteUrl());
+        this.admin = new TeamMember(id, TeamMemberRole.ADMIN, name, number, nickname, slug, getApiUrl(), getSiteUrl());
     }
     
 }

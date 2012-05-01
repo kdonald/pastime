@@ -1,12 +1,12 @@
-define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./franchise-players.html", "text!./franchise-player.html", 
+define(["pastime", "jquery", "mvc/view", "./roster", "text!./submit.html", "text!./franchise-players.html", "text!./franchise-player.html", 
         "text!./players.html", "text!./player.html", "./add-player", "./listselect"],
-    function(pastime, $, mvc, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate, rosterPlayersTemplate, rosterPlayerTemplate, addPlayer) {
+    function(pastime, $, view, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate, rosterPlayersTemplate, rosterPlayerTemplate, addPlayer) {
 
   var submit = function(team, season) {    
     
     var roster = Roster(season.roster_min, season.roster_max);
 
-    var submitRoster = mvc.view({
+    var submitRoster = view.create({
       model: { season: season },
       template: submitTemplate,
       events: {
@@ -19,10 +19,10 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
     var createRoster = submitRoster.render().find("#createRoster");
     
     if (team.franchise) {
-      var franchisePlayers = mvc.view({
+      var franchisePlayers = view.create({
         template: franchisePlayersTemplate,
         init: function() {
-          var franchisePlayer = mvc.view({
+          var franchisePlayer = view.create({
             template: franchisePlayerTemplate,
             events: {
               "click span.select": function() {
@@ -34,9 +34,9 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
           var playerList = this.$("ul");
           playerList.listselect();          
           function addPlayer(player) {
-            playerList.append(mvc.extend(franchisePlayer, player).render());
+            playerList.append(view.extend(franchisePlayer, player).render());
           }
-          roster.playerRemove(function(player) {
+          roster.on("playerRemoved", function(player) {
             addPlayer(player);  
           });
           pastime.get(team.franchise.links[players]).done(function(players) {
@@ -50,11 +50,11 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
       createRoster.append(franchisePlayers.render());
     }
 
-    var rosterPlayers = mvc.view({
+    var rosterPlayers = view.create({
       model: roster,
       template: rosterPlayersTemplate,
       init: function() {
-        var rosterPlayer = mvc.view({
+        var rosterPlayer = view.create({
           template: rosterPlayerTemplate,
           events: {
             "click span.select": function() {
@@ -67,8 +67,8 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
           }
         });
         var playerList = this.$("ul").listselect();
-        roster.playerAdd(function(player) {
-          playerList.append(mvc.extend(rosterPlayer, player).render());
+        roster.on("playerAdded", function(player) {
+          playerList.append(view.extend(rosterPlayer, player).render());
         });
       }      
     });
@@ -84,6 +84,7 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
         }
       });
     });
+    
     createRoster.append(rosterPlayers.render()).append(addPlayerView.render());
     
     return submitRoster;

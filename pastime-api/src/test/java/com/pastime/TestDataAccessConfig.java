@@ -23,7 +23,7 @@ public class TestDataAccessConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql:pastime");
+        dataSource.setUrl("jdbc:postgresql:pastime_test");
         dataSource.setUsername("pastime");
         dataSource.setPassword("pastime");
         return dataSource;

@@ -18,8 +18,8 @@ public class TeamMember extends LinkedResource {
     
     private final String nickname;
     
-    public TeamMember(Integer id, Name name, Integer number, String nickname, String slug, URI teamApi, URI teamSite) {
-        super(api(teamApi, id));
+    public TeamMember(Integer id, TeamMemberRole role, Name name, Integer number, String nickname, String slug, URI teamApi, URI teamSite) {
+        super(api(teamApi, id, role));
         this.id = id;
         this.name = name;
         this.number = number;
@@ -56,8 +56,12 @@ public class TeamMember extends LinkedResource {
 
     // static factory methods
     
-    public static URI api(URI teamApi, Integer id) {
-        return UriComponentsBuilder.fromUri(teamApi).path("/members/{id}").queryParam("role", TeamMemberRole.PLAYER).buildAndExpand(id).toUri();
+    public static URI api(URI teamApi, Integer id, TeamMemberRole role) {
+       UriComponentsBuilder builder = UriComponentsBuilder.fromUri(teamApi).path("/members/{id}");
+       if (role != null) {
+           builder.queryParam("role", role.name());
+       }
+       return builder.buildAndExpand(id).toUri();
     }
     
     public static URI site(URI teamSite, Integer id, String slug) {

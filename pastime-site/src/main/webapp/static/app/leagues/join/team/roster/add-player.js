@@ -1,9 +1,9 @@
-define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player-form.html", "jqueryui-autocomplete-html"],
-    function(pastime, $, mvc, addPlayerTemplate, addPlayerFormTemplate) {
+define(["pastime", "jquery", "mvc/view", "text!./add-player.html", "text!./add-player-form.html", "jqueryui-autocomplete-html"],
+    function(pastime, $, view, addPlayerTemplate, addPlayerFormTemplate) {
 
   var addPlayer = function(team) {
 
-    return mvc.view({
+    return view.create({
       model: { value: "" },
       template: addPlayerTemplate,
       init: function() {
@@ -30,7 +30,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
             self.selectedPlayer = ui.item.player;
           }
         });
-        var expanded = mvc.view({
+        var expanded = view.create({
           template: addPlayerFormTemplate,
           events: {
             "submit": function() {
@@ -50,7 +50,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           self.root.append(self.collapsed);            
         });
         this.expand = function(value) {
-          var form = mvc.extend(expanded, { name: "", email: "" });
+          var form = view.extend(expanded, { name: "", email: "" });
           self.collapsed = self.$("form").detach();
           self.root.append(form.render());
           if (/\S+@\S+\.\S+/.test(value)) {

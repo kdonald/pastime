@@ -1,4 +1,4 @@
-define(["pastime", "require", "jquery", "mvc", "text!./team-name.html"], function(pastime, require, $, mvc, teamNameTemplate) {
+-define(["pastime", "require", "jquery", "mvc/view", "text!./team-name.html"], function(pastime, require, $, view, teamNameTemplate) {
 
   function team(season, franchise) {
 
@@ -12,7 +12,7 @@ define(["pastime", "require", "jquery", "mvc", "text!./team-name.html"], functio
     };
 
     function teamName() {
-      var teamName = mvc.view({
+      var teamName = view.create({
         model: team,
         template: teamNameTemplate,
         events: {
