@@ -1,4 +1,4 @@
-define(['leagues/join/team/mocha.css/add-player'], function(addPlayer) {
+define(['leagues/join/team/roster/add-player'], function(addPlayer) {
   describe('add-player', function() {
     it('should be an object', function() {
      expect(addPlayer).to.be.a(Object);
