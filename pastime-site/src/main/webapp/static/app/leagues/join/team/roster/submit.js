@@ -58,8 +58,11 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
           template: rosterPlayerTemplate,
           events: {
             "click span.select": function() {
-              roster.removePlayer(this.model);
-              this.destroy();
+            	var removePlayer = function() {
+            		roster.removePlayer(this.model);
+            		this.destroy();            	    
+            	}.bind(this);
+            	pastime.del(this.model.url).done(removePlayer());
             }          
           }
         });
@@ -71,10 +74,14 @@ define(["pastime", "jquery", "mvc", "./roster", "text!./submit.html", "text!./fr
     });
 
     var addPlayerView = addPlayer(team);
-    addPlayerView.on("player-added", function(location) {
-      var xhr = pastime.get(location);
-      xhr.done(function(player) {
-    	  roster.addPlayer(player);
+    addPlayerView.on("player-added", function(result) {
+      var xhr = pastime.get(result.link);
+      xhr.done(function(entity) {
+        if (result.type === "MEMBER_CONFIRMED") {
+        	roster.addPlayer(entity);
+        } else {
+          roster.addInvite(entity);
+        }
       });
     });
     createRoster.append(rosterPlayers.render()).append(addPlayerView.render());

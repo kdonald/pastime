@@ -31,7 +31,7 @@ public class TeamMemberInvite extends LinkedResource {
         this.sent = sent;
         addLink("picture", UriComponentsBuilder.fromUri(getUrl()).path("/picture").build().toUri());
         if (id != null) {
-            addLink("player_site", Player.site(siteUrl, id, username));
+            addLink("site", Player.site(siteUrl, id, username));
         }
     }
 

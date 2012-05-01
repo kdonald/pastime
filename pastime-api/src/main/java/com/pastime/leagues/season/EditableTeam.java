@@ -69,7 +69,7 @@ public class EditableTeam {
         return roster;
     }
     
-    public URI addPlayer(Integer id) {
+    public AddMemberResult addPlayer(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
         }
@@ -77,18 +77,18 @@ public class EditableTeam {
         return addPlayer(player);
     }
     
-    public URI addPlayer(EmailAddress email) {
+    public AddMemberResult addPlayer(EmailAddress email) {
         ProposedPlayer player = teamRepository.findProposedPlayer(email.getValue());
         if (player != null) {
             return addPlayer(player);
         } else {
-            return teamRepository.sendPersonInvite(email, admin, this);
+            return teamRepository.sendPersonInvite(email, admin, this, TeamMemberRole.PLAYER);
         }
     }
     
     // internal helpers
     
-    private URI addPlayer(ProposedPlayer player) {
+    private AddMemberResult addPlayer(ProposedPlayer player) {
         if (teamRepository.alreadyPlaying(player.getId(), key)) {
             throw new AlreadyPlayingException(player.getId(), key);
         }        
@@ -98,7 +98,8 @@ public class EditableTeam {
         }
         if (admin.getId() == player.getId()) {
             teamRepository.addTeamMemberRole(key, player.getId(), TeamMemberRole.PLAYER);
-            return UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").buildAndExpand(player.getId()).toUri();
+            URI link = UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").buildAndExpand(player.getId()).toUri();
+            return AddMemberResult.confirmed(link);
         } else {
             return teamRepository.sendPlayerInvite(player, admin, this);
         }        

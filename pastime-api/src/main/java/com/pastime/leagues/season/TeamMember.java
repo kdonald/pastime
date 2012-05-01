@@ -57,7 +57,7 @@ public class TeamMember extends LinkedResource {
     // static factory methods
     
     public static URI api(URI teamApi, Integer id) {
-        return UriComponentsBuilder.fromUri(teamApi).path("/members/{id}").buildAndExpand(id).toUri();
+        return UriComponentsBuilder.fromUri(teamApi).path("/members/{id}").queryParam("role", TeamMemberRole.PLAYER).buildAndExpand(id).toUri();
     }
     
     public static URI site(URI teamSite, Integer id, String slug) {

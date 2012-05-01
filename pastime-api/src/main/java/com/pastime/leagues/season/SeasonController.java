@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.pastime.players.Player;
 import com.pastime.util.Authorized;
@@ -57,12 +58,12 @@ public class SeasonController {
     @RequestMapping(value="/teams/{team}/members", method=RequestMethod.POST)
     @Authorized("teams")
     @Transactional
-    public ResponseEntity<? extends Object> addMember(@PathVariable("league") Integer league,
+    public ResponseEntity<AddMemberResult> addMember(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number,
             AddMemberForm playerForm, Principal principal) {
         EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
-        URI link = addMember(playerForm, team, principal);
-        return created(link);       
+        AddMemberResult result = addMember(playerForm, team, principal);
+        return created(result, result.getLink());       
     }
     
     @RequestMapping(value="/teams/{team}/members/{id}", method=RequestMethod.GET, produces="application/json")
@@ -76,10 +77,18 @@ public class SeasonController {
             @PathVariable("season") Integer season, @PathVariable("team") Integer team, @PathVariable("code") String code) {
         return teamRepository.findInvite(new TeamKey(league, season, team), code);
     }
+    
+    @RequestMapping(value="/teams/{team}/members/{member}", method=RequestMethod.DELETE)
+    @ResponseStatus(value=HttpStatus.NO_CONTENT)
+    public @ResponseBody void removeMemberRole(@PathVariable("league") Integer league,
+            @PathVariable("season") Integer season, @PathVariable("team") Integer team,
+            @PathVariable("member") Integer member, @RequestParam("role") TeamMemberRole role, Principal principal) {
+        teamRepository.removeMemberRole(new TeamKey(league, season, team), member, role, principal.getPlayerId());
+    }
 
     // internal helpers
 
-    private URI addMember(AddMemberForm playerForm, EditableTeam team, Principal principal) {
+    private AddMemberResult addMember(AddMemberForm playerForm, EditableTeam team, Principal principal) {
         if (playerForm.getEmail() != null) {
            return team.addPlayer(playerForm.createEmailAddress());
         } else {
@@ -89,6 +98,10 @@ public class SeasonController {
            }
            return team.addPlayer(id);
         }        
+    }
+    
+    private <T> ResponseEntity<T> created(T result, URI link) {
+        return new ResponseEntity<T>(result, headers(link), HttpStatus.CREATED);        
     }
     
     private ResponseEntity<Object> created(URI link) {

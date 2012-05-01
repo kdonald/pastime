@@ -16,6 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.support.GlobalExceptionHandlerCapableExceptionResolver;
 
@@ -55,6 +56,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
         		new GlobalExceptionHandlerCapableExceptionResolver(new GlobalExceptionHandling(), getMessageConverters());
         resolver.afterPropertiesSet();
         exceptionResolvers.add(resolver);
+        exceptionResolvers.add(new ResponseStatusExceptionResolver());
         exceptionResolvers.add(new DefaultHandlerExceptionResolver());        
     }
     

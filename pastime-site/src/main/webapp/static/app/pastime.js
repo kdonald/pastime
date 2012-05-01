@@ -38,6 +38,14 @@ define("pastime", ["require", "jquery", "jquery-cookie"], function(require, $) {
         beforeSend: addAuthorizationHeader
       });
     },
+    del: function(url) {
+      return $.ajax({
+        type: "DELETE",
+        url: url,
+        dataType: "json",
+        beforeSend: addAuthorizationHeader
+      });        
+    },
     signin: function(container) {
       var deferred = $.Deferred();
       if (this.signedIn()) {

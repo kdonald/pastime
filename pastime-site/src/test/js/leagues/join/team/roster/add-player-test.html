@@ -6,11 +6,7 @@
   <script src="../../../../../../main/webapp/static/require-1.0.8.js"></script>
   <script src="../../../../lib/expect.js"></script>
   <script src="../../../../lib/mocha.js"></script>
-  <script>
-    var specs = [
-      "add-player-test.js"
-    ];
-  
+  <script>  
     // ignoreLeaks is generally bad but jQuery.autocomplete is putting a global on the window object to track an event handler
     mocha.setup({ ui: "bdd", ignoreLeaks: true });
     
@@ -27,7 +23,7 @@
       }
     });
 
-    require(specs, function() {
+    require(["add-player-test.js"], function() {
       mocha.run();
     });
   </script>

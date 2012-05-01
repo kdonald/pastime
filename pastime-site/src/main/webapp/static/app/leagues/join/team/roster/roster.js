@@ -22,15 +22,19 @@ define([], function() {
     function valid() {
       return this.playerCount() >= this.minPlayers && this.playerCount() <= this.maxPlayers;
     }         
-    function change(property, listener) {
-      this.changeListeners.push(listener);
-    }
     function playerAdd(listener) {
       this.addListeners.push(listener);
     }
     function playerRemove(listener) {
       this.removeListeners.push(listener);
+    }    
+    function addInvite(invite) {
+      console.log("Adding invite:");
+      console.log(invite);
     }
+    function change(property, listener) {
+      this.changeListeners.push(listener);
+    }    
     function invokeChangeListeners(listeners, value) {
       listeners.forEach(function(listener) {
         listener(value);
@@ -43,6 +47,7 @@ define([], function() {
       valid: { value: valid },
       playerAdd: { value: playerAdd },
       playerRemove: { value: playerRemove },
+      addInvite: { value: addInvite },
       change: { value: change },
     });
   })();

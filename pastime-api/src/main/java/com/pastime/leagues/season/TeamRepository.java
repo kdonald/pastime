@@ -81,7 +81,7 @@ public class TeamRepository {
         this.proposedPlayerSql = SqlUtils.sql(new ClassPathResource("proposed-player.sql", getClass()));        
         this.proposedPlayerByEmailSql = SqlUtils.sql(new ClassPathResource("proposed-player-byemail.sql", getClass()));
         this.teamMemberSql = SqlUtils.sql(new ClassPathResource("team-member.sql", getClass()));
-        this.teamMemberInviteSql = SqlUtils.sql(new ClassPathResource("team-member-invite.sql", getClass()));        
+        this.teamMemberInviteSql = SqlUtils.sql(new ClassPathResource("team-member-invite.sql", getClass()));
     }
 
     public void setInviteGenerator(StringKeyGenerator inviteGenerator) {
@@ -175,6 +175,29 @@ public class TeamRepository {
         }, team.getLeague(), team.getSeason(), team.getNumber(), code);
     }
 
+    @Transactional
+    public void removeMemberRole(TeamKey team, Integer memberId, TeamMemberRole role, Integer adminId) {
+        assertAdmin(adminId, team);
+        jdbcTemplate.update("DELETE FROM team_member_roles WHERE league = ? AND season = ? AND team = ? AND player = ? AND role = ?",
+                team.getLeague(), team.getSeason(), team.getNumber(), memberId, TeamMemberRole.dbValue(role));
+        if (!hasARole(memberId, team)) {
+            jdbcTemplate.update("DELETE FROM team_members WHERE league = ? AND season = ? AND team = ? AND player = ?",
+                    team.getLeague(), team.getSeason(), team.getNumber(), memberId);            
+        }
+    }
+    
+    private void assertAdmin(Integer id, TeamKey team) {
+        if (!jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles r WHERE league = ? AND season = ? AND team = ? AND player = ? AND role = 'a')", Boolean.class,
+                team.getLeague(), team.getSeason(), team.getNumber(), id)) {
+            throw new NoSuchAdminException();
+        }
+    }
+    
+    private boolean hasARole(Integer id, TeamKey team) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles r WHERE league = ? AND season = ? AND team = ? AND player = ?)", Boolean.class,
+                team.getLeague(), team.getSeason(), team.getNumber(), id);
+    }
+
     // package private used by Team
 
     void addTeamMember(TeamKey key, Integer playerId, FranchiseMember franchise) {
@@ -206,12 +229,12 @@ public class TeamRepository {
                 Boolean.class, key.getLeague(), key.getSeason(), key.getNumber(), playerId);
     }
 
-    URI sendPlayerInvite(final ProposedPlayer player, final TeamMember from, final EditableTeam team) {
-        return sendPersonInvite(new EmailAddress(player.getEmail(), player.getName()), from, team, player.getId());
+    AddMemberResult sendPlayerInvite(ProposedPlayer player, TeamMember from, EditableTeam team) {
+        return sendPersonInvite(new EmailAddress(player.getEmail(), player.getName()), from, team, TeamMemberRole.PLAYER, player.getId());
     }
 
-    URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team) {
-        return sendPersonInvite(email, from, team, null);
+    AddMemberResult sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role) {
+        return sendPersonInvite(email, from, team, role, null);
     }
     
     // internal helpers
@@ -241,11 +264,11 @@ public class TeamRepository {
         addTeamMemberRole(key, adminId, TeamMemberRole.ADMIN);        
     }
     
-    private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, Integer playerId) {
+    private AddMemberResult sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role, Integer playerId) {
         String code = inviteGenerator.generateKey();
         final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
         jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, first_name, last_name, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamMemberRole.dbValue(TeamMemberRole.PLAYER), code,
+                team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamMemberRole.dbValue(role), code,
                 email.getFirstName(), email.getLastName(), from.getId(), playerId);
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage message) throws Exception {
@@ -265,7 +288,7 @@ public class TeamRepository {
             }
          };
          mailSender.send(preparator);
-         return inviteUrl;
+         return AddMemberResult.invited(inviteUrl);
     }
     
     private static class ProposedPlayerMapper implements RowMapper<ProposedPlayer> {
