@@ -7,7 +7,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
       model: { value: "" },
       template: addPlayerTemplate,
       init: function() {
-        var self = this;        
+        var self = this;
         this.$("input").autocomplete({
           html: true,
           source: function(request, response) {
@@ -51,7 +51,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           self.root.append(self.collapsed);            
         });
         this.expand = function(value) {
-          var model = { role: "PLAYER" }, emailExp = "/\S+@\S+\.\S+/";
+          var model = { role: "PLAYER" }, emailExp = /\S+@\S+\.\S+/;
           if (emailExp.test(value)) {
         	  model.name = "";
         	  model.email = value;
@@ -61,7 +61,7 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           }
           self.collapsed = self.$("form").detach();
           self.root.append(mvc.extend(expanded, model).render());
-          this.$("input[name=email]").focus();                
+          this.$("input[name=email]").focus();
         };
         this.triggerPlayerAdded = function(result, status, xhr) {
     			this.trigger("player-added", xhr.getResponseHeader("Location"));

@@ -212,7 +212,6 @@
 
         if (text.createXhr()) {
             text.get = function (url, callback) {
-                console.log(url);
                 var xhr = text.createXhr();
                 xhr.open('GET', url, true);
                 xhr.onreadystatechange = function (evt) {

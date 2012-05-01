@@ -39,7 +39,7 @@ define(
           })();
 
           function addProperties(model, obj) {
-            for (name in obj) {
+            for (var name in obj) {
               var value = obj[name];
               if (typeof value === "function") {
                 addPropertyForGetterFunction(model, obj, name, value);
@@ -106,7 +106,7 @@ define(
             options = options || {};
             function initRenderOptions() {
               var helpers = Object.create(handlebars.helpers);
-              for (helper in options.helpers) {
+              for (var helper in options.helpers) {
                 helpers[helper] = options.helpers[helper];
               }
               renderOptions.helpers = helpers;
@@ -170,7 +170,7 @@ define(
             // internal
 
             function attachEventHandlers(view) {
-              for (eventDesc in view.events) {
+              for (var eventDesc in view.events) {
                 var array = eventDesc.split(" ");
                 var event = array[0];
                 var source = array[1];
