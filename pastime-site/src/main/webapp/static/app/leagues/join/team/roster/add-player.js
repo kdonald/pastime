@@ -51,17 +51,16 @@ define(["pastime", "jquery", "mvc", "text!./add-player.html", "text!./add-player
           self.root.append(self.collapsed);            
         });
         this.expand = function(value) {
-          var model = { role: "PLAYER" }, emailExp = /\S+@\S+\.\S+/;
-          if (emailExp.test(value)) {
-        	  model.name = "";
-        	  model.email = value;
-          } else {
-        	  model.name = value;
-        	  model.email = "";
-          }
+          var form = mvc.extend(expanded, { role: "PLAYER", name: "", email: "" });
           self.collapsed = self.$("form").detach();
-          self.root.append(mvc.extend(expanded, model).render());
-          this.$("input[name=email]").focus();
+          self.root.append(form.render());
+          if (/\S+@\S+\.\S+/.test(value)) {
+        	  form.model.email = value;
+        	  this.$("input[name=name]").focus();
+          } else {
+        	  form.model.name = value;
+        	  this.$("input[name=email]").focus();        	  
+          }
         };
         this.triggerPlayerAdded = function(result, status, xhr) {
     			this.trigger("player-added", xhr.getResponseHeader("Location"));
