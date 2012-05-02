@@ -185,6 +185,14 @@ public class TeamRepository {
                     team.getLeague(), team.getSeason(), team.getNumber(), memberId);            
         }
     }
+
+    @Transactional
+    public void cancelInvite(TeamKey team, String code, Integer adminId) {
+        assertAdmin(adminId, team);
+        jdbcTemplate.update("DELETE FROM team_member_invites WHERE league = ? AND season = ? AND team = ? AND code = ?",
+                team.getLeague(), team.getSeason(), team.getNumber(), code);        
+    }
+
     
     private void assertAdmin(Integer id, TeamKey team) {
         if (!jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles r WHERE league = ? AND season = ? AND team = ? AND player = ? AND role = 'a')", Boolean.class,

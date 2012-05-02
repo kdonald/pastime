@@ -77,6 +77,13 @@ public class SeasonController {
             @PathVariable("season") Integer season, @PathVariable("team") Integer team, @PathVariable("code") String code) {
         return teamRepository.findInvite(new TeamKey(league, season, team), code);
     }
+
+    @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.DELETE)
+    @ResponseStatus(value=HttpStatus.NO_CONTENT)
+    public @ResponseBody void cancelInvite(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @PathVariable("team") Integer team,
+            @PathVariable("code") String code, Principal principal) {
+        teamRepository.cancelInvite(new TeamKey(league, season, team), code, principal.getPlayerId());
+    }
     
     @RequestMapping(value="/teams/{team}/members/{member}", method=RequestMethod.DELETE)
     @ResponseStatus(value=HttpStatus.NO_CONTENT)

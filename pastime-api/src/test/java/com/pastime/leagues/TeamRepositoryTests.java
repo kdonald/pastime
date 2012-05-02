@@ -306,4 +306,12 @@ public class TeamRepositoryTests {
         assertFalse(jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members r WHERE league = 1 AND season = 1 AND team = 1 AND player = 1)", Boolean.class));        
     }
     
+    @Test
+    public void cancelInvite() throws Exception {
+        addPlayerByEmail();        
+        assertTrue(jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_invites WHERE code = '123456')", Boolean.class));        
+        teamRepository.cancelInvite(new TeamKey(1, 1, 1), "123456", 1);
+        assertFalse(jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_invites WHERE code = '123456')", Boolean.class));        
+    }
+    
 }
