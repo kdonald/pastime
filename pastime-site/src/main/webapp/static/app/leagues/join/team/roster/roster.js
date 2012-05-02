@@ -17,12 +17,23 @@ define(["mvc/observable"], function(observable) {
     }
     function valid() {
       return this.playerCount() >= this.minPlayers && this.playerCount() <= this.maxPlayers;
-    }     
+    }
+    function addInvite(invite) {
+      this.invites.push(invite);
+      this.trigger("inviteAdded", invite);
+    }
+    function removeInvite(invite) {
+      var index = this.invites.indexOf(invite);
+      this.invites.splice(index, 1);
+      this.trigger("inviteRemoved", invite);
+    }    
     return Object.create(Object.prototype, {
       addPlayer: { value: addPlayer },
       removePlayer: { value: removePlayer },
       playerCount: { value: playerCount, enumerable: true },
-      valid: { value: valid }
+      valid: { value: valid },
+      addInvite: { value: addInvite },
+      removeInvite: { value: removeInvite }
     });
   })();
 
@@ -30,7 +41,8 @@ define(["mvc/observable"], function(observable) {
     return observable(Object.create(rosterPrototype, {
       minPlayers: { value: minPlayers, enumerable: true },
       maxPlayers: { value: maxPlayers, enumerable: true },
-      players: { value: [] }
+      players: { value: [] },
+      invites: { value: [] }
     }));          
   }
 

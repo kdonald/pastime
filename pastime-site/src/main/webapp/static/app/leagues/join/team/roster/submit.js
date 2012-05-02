@@ -1,6 +1,7 @@
 define(["pastime", "jquery", "mvc/view", "./roster", "text!./submit.html", "text!./franchise-players.html", "text!./franchise-player.html", 
-        "text!./players.html", "text!./player.html", "./add-player", "./listselect"],
-    function(pastime, $, view, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate, rosterPlayersTemplate, rosterPlayerTemplate, addPlayer) {
+        "text!./players.html", "text!./player.html", "text!./invites.html", "text!./invite.html", "./add-player", "./listselect"],
+    function(pastime, $, view, Roster, submitTemplate, franchisePlayersTemplate, franchisePlayerTemplate,
+        rosterPlayersTemplate, rosterPlayerTemplate, invitesTemplate, inviteTemplate, addPlayer) {
 
   var submit = function(team, season) {    
     
@@ -72,6 +73,29 @@ define(["pastime", "jquery", "mvc/view", "./roster", "text!./submit.html", "text
         });
       }      
     });
+    
+    var invites = view.create({
+      model: roster,
+      template: invitesTemplate,
+      init: function() {
+        var inviteItem = view.create({
+          template: inviteTemplate,
+          events: {
+            "click span.select": function() {
+            	var removeInvite = function() {
+            		roster.removeInvite(this.model);
+            		this.destroy();            	    
+            	}.bind(this);
+            	pastime.del(this.model.url).done(removeInvite());
+            }          
+          }
+        });
+        var inviteList = this.$("ul").listselect();
+        roster.on("inviteAdded", function(invite) {
+          inviteList.append(view.extend(inviteItem, invite).render());
+        });
+      }      
+    });
 
     var addPlayerView = addPlayer(team);
     addPlayerView.on("player-added", function(result) {
@@ -85,7 +109,7 @@ define(["pastime", "jquery", "mvc/view", "./roster", "text!./submit.html", "text
       });
     });
     
-    createRoster.append(rosterPlayers.render()).append(addPlayerView.render());
+    createRoster.append(rosterPlayers.render()).append(invites.render()).append(addPlayerView.render());
     
     return submitRoster;
     
