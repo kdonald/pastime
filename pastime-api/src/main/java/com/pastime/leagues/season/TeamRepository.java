@@ -4,6 +4,7 @@ import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,13 +94,13 @@ public class TeamRepository {
         if (registrationClosed(season.getLeague(), season.getNumber())) {
             throw new RegistrationClosedException(season);
         }
-        FranchiseMember franchiseAdmin = null;
+        FranchiseAdmin franchiseAdmin = null;
         if (team.getFranchise() != null) {
             franchiseAdmin = findQualifiedFranchiseAdmin(team.getFranchise(), season.getLeague(), adminId);
             team.setName(franchiseAdmin.getFranchiseName());
         }
         TeamKey key = insertTeam(season, team);
-        makeAdmin(key, adminId, franchiseAdmin);
+        makeAdmin(key, adminId, franchiseAdmin != null ? franchiseAdmin.getAttributes() : null);
         return Team.api(environment.getApiUrl(), key);
     }
 
@@ -123,27 +124,15 @@ public class TeamRepository {
         return players;
     }
 
-    public EditableTeam getTeamForEditing(final TeamKey teamKey, final Integer adminId) {
-        Map<String, Object> params = new HashMap<String, Object>(4, 4);
-        params.put("league", teamKey.getLeague());
-        params.put("season", teamKey.getSeason());
-        params.put("team", teamKey.getNumber());
-        params.put("admin", adminId);
-        return namedJdbcTemplate.queryForObject(editTeamSql, params, new RowMapper<EditableTeam>() {
-            public EditableTeam mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Roster roster = new Roster(rs.getInt("total_player_count"), rs.getInt("female_player_count"), (Integer) rs.getObject("roster_max"), 
-                        new Range((Integer) rs.getObject("age_min"), (Integer) rs.getObject("age_max")),
-                        TeamGender.valueOf(rs.getString("gender")), (Integer) rs.getObject("roster_min_female"));
-                EditableTeam team = new EditableTeam(teamKey, rs.getString("name"), rs.getString("sport"), roster,
-                        rs.getString("organization_username"), rs.getString("league_slug"), rs.getInt("season_number"), rs.getString("season_slug"), rs.getString("slug"),
-                        environment.getApiUrl(), environment.getSiteUrl(), TeamRepository.this);
-                team.setAdmin(rs.getInt("admin_id"), new Name(rs.getString("admin_first_name"), rs.getString("admin_last_name")), 
-                        (Integer) rs.getObject("admin_number"), rs.getString("admin_nickname"), rs.getString("admin_slug"));
-                return team;
-            }
-        });
+    public AddMemberResult addMember(AddMemberForm form, TeamKey teamKey, Integer adminId) {
+        if (form.getRole() == null || form.getRole() == TeamMemberRole.PLAYER) {
+            EditableTeam team = getTeamForEditing(teamKey, adminId);
+            return team.addOrInvitePlayer(form);
+        } else {
+            throw new UnsupportedOperationException("Only PLAYER role is supported at this time");
+        }
     }
-
+    
     public TeamMember findMember(final TeamKey team, Integer id) {
         return jdbcTemplate.queryForObject(teamMemberSql, new RowMapper<TeamMember>() {
             public TeamMember mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -160,8 +149,8 @@ public class TeamRepository {
             public TeamMemberInvite mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Integer player = (Integer) rs.getObject("player_id");
                 Name name = mapName(player, rs);                
-                return new TeamMemberInvite(rs.getString("code"), rs.getString("email"),
-                        TeamMemberRole.dbValueOf(rs.getString("role")), name,
+                return new TeamMemberInvite(rs.getString("code"), name,
+                        TeamMemberRole.dbValueOf(rs.getString("role")),
                         new DateTime(rs.getDate("sent")), player, rs.getString("username"),
                         Team.api(environment.getApiUrl(), team), environment.getSiteUrl());
             }
@@ -175,6 +164,29 @@ public class TeamRepository {
         }, team.getLeague(), team.getSeason(), team.getNumber(), code);
     }
 
+    @Transactional
+    public void answerInvite(TeamKey team, String code, InviteAnswer answer, Integer playerId) {
+        if (answer == null) {
+            throw new IllegalArgumentException("answer cannot be null");
+        }
+        String sql = "SELECT player, sent_by FROM team_member_invites WHERE league = ? AND season = ? AND team = ? AND code = ? AND accepted = false";
+        OutstandingInvite invite = jdbcTemplate.queryForObject(sql, new RowMapper<OutstandingInvite>() {
+            public OutstandingInvite mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new OutstandingInvite((Integer) rs.getObject("player"), rs.getInt("sent_by"));
+            }
+        }, team.getLeague(), team.getSeason(), team.getNumber(), code);
+        invite.assertInviteFor(playerId);
+        if (answer == InviteAnswer.ACCEPT) {
+            EditableTeam editableTeam = getTeamForEditing(team, invite.getSentBy());
+            editableTeam.addPlayer(playerId);
+            jdbcTemplate.update("UPDATE team_member_invites SET accepted = true, accepted_player = ?, answered_on = ? WHERE league = ? AND season = ? AND team = ? AND code = ?",
+                    playerId, new Date(), team.getLeague(), team.getSeason(), team.getNumber(), code);            
+        } else {
+            jdbcTemplate.update("UPDATE team_member_invites SET answered_on = ? WHERE league = ? AND season = ? AND team = ? AND code = ?",
+                    new Date(), team.getLeague(), team.getSeason(), team.getNumber(), code);            
+        }
+    }
+    
     @Transactional
     public void removeMemberRole(TeamKey team, Integer memberId, TeamMemberRole role, Integer adminId) {
         assertAdmin(adminId, team);
@@ -193,7 +205,6 @@ public class TeamRepository {
                 team.getLeague(), team.getSeason(), team.getNumber(), code);        
     }
 
-    
     private void assertAdmin(Integer id, TeamKey team) {
         if (!jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_member_roles r WHERE league = ? AND season = ? AND team = ? AND player = ? AND role = 'a')", Boolean.class,
                 team.getLeague(), team.getSeason(), team.getNumber(), id)) {
@@ -208,20 +219,20 @@ public class TeamRepository {
 
     // package private used by Team
 
-    void addTeamMember(TeamKey key, Integer playerId, FranchiseMember franchise) {
+    boolean isMember(Integer player, TeamKey team) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members where league = ? AND season = ? AND team = ? AND player = ?)", Boolean.class, 
+                team.getLeague(), team.getSeason(), team.getNumber(), player);
+    }
+    
+    void addMember(Integer player, TeamKey team, FranchiseMember franchise) {
         jdbcTemplate.update("INSERT INTO team_members (league, season, team, player, number, nickname) VALUES (?, ?, ?, ?, ?, ?)",
-                key.getLeague(), key.getSeason(), key.getNumber(),
-                playerId, franchise != null ? franchise.getNumber() : null, franchise != null ? franchise.getNickname() : null);
+                team.getLeague(), team.getSeason(), team.getNumber(),
+                player, franchise != null ? franchise.getNumber() : null, franchise != null ? franchise.getNickname() : null);
     }
 
     void addTeamMemberRole(TeamKey key, Integer playerId, TeamMemberRole role) {
         jdbcTemplate.update("INSERT INTO team_member_roles (league, season, team, player, role) VALUES (?, ?, ?, ?, ?)",
                 key.getLeague(), key.getSeason(), key.getNumber(), playerId, TeamMemberRole.dbValue(role));
-    }
-
-    boolean isTeamMember(TeamKey key, Integer playerId) {
-        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM team_members where league = ? AND season = ? AND team = ? AND player = ?)", Boolean.class, 
-                key.getLeague(), key.getSeason(), key.getNumber(), playerId);
     }
 
     ProposedPlayer findProposedPlayer(Integer id) {
@@ -237,12 +248,21 @@ public class TeamRepository {
                 Boolean.class, key.getLeague(), key.getSeason(), key.getNumber(), playerId);
     }
 
-    AddMemberResult sendPlayerInvite(ProposedPlayer player, TeamMember from, EditableTeam team) {
+    URI sendPlayerInvite(ProposedPlayer player, TeamMember from, EditableTeam team) {
         return sendPersonInvite(new EmailAddress(player.getEmail(), player.getName()), from, team, TeamMemberRole.PLAYER, player.getId());
     }
 
-    AddMemberResult sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role) {
+    URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role) {
         return sendPersonInvite(email, from, team, role, null);
+    }
+    
+    FranchiseMember findFranchiseMember(Integer playerId, Integer franchise) {
+        String sql = "SELECT number, nickname FROM franchise_members WHERE franchise = ? AND player = ?";
+        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, new RowMapper<FranchiseMember>() {
+            public FranchiseMember mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new FranchiseMember((Integer) rs.getObject("number"), rs.getString("nickname")); 
+            }
+        }, franchise, playerId));  
     }
     
     // internal helpers
@@ -251,12 +271,33 @@ public class TeamRepository {
         return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM seasons WHERE league = ? and number = ? and registration_status = 'c')", Boolean.class, league, season);
     }
 
-    private FranchiseMember findQualifiedFranchiseAdmin(Integer franchiseId, Integer leagueId, Integer playerId) {
-        return jdbcTemplate.queryForObject(qualifiedFranchiseAdminSql, new RowMapper<FranchiseMember>() {
-            public FranchiseMember mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return new FranchiseMember(rs.getString("franchise_name"), (Integer) rs.getObject("number"), rs.getString("nickname"));
+    private FranchiseAdmin findQualifiedFranchiseAdmin(Integer franchiseId, Integer leagueId, Integer playerId) {
+        return jdbcTemplate.queryForObject(qualifiedFranchiseAdminSql, new RowMapper<FranchiseAdmin>() {
+            public FranchiseAdmin mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new FranchiseAdmin(rs.getString("franchise_name"), new FranchiseMember((Integer) rs.getObject("number"), rs.getString("nickname")));
             }
         }, franchiseId, leagueId, playerId);
+    }
+        
+    private static class FranchiseAdmin {
+        
+        private String franchiseName;
+        
+        private FranchiseMember attributes;
+        
+        public FranchiseAdmin(String franchiseName, FranchiseMember attributes) {
+            this.franchiseName = franchiseName;
+            this.attributes = attributes;
+        }
+
+        public String getFranchiseName() {
+            return franchiseName; 
+        }
+        
+        public FranchiseMember getAttributes() {
+            return attributes;
+        }
+        
     }
 
     private TeamKey insertTeam(SeasonKey season, CreateTeamForm team) {
@@ -268,11 +309,33 @@ public class TeamRepository {
     }
     
     private void makeAdmin(TeamKey key, Integer adminId, FranchiseMember franchiseAdmin) {
-        addTeamMember(key, adminId, franchiseAdmin);
+        addMember(adminId, key, franchiseAdmin);
         addTeamMemberRole(key, adminId, TeamMemberRole.ADMIN);        
     }
-    
-    private AddMemberResult sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role, Integer playerId) {
+
+    private EditableTeam getTeamForEditing(final TeamKey teamKey, final Integer adminId) {
+        Map<String, Object> params = new HashMap<String, Object>(4, 4);
+        params.put("league", teamKey.getLeague());
+        params.put("season", teamKey.getSeason());
+        params.put("team", teamKey.getNumber());
+        params.put("admin", adminId);
+        return namedJdbcTemplate.queryForObject(editTeamSql, params, new RowMapper<EditableTeam>() {
+            public EditableTeam mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Roster roster = new Roster(rs.getInt("total_player_count"), rs.getInt("female_player_count"), (Integer) rs.getObject("roster_max"), 
+                        new Range((Integer) rs.getObject("age_min"), (Integer) rs.getObject("age_max")),
+                        TeamGender.valueOf(rs.getString("gender")), (Integer) rs.getObject("roster_min_female"));
+                EditableTeam team = new EditableTeam(teamKey, rs.getString("name"), rs.getString("sport"), roster, rs.getBoolean("season_rosters_frozen"),
+                        (Integer) rs.getObject("franchise"), rs.getString("organization_username"), rs.getString("league_slug"),
+                        rs.getInt("season_number"), rs.getString("season_slug"), rs.getString("slug"),
+                        environment.getApiUrl(), environment.getSiteUrl(), TeamRepository.this);
+                team.setAdmin(rs.getInt("admin_id"), new Name(rs.getString("admin_first_name"), rs.getString("admin_last_name")), 
+                        (Integer) rs.getObject("admin_number"), rs.getString("admin_nickname"), rs.getString("admin_slug"));
+                return team;
+            }
+        });
+    }
+
+    private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role, Integer playerId) {
         String code = inviteGenerator.generateKey();
         final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
         jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, first_name, last_name, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -296,7 +359,7 @@ public class TeamRepository {
             }
          };
          mailSender.send(preparator);
-         return AddMemberResult.invited(inviteUrl);
+         return inviteUrl;
     }
     
     private static class ProposedPlayerMapper implements RowMapper<ProposedPlayer> {
@@ -304,6 +367,29 @@ public class TeamRepository {
             return new ProposedPlayer(rs.getInt("id"), new Name(rs.getString("first_name"), rs.getString("last_name")),
                     rs.getString("email"), Gender.dbValueOf(rs.getString("gender")), new LocalDate(rs.getDate("birthday")));
         }
+    }
+
+    class OutstandingInvite {
+
+        private Integer player;
+        
+        private Integer sentBy;
+
+        public OutstandingInvite(Integer player, Integer sentBy) {
+            this.player = player;
+            this.sentBy = sentBy;
+        }
+
+        public void assertInviteFor(Integer playerId) {
+            if (!player.equals(playerId)) {
+                throw new IllegalArgumentException("This invite is not for you");
+            }
+        }
+
+        public Integer getSentBy() {
+            return sentBy;
+        }
+        
     }
     
     // cglib ceremony 

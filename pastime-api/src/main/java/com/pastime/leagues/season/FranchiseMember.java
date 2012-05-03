@@ -1,28 +1,21 @@
 package com.pastime.leagues.season;
 
-public class FranchiseMember {
+class FranchiseMember {
 
-    private String franchiseName;
-    
     private Integer number;
     
     private String nickname;
     
-    public FranchiseMember(String franchiseName, Integer number, String nickname) {
-        this.franchiseName = franchiseName;
+    public FranchiseMember(Integer number, String nickname) {
         this.number = number;
         this.nickname = nickname;
     }
 
-    public String getFranchiseName() {
-        return franchiseName;
-    }
-
-    public Object getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public Object getNickname() {
+    public String getNickname() {
         return nickname;
     }
 

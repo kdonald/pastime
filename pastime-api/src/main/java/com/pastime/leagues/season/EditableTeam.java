@@ -17,21 +17,27 @@ public class EditableTeam {
     
     private final Roster roster;
 
-    private final TeamRepository teamRepository;
+    private final boolean rosterFrozen;
 
+    private final Integer franchise;
+    
     private final URI apiUrl;
 
     private final URI siteUrl;
 
     private TeamMember admin;
-    
-    public EditableTeam(TeamKey key, String name, String sport, Roster roster, 
-            String organization, String league, Integer seasonNumber, String season, String slug,
+
+    private final TeamRepository teamRepository;
+
+    public EditableTeam(TeamKey key, String name, String sport, Roster roster, Boolean rosterFrozen,
+            Integer franchise, String organization, String league, Integer seasonNumber, String season, String slug,
             URI apiUrl, URI siteUrl, TeamRepository teamRepository) {
         this.key = key;
         this.name = name;
         this.sport = sport;
         this.roster = roster;
+        this.rosterFrozen = rosterFrozen;
+        this.franchise = franchise;
         this.apiUrl = Team.api(apiUrl, key);
         this.siteUrl = Team.site(siteUrl, organization, league, seasonNumber, season, slug);
         this.teamRepository = teamRepository;        
@@ -68,41 +74,86 @@ public class EditableTeam {
     public Roster getRoster() {
         return roster;
     }
-    
-    public AddMemberResult addPlayer(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("id cannot be null");
-        }
-        ProposedPlayer player = teamRepository.findProposedPlayer(id);
-        return addPlayer(player);
+
+    public AddMemberResult addOrInvitePlayer(AddMemberForm form) {
+        assertRosterNotFrozen();        
+        if (form.getEmail() != null) {
+            ProposedPlayer player = teamRepository.findProposedPlayer(form.getEmail());
+            if (player != null) {
+                if (admin.getId() == player.getId()) {
+                    return AddMemberResult.confirmed(addPlayer(player));
+                } else {
+                    return AddMemberResult.invited(invitePlayer(player));                    
+                }
+            } else {
+                return AddMemberResult.invited(invitePerson(form.createEmailAddress()));
+            }            
+         } else {
+            Integer playerId = form.getId();
+            if (playerId == null) {
+                playerId = admin.getId();
+            }
+            if (admin.getId() == playerId) {
+                return AddMemberResult.confirmed(addPlayer(playerId));                   
+            } else {
+                return AddMemberResult.invited(invitePlayer(playerId));                   
+            }
+         }        
     }
-    
-    public AddMemberResult addPlayer(EmailAddress email) {
-        ProposedPlayer player = teamRepository.findProposedPlayer(email.getValue());
-        if (player != null) {
-            return addPlayer(player);
-        } else {
-            return teamRepository.sendPersonInvite(email, admin, this, TeamMemberRole.PLAYER);
-        }
+
+    public URI addPlayer(Integer id) {
+        assertRosterNotFrozen(); 
+        return addPlayer(teamRepository.findProposedPlayer(id));
     }
-    
+
     // internal helpers
+
+    private URI addPlayer(ProposedPlayer player) {
+        vetPlayer(player);
+        FranchiseMember franchise = teamRepository.findFranchiseMember(player.getId(), this.franchise);
+        if (!teamRepository.isMember(player.getId(), key)) {
+            teamRepository.addMember(player.getId(), key, franchise);
+        }
+        teamRepository.addTeamMemberRole(key, player.getId(), TeamMemberRole.PLAYER);
+        return UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").queryParam("role", TeamMemberRole.PLAYER).buildAndExpand(player.getId()).toUri();        
+    }
     
-    private AddMemberResult addPlayer(ProposedPlayer player) {
-        if (teamRepository.alreadyPlaying(player.getId(), key)) {
-            throw new AlreadyPlayingException(player.getId(), key);
-        }        
+    private URI invitePlayer(Integer id) {
+        return invitePlayer(teamRepository.findProposedPlayer(id));
+    }
+    
+    private URI invitePerson(EmailAddress email) {
+        return teamRepository.sendPersonInvite(email, admin, this, TeamMemberRole.PLAYER);        
+    }
+    
+    private void assertRosterNotFrozen() {
+        if (rosterFrozen) {
+            throw new RosterFrozenException();
+        }
+    }
+
+    private void vetPlayer(ProposedPlayer player) {
         ErrorReporter reporter = new ErrorReporter();
         if (!roster.isAcceptable(player, reporter)) {
             throw new RosterViolationException(key, reporter.getMessage());
-        }
-        if (admin.getId() == player.getId()) {
-            teamRepository.addTeamMemberRole(key, player.getId(), TeamMemberRole.PLAYER);
-            URI link = UriComponentsBuilder.fromUri(apiUrl).path("/members/{id}").buildAndExpand(player.getId()).toUri();
-            return AddMemberResult.confirmed(link);
-        } else {
-            return teamRepository.sendPlayerInvite(player, admin, this);
         }        
+    }
+
+    private URI invitePlayer(ProposedPlayer player) {
+        assertNotAlreadyPlaying(player.getId());
+        assertNotAlreadyInvited(player.getId());        
+        vetPlayer(player);
+        return teamRepository.sendPlayerInvite(player, admin, this);        
+    }
+
+    private void assertNotAlreadyPlaying(Integer id) {
+        if (teamRepository.alreadyPlaying(id, key)) {
+            throw new AlreadyPlayingException(id, key);
+        }        
+    }
+
+    private void assertNotAlreadyInvited(Integer id) {
+        // TODO
     }
 
     void setAdmin(Integer id, Name name, Integer number, String nickname, String slug) {

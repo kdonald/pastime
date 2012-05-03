@@ -13,20 +13,17 @@ public class TeamMemberInvite extends LinkedResource {
 
     private final String code;
     
-    private final String email;
-    
     private final TeamMemberRole role;
     
     private final Name name;
     
     private final DateTime sent;
 
-    public TeamMemberInvite(String code, String email, TeamMemberRole role, Name name, DateTime sent, Integer id, String username,
+    public TeamMemberInvite(String code, Name name, TeamMemberRole role, DateTime sent, Integer id, String username,
             URI teamUrl, URI siteUrl) {
         super(apiUrl(teamUrl, code));
         this.code = code;
         this.role = role;
-        this.email = email;
         this.name = name;
         this.sent = sent;
         addLink("picture", UriComponentsBuilder.fromUri(getUrl()).path("/picture").build().toUri());
@@ -39,18 +36,14 @@ public class TeamMemberInvite extends LinkedResource {
         return code;
     }
 
-    public String getEmail() {
-        return email;
+    public String getName() {
+        return name != null ? name.toString() : null;
     }
 
     public TeamMemberRole getRole() {
         return role;
     }
 
-    public String getName() {
-        return name != null ? name.toString() : null;
-    }
-    
     public DateTime getSent() {
         return sent;
     }

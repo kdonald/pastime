@@ -60,9 +60,8 @@ public class SeasonController {
     @Transactional
     public ResponseEntity<AddMemberResult> addMember(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @PathVariable("team") Integer number,
-            AddMemberForm playerForm, Principal principal) {
-        EditableTeam team = teamRepository.getTeamForEditing(new TeamKey(league, season, number), principal.getPlayerId());
-        AddMemberResult result = addMember(playerForm, team, principal);
+            AddMemberForm form, Principal principal) {
+        AddMemberResult result = teamRepository.addMember(form, new TeamKey(league, season, number), principal.getPlayerId());
         return created(result, result.getLink());       
     }
     
@@ -78,6 +77,13 @@ public class SeasonController {
         return teamRepository.findInvite(new TeamKey(league, season, team), code);
     }
 
+    @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.PUT, params="a")
+    @Authorized("teams")
+    public void answerInvite(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @PathVariable("team") Integer team,
+            @PathVariable("code") String code, @RequestParam("a") InviteAnswer answer, Principal principal) {
+        teamRepository.answerInvite(new TeamKey(league, season, team), code, answer, principal.getPlayerId());
+    }
+    
     @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.DELETE)
     @ResponseStatus(value=HttpStatus.NO_CONTENT)
     public @ResponseBody void cancelInvite(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @PathVariable("team") Integer team,
@@ -94,18 +100,6 @@ public class SeasonController {
     }
 
     // internal helpers
-
-    private AddMemberResult addMember(AddMemberForm playerForm, EditableTeam team, Principal principal) {
-        if (playerForm.getEmail() != null) {
-           return team.addPlayer(playerForm.createEmailAddress());
-        } else {
-           Integer id = playerForm.getId();
-           if (id == null) {
-               id = principal.getPlayerId();
-           }
-           return team.addPlayer(id);
-        }        
-    }
     
     private <T> ResponseEntity<T> created(T result, URI link) {
         return new ResponseEntity<T>(result, headers(link), HttpStatus.CREATED);        
