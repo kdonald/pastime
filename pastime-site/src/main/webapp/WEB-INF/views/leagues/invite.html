@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Pastime - Join a League</title>
+<title>Pastime - Answer Invite</title>
 <meta charset="utf-8" />
 <meta name="description" content="Join {{name}}" />
 <meta name="keywords" content="join, register, enroll, signup, {{name}}" />
@@ -33,20 +33,8 @@
     },
     priority : [ "common" ]
   });
-  require(["jquery", "leagues/join/join", "jquery-cors-patch"], function($, join) {
-    var season = {
-        name: '{{name}}',
-        start_date: '{{start_date}}',
-        roster_min: {{roster_min}},
-        roster_max: {{roster_max}},
-        league: {
-          id: {{league_id}}  
-        },
-        links: {
-        	teams: '{{apiUrl}}/leagues/{{league_id}}/seasons/{{number}}/teams'
-        }
-    };
-    var content = join(season);
+  require(["jquery", "leagues/invite/invite", "jquery-cors-patch"], function($, invite) {
+    var content = invite("{{inviteUrl}}");
     $(document).ready(function() {
       $("#main").html(content);      
     });

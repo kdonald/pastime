@@ -62,15 +62,20 @@ define(["pastime", "jquery", "mvc/view", "text!./add-player.html", "text!./add-p
           }
         };
         this.triggerPlayerAdded = function(result) {
-    			this.trigger("player-added", result);
-    		}.bind(this);
+          this.trigger("player-added", result);
+    	}.bind(this);
+    	this.clearSelectedPlayer = function() {
+    	  delete this.selectedPlayer;
+    	}.bind(this);
       },
       events: {
         "submit form": function(event) {
           if (this.selectedPlayer) {
         	  pastime.post(team.links["players"], {
         		  id: this.selectedPlayer.id,
-        	  }).done(this.triggerPlayerAdded);
+        	  })
+        	  .done(this.triggerPlayerAdded)
+        	  .done(this.clearSelectedPlayer);
           } else {
             if (this.model.value === "me") {
             	pastime.post(team.links["players"]).done(this.triggerPlayerAdded);

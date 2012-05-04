@@ -37,8 +37,7 @@ public class SeasonController {
     @Authorized("teams")
     public ResponseEntity<Object> createTeam(@PathVariable("league") Integer league,
             @PathVariable("season") Integer season, @Valid CreateTeamForm form, Principal principal) {
-        URI link = teamRepository.createTeam(new SeasonKey(league, season), form, principal.getPlayerId());        
-        return created(link);
+        return created(teamRepository.createTeam(new SeasonKey(league, season), form, principal.getPlayerId()));
     }
     
     @RequestMapping(value="/teams/{team}", method=RequestMethod.GET, produces="application/json")
@@ -77,11 +76,11 @@ public class SeasonController {
         return teamRepository.findInvite(new TeamKey(league, season, team), code);
     }
 
-    @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.PUT, params="a")
+    @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.POST, params="a")
     @Authorized("teams")
-    public void answerInvite(@PathVariable("league") Integer league, @PathVariable("season") Integer season, @PathVariable("team") Integer team,
-            @PathVariable("code") String code, @RequestParam("a") InviteAnswer answer, Principal principal) {
-        teamRepository.answerInvite(new TeamKey(league, season, team), code, answer, principal.getPlayerId());
+    public @ResponseBody ResponseEntity<Object> answerInvite(@PathVariable("league") Integer league, @PathVariable("season") Integer season,
+            @PathVariable("team") Integer team, @PathVariable("code") String code, @RequestParam("a") InviteAnswer answer, Principal principal) {
+        return createdIf(teamRepository.answerInvite(new TeamKey(league, season, team), code, answer, principal.getPlayerId()));
     }
     
     @RequestMapping(value="/teams/{team}/invites/{code}", method=RequestMethod.DELETE)
@@ -100,6 +99,10 @@ public class SeasonController {
     }
 
     // internal helpers
+
+    private ResponseEntity<Object> createdIf(URI link) {
+        return link != null ? created(link) : new ResponseEntity<Object>(HttpStatus.NO_CONTENT);        
+    }
     
     private <T> ResponseEntity<T> created(T result, URI link) {
         return new ResponseEntity<T>(result, headers(link), HttpStatus.CREATED);        

@@ -165,7 +165,7 @@ public class TeamRepository {
     }
 
     @Transactional
-    public void answerInvite(TeamKey team, String code, InviteAnswer answer, Integer playerId) {
+    public URI answerInvite(TeamKey team, String code, InviteAnswer answer, Integer playerId) {
         if (answer == null) {
             throw new IllegalArgumentException("answer cannot be null");
         }
@@ -178,12 +178,14 @@ public class TeamRepository {
         invite.assertInviteFor(playerId);
         if (answer == InviteAnswer.ACCEPT) {
             EditableTeam editableTeam = getTeamForEditing(team, invite.getSentBy());
-            editableTeam.addPlayer(playerId);
+            URI player = editableTeam.addPlayer(playerId);
             jdbcTemplate.update("UPDATE team_member_invites SET accepted = true, accepted_player = ?, answered_on = ? WHERE league = ? AND season = ? AND team = ? AND code = ?",
-                    playerId, new Date(), team.getLeague(), team.getSeason(), team.getNumber(), code);            
+                    playerId, new Date(), team.getLeague(), team.getSeason(), team.getNumber(), code);
+            return player;
         } else {
             jdbcTemplate.update("UPDATE team_member_invites SET answered_on = ? WHERE league = ? AND season = ? AND team = ? AND code = ?",
-                    new Date(), team.getLeague(), team.getSeason(), team.getNumber(), code);            
+                    new Date(), team.getLeague(), team.getSeason(), team.getNumber(), code);
+            return null;
         }
     }
     
@@ -336,7 +338,7 @@ public class TeamRepository {
     }
 
     private URI sendPersonInvite(final EmailAddress email, final TeamMember from, final EditableTeam team, TeamMemberRole role, Integer playerId) {
-        String code = inviteGenerator.generateKey();
+        final String code = inviteGenerator.generateKey();
         final URI inviteUrl = UriComponentsBuilder.fromUri(team.getApiUrl()).path("/invites/{code}").buildAndExpand(code).toUri();
         jdbcTemplate.update("INSERT INTO team_member_invites (league, season, team, email, role, code, first_name, last_name, sent_by, player) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 team.getLeague(), team.getSeason(), team.getNumber(), email.getValue(), TeamMemberRole.dbValue(role), code,
@@ -354,7 +356,7 @@ public class TeamRepository {
                model.put("sport", team.getSport());              
                model.put("teamUrl", team.getSiteUrl());
                model.put("team", team.getName());
-               model.put("inviteUrl", inviteUrl.toString());
+               model.put("inviteUrl", UriComponentsBuilder.fromUri(team.getSiteUrl()).queryParam("invite", code).buildAndExpand(code).toUri());
                invite.setText(templateLoader.getTemplate("teams/mail/player-invite").render(model), true);
             }
          };
