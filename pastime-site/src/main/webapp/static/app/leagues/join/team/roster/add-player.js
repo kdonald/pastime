@@ -34,11 +34,11 @@ define(["pastime", "jquery", "mvc/view", "text!./add-player.html", "text!./add-p
           template: addPlayerFormTemplate,
           events: {
             "submit": function() {
-        			pastime.post(team.links["players"], this.model)
-        				.done(self.triggerPlayerAdded)
-        				.done(function() {
-        					this.destroy();
-        				}.bind(this));
+              pastime.post(team.links["players"], this.model)
+                .done(self.triggerPlayerAdded)
+        		.done(function() {
+        		  this.destroy();
+        	    }.bind(this));
               return false;
             },
             "click button.cancel": function() {
@@ -54,11 +54,11 @@ define(["pastime", "jquery", "mvc/view", "text!./add-player.html", "text!./add-p
           self.collapsed = self.$("form").detach();
           self.root.append(form.render());
           if (/\S+@\S+\.\S+/.test(value)) {
-        	  form.model.email = value;
-        	  this.$("input[name=name]").focus();
+            form.model.email = value;
+            this.$("input[name=name]").focus();
           } else {
-        	  form.model.name = value;
-        	  this.$("input[name=email]").focus();        	  
+            form.model.name = value;
+            this.$("input[name=email]").focus();        	  
           }
         };
         this.triggerPlayerAdded = function(result) {
@@ -71,23 +71,23 @@ define(["pastime", "jquery", "mvc/view", "text!./add-player.html", "text!./add-p
       events: {
         "submit form": function(event) {
           if (this.selectedPlayer) {
-        	  pastime.post(team.links["players"], {
-        		  id: this.selectedPlayer.id,
-        	  })
-        	  .done(this.triggerPlayerAdded)
-        	  .done(this.clearSelectedPlayer);
+            pastime.post(team.links["players"], {
+              id: this.selectedPlayer.id,
+            })
+        	.done(this.triggerPlayerAdded)
+        	.done(this.clearSelectedPlayer);
           } else {
             if (this.model.value === "me") {
-            	pastime.post(team.links["players"]).done(this.triggerPlayerAdded);
+              pastime.post(team.links["players"]).done(this.triggerPlayerAdded);
             } else {
-            	this.expand(this.model.value);
+              this.expand(this.model.value);
             }
           }
           return false;
         } 
       }
     }).on("player-added", function() {
-    	this.model.value = "";        
+      this.model.value = "";        
     });
 
   };

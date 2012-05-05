@@ -27,6 +27,8 @@ public class TeamMemberInvite extends LinkedResource {
         this.name = name;
         this.sent = sent;
         addLink("picture", UriComponentsBuilder.fromUri(getUrl()).path("/picture").build().toUri());
+        addLink("accept", UriComponentsBuilder.fromUri(getUrl()).queryParam("a", InviteAnswer.ACCEPT).build().toUri());
+        addLink("decline", UriComponentsBuilder.fromUri(getUrl()).queryParam("a", InviteAnswer.DECLINE).build().toUri());
         if (id != null) {
             addLink("site", Player.site(siteUrl, id, username));
         }

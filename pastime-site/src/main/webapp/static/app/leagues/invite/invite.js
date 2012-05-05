@@ -1,6 +1,6 @@
-define(["pastime", "require", "jquery"], function(pastime, require, $) {
+define(["pastime", "require", "jquery", "mvc/view", "text!./answer.html"], function(pastime, require, $, view, answerTemplate) {
 
-  var module = function(url) {
+  var module = function(inviteLink) {
 
     var container = $("<div></div>", {
       id: "invite"
@@ -8,9 +8,22 @@ define(["pastime", "require", "jquery"], function(pastime, require, $) {
 
     var signin = pastime.signin(container);
     signin.done(function() {
-      var xhr = pastime.get(url);
+      var xhr = pastime.get(inviteLink);
       xhr.done(function(invite) {
-        console.log(invite);
+        container.html(view.create({
+          model: invite,
+          template: answerTemplate,
+          events: {
+            "click button[name=accept]": function() {
+              pastime.post(invite.links['accept']);
+              return false;
+            },
+            "click button[name=decline]": function() {
+              pastime.post(invite.links['decline']);              
+              return false;
+            }        
+          }
+        }).render());        
       });
     });
 
