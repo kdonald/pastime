@@ -1,20 +1,5 @@
-define([], function() {
-    
-  var mapPrototype = (function() {
-
-    function get(key) {
-      if (!this.data.hasOwnProperty(key)) {
-        this.data[key] = this.newValue();
-      }
-      return this.data[key];
-    }
+define(["collections/map"], function(map) {
   
-    return {
-      get: get
-    };
-
-  })();
-
   var observablePrototype = (function() {
 
     function on(event, listener) {
@@ -33,19 +18,15 @@ define([], function() {
     return {
       on: on,
       trigger: trigger
-    };
+    }
     
   })();
   
   return function(obj) {
-    var listeners = Object.create(mapPrototype, {
-      data: { value: {} },
-      newValue: { value: function() { return []; } }
-    });
     obj.on = observablePrototype.on;
     obj.trigger = observablePrototype.trigger;
-    obj.listeners = listeners;
+    obj.listeners = map.ofArrays();
     return obj;
-  };
-  
+  }
+
 });

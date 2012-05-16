@@ -71,7 +71,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
 
   function template(template, options) {
     var compiled = undefined;          
-    var renderOptions = {};            
+    var renderOptions = {};
     options = options || {};
     function initRenderOptions() {
       var helpers = Object.create(handlebars.helpers);
@@ -101,7 +101,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
       if (arg === "model") {
         value = model(value);
       } else if (arg === "template") {
-        value = template(value);
+        value = template(value, { helpers: args.helpers, partials: args.partials } );
       }
       props[arg] = { value: value }
     }
@@ -126,10 +126,15 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
         return this.root;
       }
   
-      function find(element) {
-        return this.root.find(element);
+      function find(selector) {
+        return this.root.find(selector);
       }
   
+      function append(view) {
+        this.root.append(view.render());
+        return this;
+      }
+      
       function destroy(result) {
         this.root.remove();
         this.trigger("destroy", result);
@@ -189,36 +194,65 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
           }
         }
         
-        var bindElements = view.root.find("[data-bind]");
-        bindElements.each(function(element) {
-          var element = $(this);
+        function bindList(element, view, propertyName, propertyValue) {
+          var appender = propertyValue.appender ? propertyValue.appender : function(item, list) { list.append(element); }
+          function addItem(item) {
+            var itemView = extend(propertyValue.itemView, { model: item });
+            var li = $("<li/>").attr("data-id", item.id).append(itemView.render());
+            appender.call(view, li, element);
+            view.trigger("itemAdded", {
+              item: li,
+              list: element,
+              property: propertyName
+            });    
+          }
+          propertyValue.source.forEach(function(item) {
+            addItem(item);
+          });
+          propertyValue.source.on("add", addItem);
+        }
+        
+        function setupBindings(element) {
           var propertyName = element.attr("data-bind");
           var propertyValue = postProcess(view.model[propertyName]);
           if (element.is("input")) {
             bindInput(element, view, propertyName, propertyValue);
           } else if (element.is("select")) {
             bindSelect(element, view, propertyName, propertyValue);
+          } else if (element.is("ul")) {
+            console.log("Binding list");
+            bindList(element, view, propertyName, propertyValue);
           } else {
             element.html(propertyValue);
             view.model.change(propertyName, function(newValue) {
               element.html(newValue);
             });
           }
+        };
+
+        if (view.root.attr("data-bind")) {
+          setupBindings(view.root);
+        }   
+        var bindElements = view.root.find("[data-bind]");
+        bindElements.each(function() {
+          setupBindings($(this));          
         });
+        
       }
   
       return {
         render: render,
         $: find,
+        append: append,        
         destroy: destroy,
         toString: toString
-      };
+      }
   
     })();
     
     return function(args) {
       return observable(Object.create(viewPrototype, props(args)));
-    };
+    }
     
   })();
 
