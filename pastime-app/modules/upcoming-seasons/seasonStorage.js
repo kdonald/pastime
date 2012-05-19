@@ -15,7 +15,7 @@ define(["jquery", "collections/list"], function($, list) {
        name: "Brevard Parks and Recreation",       
        logo: "/brevardparks/logo.png"
       },
-      link: "#/brevardparks/south-flag/2012-summer"
+      link: "/brevardparks/south-flag/2012-summer"
     })
     .add({
       id: 2,
@@ -31,7 +31,7 @@ define(["jquery", "collections/list"], function($, list) {
         name: "Brevard Parks and Recreation",      
         logo: "/brevardparks/logo.png"
       },
-      link: "#/brevardparks/south-indoor/2012-summer"       
+      link: "/brevardparks/south-indoor/2012-summer"       
     })
     .add({
       id: 3,
@@ -47,7 +47,7 @@ define(["jquery", "collections/list"], function($, list) {
         name: "City of Palm Bay",       
         logo: "/palmbay/logo.png"
       },
-      link: "#/palmbay/pony-softball/2012-fall"       
+      link: "/palmbay/pony-softball/2012-fall"       
     });
     
   return {

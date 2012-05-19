@@ -2,6 +2,9 @@ define(["observable"], function(observable) {
     
   var collectionPrototype = {
     add: function(obj) {
+      if (this.elements.indexOf(obj) != -1) {
+        throw new Error("Element already in list: potential memory leak detected");
+      }
       this.elements.push(obj);
       this.trigger("add", obj);
       return this;

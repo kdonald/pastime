@@ -3,7 +3,12 @@ define(["mvc", "text!./home.html", "upcoming-seasons/upcoming-seasons"], functio
     path: "/",
     template: template,
     init: function() {
-      this.root.append(upcomingSeasons.render());
+      this.append(upcomingSeasons);
+    },
+    events: {
+      "click": function() {
+        console.log("Home - Hello World!");
+      }
     }
   });
 });

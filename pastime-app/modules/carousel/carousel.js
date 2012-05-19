@@ -1,27 +1,30 @@
 define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.html", "jqueryui-carousel"], function(mvc, containerTemplate, carouselTemplate, emptyTemplate) {
   
-  var carousel = function(items) {
-    items.appender = function(item, list) {
+  var carouselPrototype = mvc.prototype({
+    template: carouselTemplate,
+    itemsAppender: function(item, list) {
       if (this.carousel) {
         this.carousel.rcarousel("append", item);
       } else {
         list.append(item);
       }
+    },
+    init: function() {
+      this.carousel = this.root.rcarousel({
+        visible: 1,
+        step: 1,
+        speed: 700,
+        auto: { enabled: true },
+        height: 150,
+        width: 470			  
+      });     
     }
-    return mvc.create({
-      id: "carousel",
-      template: carouselTemplate,
+  });
+  
+  var carousel = function(items, itemView) {
+    return mvc.create(carouselPrototype, {
       model: { items: items },
-      init: function() {
-        this.carousel = this.root.rcarousel({
-          visible: 1,
-          step: 1,
-          speed: 700,
-          auto: { enabled: true },
-          height: 150,
-          width: 470			  
-        });      
-      }
+      itemsView: itemView
     });
   }
   
@@ -29,58 +32,61 @@ define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.ht
     return mvc.create({
       id: "empty",
       template: emptyTemplate,
-      model: {
-        message: message
-      }
+      model: { message: message }
     });
   }
   
-  var container = mvc.create({ 
+  var containerPrototype = mvc.prototype({ 
     template: containerTemplate,
     init: function() {
-      this.initContent();
+      console.log("Carousel Container - Initializing");
+      if (this.items.size() > 0) {
+        this.carousel();
+      } else {
+        this.empty();
+      }
       this.subscribe();
     },
-    initContent: function() {
-      if (this.items.source.size()) {
-        this.initCarousel();
-      } else {
-        this.initEmpty();
-      }
-    },
-    initCarousel: function() {
-      this.content(carousel(this.items));
-    },
-    initEmpty: function() {
-      this.content(empty(this.emptyMessage));      
-    },
     subscribe: function() {
-      var self = this;
-      this.items.source.on("add", function(item) {
-        if (self.empty()) {
-          self.initCarousel();
-        }
+      this.items.listener(this).
+        on("add", function() {
+          if (this._content.id === "empty") {
+            this.carousel();
+          }          
+        })
+        .on("remove", function() {
+          if (this.items.size() == 0) {
+            this.empty();
+          }          
+        });
+      console.log("Registering items unsubscribe callback");
+      this.on("destroy", function(event) {
+        console.log("Carousel Container - Unsubscribing from items");
+        this.items.listener(this).off();
+        event.off();
       });      
+    },
+    carousel: function() {
+      this.content(carousel(this.items, this.itemView));
+    },
+    empty: function() {
+      this.content(empty(this.emptyMessage));      
     },
     content: function(content) {
       if (this._content) {
-        this._content.destroy();        
+        this._content.destroy();
       }
       this._content = content;
+      console.log("Appending content: " + content);
       this.append(this._content); 
-    },
-    empty: function() {
-      return this._content.id === "empty";
     }
   });
     
   return function(args) {
-    return mvc.extend(container, { 
+    return mvc.create(containerPrototype, { 
       model: { title: args.title },
-      items: { 
-        source: args.items, 
-        itemView: args.itemView,
-      },
+      items: args.items,
+      itemView: args.itemView,
       emptyMessage: args.emptyMessage
     });
   }

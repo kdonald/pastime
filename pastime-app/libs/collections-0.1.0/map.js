@@ -6,6 +6,12 @@ define([], function() {
         this.data[key] = this.newValue();
       }
       return this.data[key];
+    },
+    clear: function() {
+      console.log("Clearing data");
+      console.log(this.data);
+      this.data = {};
+      console.log(this.data);      
     }
   }
 

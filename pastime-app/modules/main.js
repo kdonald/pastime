@@ -8,22 +8,22 @@ require.config({
     "handlebars": "../libs/handlebars-1.0.0.beta6",
     "observable": "../libs/observable-0.1.0",  
     "mvc": "../libs/mvc-0.1.0",
-    "path": "../libs/path-0.8.4",
+    "page": "../libs/page-0.1.0",
     "router": "../libs/router-0.1.0",
     "text": "../libs/text-1.0.8"
   }
-});	  
-require(["router", "home/home", "dateformat"], function(router, home) {
+});
+require(["router", "home/home", "user/user", "dateformat"], function(router, home, user) {
   
   function addRoutes() {
     router.route(home);
-    router.defaultRoute(home);
+    router.route(user);
   }  
   
   function startListening() {
     $(document).ready(function() {
       router.listen();
-    });    
+    });
   }
   
   addRoutes();

@@ -2,6 +2,12 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
 
   var model = (function() {
     var modelPrototype = (function() {
+      function listener() {
+        return this;
+      }
+      function off() {
+        this.changeListeners = {};
+      }
       function change(property, listener) {
         if (this.changeListeners[property] === undefined) {
           this.changeListeners[property] = [];
@@ -9,7 +15,9 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
         this.changeListeners[property].push(listener);
       }
       return Object.create(Object.prototype, {
-        change: { value: change }
+        change: { value: change },
+        listener: { value: listener },
+        off: { value: off }
       });
     })();
     
@@ -89,11 +97,179 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
       return compiled(context, renderOptions);
     }
     render.toString = function() {
-      return "{ template: " + template + ", renderOptions: " + renderOptions + "}";
+      return template;
     };
     return render;
   }
   
+  var viewPrototype = (function() {
+
+    function render() {
+      if (!this.root) {
+        this.root = $(this.template(this.model));
+        if (this.events) {
+          attachEventHandlers(this);
+        }
+        if (this.model) {
+          attachDataBindings(this);            
+        }
+        this.subviews = [];          
+        if (this.init) {
+          this.init();
+        }
+      }
+      return this.root;
+    }
+
+    function find(selector) {
+      return this.root.find(selector);
+    }
+
+    function append(view) {
+      this.root.append(view.render());
+      this.subviews.push(view);
+      var cleanupSubview = function(event) {
+        console.log(this + " - Cleaning up subview: " + view);
+        var index = this.subviews.indexOf(view);
+        this.subviews.splice(index, 1);
+        event.off();
+      }.bind(this);
+      console.log("Registering cleanup subview callback");
+      view.on("destroy", cleanupSubview);    
+      return this;
+    }
+    
+    function destroy(result) {
+      if (!this.root) {
+        return;
+      }
+      this.subviews.forEach(function(view) {
+        view.destroy();
+      });
+      this.root.remove();
+      delete this.root;        
+      this.trigger("destroy", result);
+    }
+
+    function toString() {
+      return this.template.toString();
+    }
+
+    // internal
+
+    function attachEventHandlers(view) {
+      for (var eventDesc in view.events) {
+        var array = eventDesc.split(" ");
+        var event = array[0];
+        var source = array[1];
+        var handler = view.events[eventDesc].bind(view);
+        if (source) {
+          view.root.find(source).on(event, handler);
+        } else {
+          view.root.on(event, handler);
+        }
+      }
+    }
+
+    function attachDataBindings(view) {
+
+      function postProcess(value) {
+        return typeof value === "function" ? value.bind(view.model) : value;
+      }
+
+      function viewDirection(view, propertyName) {
+        view.model.listener(view).change(propertyName, function(newValue) {
+          element.val(newValue);
+        });
+      }
+      
+      function bindInput(element, view, propertyName, propertyValue) {
+        element.val(propertyValue);
+        viewDirection(element, propertyName);
+        element.change(function() {
+          view.model[propertyName] = element.val();
+        });
+      }
+      
+      function bindSelect(element, view, propertyName, propertyValue) {
+        var optionsSource = element.attr("data-options");
+        if (optionsSource) {
+          var optionsLoader = view.referenceData[optionsSource], deferred = $.Deferred();
+          deferred.done(function(options) {
+            options.forEach(function(option) {
+              var optionElement = $("<option></option>").attr("value", option.value).append(option.label);
+              if (option.value === propertyValue) {
+                optionElement.attr("selected", "selected");
+              }
+              optionElement.appendTo(element);
+            });
+          });
+          optionsLoader(deferred);
+        }
+      }
+      
+      function bindList(element, view, propertyName, propertyValue) {
+        var appender = view[propertyName + "Appender"] ? view[propertyName + "Appender"] : function(item, list) { list.append(element); }
+        function addItem(item) {
+          var itemView = create(view[propertyName + "View"], { model: item });
+          var li = $("<li/>").attr("data-id", item.id).append(itemView.render());
+          appender.call(view, li, element);
+        }
+        propertyValue.forEach(function(item) {
+          addItem(item);
+        });
+        propertyValue.listener(view).on("add", addItem);
+        console.log("Registering items list unsubscribe callback");
+        view.on("destroy", function(event) {
+          console.log(view + " - " + element[0] + " Binding - Unsubscribing from " + propertyName)
+          propertyValue.listener(view).off();
+          event.off();
+        });          
+      }
+      
+      function setupBindings(element) {
+        var propertyName = element.attr("data-bind");
+        var propertyValue = postProcess(view.model[propertyName]);
+        if (element.is("input")) {
+          bindInput(element, view, propertyName, propertyValue);
+        } else if (element.is("select")) {
+          bindSelect(element, view, propertyName, propertyValue);
+        } else if (element.is("ul")) {
+          bindList(element, view, propertyName, propertyValue);
+        } else {
+          element.html(propertyValue);
+          viewDirection(element, propertyName);
+        }
+      };
+
+      if (view.root.attr("data-bind")) {
+        setupBindings(view.root);
+      }
+      
+      var bindElements = view.root.find("[data-bind]");
+      bindElements.each(function() {
+        setupBindings($(this));          
+      });
+      
+      console.log("Registering model unsubscribe callback");
+      view.on("destroy", function(event) {
+        console.log(view + " - Unsubscribing from model");
+        view.model.listener(this).off();
+        event.off();          
+      });
+      
+    }
+
+    return {
+      render: render,
+      $: find,
+      append: append,        
+      destroy: destroy,
+      toString: toString
+    }
+
+  })();
+
   function props(args) {
     var props = {};
     for (var arg in args) {
@@ -108,161 +284,25 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
     return props;
   }
   
-  var create = (function() {
+  function prototype(args) {
+    return Object.create(viewPrototype, props(args));    
+  }
   
-    var viewPrototype = (function() {
-  
-      function render() {
-        if (!this.root) {
-          this.root = $(this.template(this.model));
-          if (this.events) {
-            attachEventHandlers(this);
-          }
-          attachDataBindings(this);
-          if (this.init) {
-            this.init();
-          }
-        }
-        return this.root;
-      }
-  
-      function find(selector) {
-        return this.root.find(selector);
-      }
-  
-      function append(view) {
-        this.root.append(view.render());
-        return this;
-      }
-      
-      function destroy(result) {
-        this.root.remove();
-        this.trigger("destroy", result);
-      }
-  
-      function toString() {
-        return "{ template: " + this.template + "], model: " + this.model + "}";
-      }
-  
-      // internal
-  
-      function attachEventHandlers(view) {
-        for (var eventDesc in view.events) {
-          var array = eventDesc.split(" ");
-          var event = array[0];
-          var source = array[1];
-          var handler = view.events[eventDesc].bind(view);
-          if (source) {
-            view.root.find(source).on(event, handler);
-          } else {
-            view.root.on(event, handler);
-          }
-        }
-      }
-  
-      function attachDataBindings(view) {
-  
-        function postProcess(value) {
-          return typeof value === "function" ? value.bind(view.model) : value;
-        }
-        
-        function bindInput(element, view, propertyName, propertyValue) {
-          element.val(propertyValue);
-          view.model.change(propertyName, function(newValue) {
-            element.val(newValue);
-          });
-          element.change(function() {
-            view.model[propertyName] = element.val();
-          });
-        }
-        
-        function bindSelect(element, view, propertyName, propertyValue) {
-          var optionsSource = element.attr("data-options");
-          if (optionsSource) {
-            var optionsLoader = view.referenceData[optionsSource], deferred = $.Deferred();
-            deferred.done(function(options) {
-              options.forEach(function(option) {
-                var optionElement = $("<option></option>").attr("value",
-                    option.value).append(option.label);
-                if (option.value === propertyValue) {
-                  optionElement.attr("selected", "selected");
-                }
-                optionElement.appendTo(element);
-              });
-            });
-            optionsLoader(deferred);
-          }
-        }
-        
-        function bindList(element, view, propertyName, propertyValue) {
-          var appender = propertyValue.appender ? propertyValue.appender : function(item, list) { list.append(element); }
-          function addItem(item) {
-            var itemView = extend(propertyValue.itemView, { model: item });
-            var li = $("<li/>").attr("data-id", item.id).append(itemView.render());
-            appender.call(view, li, element);
-            view.trigger("itemAdded", {
-              item: li,
-              list: element,
-              property: propertyName
-            });    
-          }
-          propertyValue.source.forEach(function(item) {
-            addItem(item);
-          });
-          propertyValue.source.on("add", addItem);
-        }
-        
-        function setupBindings(element) {
-          var propertyName = element.attr("data-bind");
-          var propertyValue = postProcess(view.model[propertyName]);
-          if (element.is("input")) {
-            bindInput(element, view, propertyName, propertyValue);
-          } else if (element.is("select")) {
-            bindSelect(element, view, propertyName, propertyValue);
-          } else if (element.is("ul")) {
-            console.log("Binding list");
-            bindList(element, view, propertyName, propertyValue);
-          } else {
-            element.html(propertyValue);
-            view.model.change(propertyName, function(newValue) {
-              element.html(newValue);
-            });
-          }
-        };
-
-        if (view.root.attr("data-bind")) {
-          setupBindings(view.root);
-        }   
-        var bindElements = view.root.find("[data-bind]");
-        bindElements.each(function() {
-          setupBindings($(this));          
-        });
-        
-      }
-  
-      return {
-        render: render,
-        $: find,
-        append: append,        
-        destroy: destroy,
-        toString: toString
-      }
-  
-    })();
-    
-    return function(args) {
-      return observable(Object.create(viewPrototype, props(args)));
+  function create() {
+    var prototype;
+    if (arguments.length === 2) {
+      prototype = arguments[0];
+      args = arguments[1];
+    } else {
+      prototype = viewPrototype;
+      args = arguments[0];
     }
-    
-  })();
-
-  var extend = function(view, args) {
-    return Object.create(view, props(args));
-  };
-
+    return observable(Object.create(prototype, props(args)));
+  }
+  
   return {
-    create: create,
-    extend: extend
+    prototype: prototype,
+    create: create
   };
     
 });
