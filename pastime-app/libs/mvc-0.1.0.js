@@ -129,12 +129,9 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
       this.root.append(view.render());
       this.subviews.push(view);
       var cleanupSubview = function(event) {
-        console.log(this + " - Cleaning up subview: " + view);
         var index = this.subviews.indexOf(view);
         this.subviews.splice(index, 1);
-        event.off();
       }.bind(this);
-      console.log("Registering cleanup subview callback");
       view.on("destroy", cleanupSubview);    
       return this;
     }
@@ -147,6 +144,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
         view.destroy();
       });
       this.root.remove();
+      this.off();
       delete this.root;        
       this.trigger("destroy", result);
     }
@@ -219,12 +217,9 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
           addItem(item);
         });
         propertyValue.listener(view).on("add", addItem);
-        console.log("Registering items list unsubscribe callback");
-        view.on("destroy", function(event) {
-          console.log(view + " - " + element[0] + " Binding - Unsubscribing from " + propertyName)
+        view.on("destroy", function() {
           propertyValue.listener(view).off();
-          event.off();
-        });          
+        }); 
       }
       
       function setupBindings(element) {
@@ -251,11 +246,8 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
         setupBindings($(this));          
       });
       
-      console.log("Registering model unsubscribe callback");
       view.on("destroy", function(event) {
-        console.log(view + " - Unsubscribing from model");
         view.model.listener(this).off();
-        event.off();          
       });
       
     }

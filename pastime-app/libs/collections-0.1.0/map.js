@@ -8,10 +8,9 @@ define([], function() {
       return this.data[key];
     },
     clear: function() {
-      console.log("Clearing data");
-      console.log(this.data);
-      this.data = {};
-      console.log(this.data);      
+      for (var key in this.data) {
+        delete this.data[key];
+      }
     }
   }
 

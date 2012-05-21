@@ -9,30 +9,18 @@ define(["collections/map"], function(map) {
     function on(event, listener) {
       var eventListeners = this.listeners.get(event);
       eventListeners.push(listener);
-      if ("destroy" === event) {
-        console.log(this + ":" + event + ": " + eventListeners.length);        
-      }
       return this;
     }
 
     function off() {
-      this.listeners = map.ofArrays();
+      this.listeners.clear();
       return this;
     }
 
     function trigger(event, args) {
-      var offs = [], self = this, listeners = this.listeners.get(event);
+      var self = this, listeners = this.listeners.get(event);
       listeners.forEach(function(listener) {
-        var off = function() {
-          console.log("off called");
-          offs.push(listener);
-        }
-        listener.call(self, { off: off, args: args });
-      });
-      offs.forEach(function(listener) {
-        var index = listeners.indexOf(listener);
-        console.log("removing listener " + index);
-        listeners.splice(index, 1);
+        listener.call(self, args);
       });
       return this;
     }

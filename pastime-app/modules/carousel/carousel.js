@@ -39,7 +39,6 @@ define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.ht
   var containerPrototype = mvc.prototype({ 
     template: containerTemplate,
     init: function() {
-      console.log("Carousel Container - Initializing");
       if (this.items.size() > 0) {
         this.carousel();
       } else {
@@ -59,11 +58,8 @@ define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.ht
             this.empty();
           }          
         });
-      console.log("Registering items unsubscribe callback");
       this.on("destroy", function(event) {
-        console.log("Carousel Container - Unsubscribing from items");
         this.items.listener(this).off();
-        event.off();
       });      
     },
     carousel: function() {
@@ -77,7 +73,6 @@ define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.ht
         this._content.destroy();
       }
       this._content = content;
-      console.log("Appending content: " + content);
       this.append(this._content); 
     }
   });
