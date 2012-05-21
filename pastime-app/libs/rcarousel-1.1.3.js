@@ -605,7 +605,6 @@ define('jqueryui/carousel', ['jquery', 'jqueryui/core', 'jqueryui/widget'], func
 
   			$root
   				.animate(_animOpts, options.speed, function() {
-  				  console.log("animating");
   				  
   					self._removeOldElements( "first", _page.length );
 
