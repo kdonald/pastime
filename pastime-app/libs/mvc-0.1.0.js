@@ -214,6 +214,8 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
           appender.call(view, li, element);
         }
         function removeItem(item) {
+          console.log("Removing item: " + item.id);
+          element.find("li[data-id='" + item.id + "']").remove();
         }        
         propertyValue.forEach(function(item) {
           addItem(item);

@@ -17,7 +17,7 @@ define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.ht
         auto: { enabled: true },
         height: 150,
         width: 470			  
-      });     
+      });
     }
   });
   

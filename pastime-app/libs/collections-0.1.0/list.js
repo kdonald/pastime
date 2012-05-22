@@ -6,6 +6,11 @@ define(["observable"], function(observable) {
       this.trigger("add", obj);
       return this;
     },
+    remove: function(index) {
+      var obj = this.elements.splice(index, 1);
+      this.trigger("remove", obj[0]);
+      return this;
+    },
     forEach: function(callback) {
       this.elements.forEach(callback);
       return this;
