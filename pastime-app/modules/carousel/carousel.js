@@ -45,21 +45,22 @@ define(["mvc", "text!./container.html", "text!./carousel.html", "text!./empty.ht
         this.empty();
       }
       this.subscribe();
+      window.items = this.items;
     },
     subscribe: function() {
-      this.items.listener(this).
+      this.items.observer(this).
         on("add", function() {
           if (this._content.id === "empty") {
             this.carousel();
           }          
         })
         .on("remove", function() {
-          if (this.items.size() == 0) {
+          if (this.items.size() === 0) {
             this.empty();
           }          
         });
-      this.on("destroy", function(event) {
-        this.items.listener(this).off();
+      this.on("destroy", function() {
+        this.items.observer(this).off();
       });      
     },
     carousel: function() {

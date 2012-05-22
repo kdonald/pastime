@@ -2,7 +2,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
 
   var model = (function() {
     var modelPrototype = (function() {
-      function listener() {
+      function observer() {
         return this;
       }
       function off() {
@@ -16,7 +16,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
       }
       return Object.create(Object.prototype, {
         change: { value: change },
-        listener: { value: listener },
+        observer: { value: observer },
         off: { value: off }
       });
     })();
@@ -144,9 +144,9 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
         view.destroy();
       });
       this.root.remove();
-      this.off();
       delete this.root;        
       this.trigger("destroy", result);
+      this.off();      
     }
 
     function toString() {
@@ -176,7 +176,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
       }
 
       function viewDirection(view, propertyName) {
-        view.model.listener(view).change(propertyName, function(newValue) {
+        view.model.observer(view).change(propertyName, function(newValue) {
           element.val(newValue);
         });
       }
@@ -213,12 +213,15 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
           var li = $("<li/>").attr("data-id", item.id).append(itemView.render());
           appender.call(view, li, element);
         }
+        function removeItem(item) {
+        }        
         propertyValue.forEach(function(item) {
           addItem(item);
         });
-        propertyValue.listener(view).on("add", addItem);
+        propertyValue.observer(view).on("add", addItem);
+        propertyValue.observer(view).on("remove", removeItem);        
         view.on("destroy", function() {
-          propertyValue.listener(view).off();
+          propertyValue.observer(view).off();
         }); 
       }
       
@@ -247,7 +250,7 @@ define([ "observable", "jquery", "handlebars" ], function(observable, $, handleb
       });
       
       view.on("destroy", function(event) {
-        view.model.listener(this).off();
+        view.model.observer(this).off();
       });
       
     }

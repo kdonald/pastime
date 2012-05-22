@@ -3,7 +3,7 @@ define([], function() {
   var mapPrototype = {
      get: function(key) {
       if (!this.data.hasOwnProperty(key)) {
-        this.data[key] = this.newValue();
+        this.data[key] = this.newValue(key);
       }
       return this.data[key];
     },
